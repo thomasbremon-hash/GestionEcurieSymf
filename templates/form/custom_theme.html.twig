@@ -1,0 +1,9 @@
+{% block form_errors %}
+  {% if (errors|length) > 0 %}
+    <ul class="form-errors">
+      {% for error in errors %}
+        <li class="form-error-item help is-danger">{{ error.message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
