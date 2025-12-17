@@ -62,9 +62,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Entreprise::class, inversedBy: 'users')]
     private Collection $entreprise;
 
+    /**
+     * @var Collection<int, Cheval>
+     */
+    #[ORM\OneToMany(targetEntity: Cheval::class, mappedBy: 'proprietaire')]
+    private Collection $chevals;
+
     public function __construct()
     {
         $this->entreprise = new ArrayCollection();
+        $this->chevals = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -252,6 +259,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeEntreprise(Entreprise $entreprise): static
     {
         $this->entreprise->removeElement($entreprise);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cheval>
+     */
+    public function getChevals(): Collection
+    {
+        return $this->chevals;
+    }
+
+    public function addCheval(Cheval $cheval): static
+    {
+        if (!$this->chevals->contains($cheval)) {
+            $this->chevals->add($cheval);
+            $cheval->setProprietaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCheval(Cheval $cheval): static
+    {
+        if ($this->chevals->removeElement($cheval)) {
+            // set the owning side to null (unless already changed)
+            if ($cheval->getProprietaire() === $this) {
+                $cheval->setProprietaire(null);
+            }
+        }
 
         return $this;
     }

@@ -7,7 +7,7 @@
     <title>Famms | BackOffice</title>
 
     <!-- Bulma is included -->
-    <link rel="stylesheet" href="{{ asset('/assets/css/main.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/main.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/main.min.css') }}" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
@@ -56,37 +56,55 @@
             </span>
           </div>
         </div>
-
+        {% set currentPath = app.request.attributes.get('_route') %}
         <div class="menu is-menu-main">
           <p class="menu-label">General</p>
           <ul class="menu-list">
             <li>
-              <a href="{{ path('app_admin') }}" class="has-icon">
-                <span class="icon"><i class="mdi mdi-desktop-mac"></i></span>
-                <span class="menu-item-label">Dashboard</span>
+              <a href="{{ path('app_admin') }}" class="{% if currentPath == 'app_admin' %}{% endif %}has-icon">
+                <span class="icon {% if currentPath == 'app_admin' %}{% endif %}"><i class="mdi mdi-desktop-mac"></i></span>
+                <span class="menu-item-label">Tableau de bord</span>
               </a>
             </li>
           </ul>
           <p class="menu-label">MENU</p>
           <ul class="menu-list">
             <li>
-              <a href="{{ path('app_admin_users') }}" class="has-icon">
-                <span class="icon has-update-mark"><span class="mdi mdi-account-circle"></span></span>
+              <a href="{{ path('app_admin_users') }}" class="{% if currentPath == 'app_admin_users' %}{% endif %} has-icon">
+                <span class="icon"><span class="mdi mdi-account-circle"></span></span>
                 <span class="menu-item-label">Utilisateurs</span>
               </a>
             </li>
             <li>
-              <a href="" class="has-icon">
-                <span class="icon"><span class="mdi mdi-sheep"></span></span>
-                <span class="menu-item-label">Entreprise</span>
+              <a href="{{ path('app_admin_entreprises') }}" class="has-icon">
+                <span class="icon"><span class="mdi mdi-domain"></span></span>
+                <span class="menu-item-label">Entreprises</span>
               </a>
             </li>
             <li>
-              <a href="" class="has-icon">
-                <span class="icon"><i class="mdi mdi-account-circle"></i></span>
-                <span class="menu-item-label">Chevaux</span>
+              <a href="#" class="has-icon is-flex is-align-items-center" id="toggleChevauxCourses" style="justify-content: space-between;">
+                <span class="is-flex is-align-items-center">
+                  <span class="icon"><i class="mdi mdi-horseshoe"></i></span>
+                  <span class="menu-item-label">Chevaux & Courses</span>
+                </span>
+                <span class="icon"><i class="mdi mdi-chevron-down" id="chevauxCoursesArrow"></i></span>
               </a>
+              <ul class="submenu" style="display: none;">
+                <li>
+                  <a href="{{ path('app_admin_chevaux') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-chess-knight"></i></span>
+                    <span>Chevaux</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ path('app_admin_courses') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-flag-checkered"></i></span>
+                    <span>Courses</span>
+                  </a>
+                </li>
+              </ul>
             </li>
+
             <li>
               <a href="{{ path('app_home') }}" title="Log out" class="has-icon">
                 <span class="icon"><i class="mdi mdi-logout"></i></span>

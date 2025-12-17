@@ -3,27 +3,39 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Entity\Cheval;
+use App\Entity\Entreprise;
+use App\Repository\ChevalRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 
 class RegistrationFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('email')
-            ->add('roles', ChoiceType::class, [
+        $isEdit = $options['is_edit'] ?? false;
 
+        $builder
+            ->add('email', EmailType::class, [
+                'attr' => [
+                    'class' => 'input',
+                    'placeholder' => 'Entrez votre email',
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre email'])
+                ],
+            ])
+            ->add('roles', ChoiceType::class, [
+                'label' => 'Rôles',
                 'choices' => [
                     'Utilisateur' => 'ROLE_USER',
                     'Administrateur' => 'ROLE_ADMIN',
@@ -32,91 +44,131 @@ class RegistrationFormType extends AbstractType
                     'Comptabilité' => 'ROLE_COMPTABILITE',
                 ],
                 'multiple' => true,
-                'expanded' => true, // des cases à cocher
+                'expanded' => true, // cases à cocher
+
             ])
-            ->add('password', RepeatedType::class, [
-                'type' => PasswordType::class,
-                'required' => false,
-                'first_options' => ['label' => 'Mot de passe'],
-                'second_options' => ['label' => 'Confirmez le mot de passe'],
-                'invalid_message' => 'Les mots de passe ne correspondent pas.',
+            ->add('prenom', TextType::class, [
+                'label' => 'Prénom',
+                'attr' => [
+                    'class' => 'input',
+                    'placeholder' => 'Entrez votre prénom',
+                ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer un mot de passe',
-                    ]),
+                    new NotBlank(['message' => 'Veuillez entrer votre prénom'])
+                ]
+            ])
+            ->add('nom', TextType::class, [
+                'label' => 'Nom',
+                'attr' => [
+                    'class' => 'input',
+                    'placeholder' => 'Entrez votre nom',
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre nom'])
+                ]
+            ])
+            ->add('rue', TextType::class, [
+                'label' => 'Rue',
+                'attr' => [
+                    'class' => 'input',
+                    'placeholder' => 'Entrez votre rue',
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre rue'])
+                ]
+            ])
+            ->add('ville', TextType::class, [
+                'label' => 'Ville',
+                'attr' => [
+                    'class' => 'input',
+                    'placeholder' => 'Entrez votre ville',
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre ville'])
+                ]
+            ])
+            ->add('cp', TextType::class, [
+                'label' => 'Code postal',
+                'attr' => [
+                    'class' => 'input',
+                    'placeholder' => 'Entrez votre code postal',
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre code postal'])
+                ]
+            ])
+            ->add('pays', TextType::class, [
+                'label' => 'Pays',
+                'attr' => [
+                    'class' => 'input',
+                    'placeholder' => 'Entrez votre pays',
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre pays'])
+                ]
+            ])
+            ->add('entreprise', EntityType::class, [
+                'class' => Entreprise::class,
+                'choice_label' => function (Entreprise $entreprise) {
+                    return $entreprise->getNom();
+                },
+                'multiple' => true,
+                'expanded' => true,
+                'label' => 'Entreprises',
+                'required' => false,
+            ])
+            ->add('chevals', EntityType::class, [
+                'class' => Cheval::class,
+                'choice_label' => 'nom',
+                'multiple' => true,
+                'expanded' => true,
+                'required' => false,
+                'query_builder' => function (ChevalRepository $cr) use ($options) {
+                    $userId = $options['data']->getId(); // null si création
+                    $qb = $cr->createQueryBuilder('c')
+                        ->where('c.proprietaire IS NULL'); // chevaux libres
+
+                    if ($userId) {
+                        $qb->orWhere('c.proprietaire = :userId')
+                            ->setParameter('userId', $userId); // chevaux déjà assignés à cet user
+                    }
+
+                    return $qb;
+                },
+            ]);
+
+
+
+        // Ajouter le champ mot de passe uniquement si on crée un utilisateur
+        if (!$isEdit) {
+            $builder->add('password', PasswordType::class, [
+                'label' => 'Mot de passe',
+                'attr' => [
+                    'class' => 'input',
+                    'placeholder' => 'Entrez votre mot de passe',
+                ],
+                'required' => true,
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer un mot de passe']),
                     new Length([
                         'min' => 8,
                         'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
                         'max' => 4096,
                     ]),
                     new Regex([
-                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
-                        'message' => 'Votre mot de passe doit contenir au moins une lettre majuscule, une minuscule, un chiffre, et un caractère spécial.',
+                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/i',
+                        'message' => 'Votre mot de passe doit contenir au moins une lettre majuscule, une minuscule, un chiffre et un caractère spécial.'
                     ]),
                 ],
-            ])
-
-            ->add('prenom', TextType::class, [
-                'label' => 'Prénom',
-                'required' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer votre prénom'
-                    ])
-                ]
-            ])
-            ->add('nom', TextType::class, [
-                'label' => 'Nom',
-                'required' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer votre nom'
-                    ])
-                ]
-            ])
-            ->add('rue', TextType::class, [
-                'label' => 'Rue',
-                'required' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer votre rue'
-                    ])
-                ]
-            ])
-            ->add('ville', TextType::class, [
-                'label' => 'Ville',
-                'required' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer votre ville'
-                    ])
-                ]
-            ])
-            ->add('cp', TextType::class, [
-                'label' => 'Code postal',
-                'required' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer votre code postal'
-                    ])
-                ]
-            ])
-            ->add('pays', TextType::class, [
-                'label' => 'Pays',
-                'required' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez entrer votre pays'
-                    ])
-                ]
-            ])
-        ;
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'is_edit' => false, // option personnalisée
         ]);
     }
 }

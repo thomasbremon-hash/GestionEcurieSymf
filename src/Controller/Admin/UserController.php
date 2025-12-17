@@ -3,17 +3,19 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
+use App\Entity\Cheval;
 use App\Form\UserType;
+use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-
+#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/user')]
 final class UserController extends AbstractController
 {
@@ -24,6 +26,7 @@ final class UserController extends AbstractController
         $this->em = $em;
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route(name: 'app_admin_users')]
     public function index(UserRepository $userRepository): Response
     {
@@ -32,39 +35,57 @@ final class UserController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_user_new')]
     #[Route('/update/{id}', name: 'app_admin_user_update')]
-    public function new(Request $request, ?User $user): Response
+    public function new(Request $request, UserPasswordHasherInterface $passwordHasher, ?User $user): Response
     {
+        $isEdit = $user !== null;
+
         if (!$user) {
             $user = new User();
         }
 
-        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form = $this->createForm(RegistrationFormType::class, $user, [
+            'is_edit' => $isEdit
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $txt = 'modifié';
-            if (!$user->getId()) {
-                $txt = 'enregistrée';
-                $user->setCreatedAt(new \DateTimeImmutable());
+            $nouveauxChevaux = $user->getChevals();
+            $chevauxAvant = $this->em->getRepository(Cheval::class)->findBy(['proprietaire' => $user]);
+
+            foreach ($chevauxAvant as $cheval) {
+                if (!$nouveauxChevaux->contains($cheval)) {
+                    $cheval->setProprietaire(null);
+                    $this->em->persist($cheval);
+                }
+            }
+
+            foreach ($nouveauxChevaux as $cheval) {
+                $cheval->setProprietaire($user);
+                $this->em->persist($cheval);
             }
 
             $this->em->persist($user);
             $this->em->flush();
 
-            $this->addFlash('success', "L'utilisateur' a été $txt !");
+
+            $txt = $isEdit ? 'modifié' : 'enregistré';
+            $this->addFlash('success', "L'utilisateur a été $txt avec succès !");
 
             return $this->redirectToRoute('app_admin_users');
         }
 
-        return $this->render('admin/user/form.html.twig', [
-            'formUser' => $user,
-            'userId' => $user->getId(),
+        return $this->render('admin/user/user.form.html.twig', [
+            'formUser' => $form,
+            'userId' => $user->getId()
         ]);
     }
 
+
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'app_admin_user_show')]
     public function show(User $user): Response
     {
@@ -74,17 +95,18 @@ final class UserController extends AbstractController
     }
 
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/delete/{id}', name: 'app_admin_user_delete')]
-    public function adminCategoryRemove(?User $user, Request $request, UserRepository $userRepository)
+    public function adminCategoryRemove(?User $user)
     {
         if (!$user->getEntreprise()->isEmpty()) {
 
-            $this->addFlash('danger', "Impossible de supprimer l'utilisateur ' " . $user->getNom() . " car il est affilié à une entreprise !");
-            return $this->redirectToRoute('app_admin_user');
+            $this->addFlash('danger', "Impossible de supprimer l'utilisateur " . $user->getPrenom() . " " . $user->getPrenom() . " car il est affilié à une entreprise !");
+            return $this->redirectToRoute('app_admin_users');
         }
         $this->em->remove($user);
         $this->em->flush();
-        $this->addFlash('success', "L'utilisateur ' " . $user->getNom() . " a bien été supprimée !");
-        return $this->redirectToRoute('app_admin_user');
+        $this->addFlash('success', "L'utilisateur " . $user->getPrenom() . " " . $user->getPrenom() . " a bien été supprimée !");
+        return $this->redirectToRoute('app_admin_users');
     }
 }

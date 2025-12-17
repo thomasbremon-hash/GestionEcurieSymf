@@ -1,0 +1,118 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Ajouter un cheval
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>BackOffice</li>
+            <li>Chevaux</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><span class="mdi mdi-horse"></span></span>
+          {% if chevalId is not null %}
+            Modifier
+          {% else %}
+            Ajouter
+          {% endif %}un cheval
+        </p>
+      </header>
+
+      <div class="card-content">
+        {{ form_start(formCheval) }}
+
+        {# NOM / RACE #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Nom / Race</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formCheval.nom) }}
+              <p class="control is-expanded">{{ form_widget(formCheval.nom) }}</p>
+              {{ form_errors(formCheval.nom) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formCheval.race) }}
+              <p class="control is-expanded">{{ form_widget(formCheval.race) }}</p>
+              {{ form_errors(formCheval.race) }}
+            </div>
+          </div>
+        </div>
+
+        {# SEXE / DATE NAISSANCE #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Sexe / Date de naissance</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formCheval.sexe) }}
+              <p class="control is-expanded">
+                <div class="select is-fullwidth">{{ form_widget(formCheval.sexe) }}</div>
+              </p>
+              {{ form_errors(formCheval.sexe) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formCheval.dateNaissance) }}
+              <p class="control is-expanded">{{ form_widget(formCheval.dateNaissance) }}</p>
+              {{ form_errors(formCheval.dateNaissance) }}
+            </div>
+          </div>
+        </div>
+
+        {# PROPRIÉTAIRE #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Propriétaire</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded">
+                <div class="select is-fullwidth">{{ form_widget(formCheval.proprietaire) }}</div>
+              </p>
+              {{ form_errors(formCheval.proprietaire) }}
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        {# BOUTON #}
+        <div class="field is-horizontal">
+          <div class="field-label"></div>
+          <div class="field-body">
+            <div class="field">
+              <div class="buttons">
+                <button type="submit" class="button is-primary">
+                  {% if chevalId %}
+                    Modifier
+                  {% else %}
+                    Ajouter
+                  {% endif %}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_end(formCheval) }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

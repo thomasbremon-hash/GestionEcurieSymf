@@ -1,6 +1,6 @@
 {% extends 'layouts/base.admin.html.twig' %}
 {% block title %}
-  BackOffice | Liste utilisateur
+  BackOffice | Liste entreprise
 {% endblock %}
 
 {% block body %}
@@ -10,12 +10,12 @@
         <div class="level-item">
           <ul>
             <li>Admin</li>
-            <li>Utilisateur</li>
+            <li>Cheval</li>
           </ul>
         </div>
       </div>
       <div class="level-right">
-        <a href="{{ path('app_admin_user_new') }}" class="button is-small is-primary">
+        <a href="{{ path('app_admin_cheval_new') }}" class="button is-small is-primary">
           <span>Ajouter</span>
           <span class="icon"><i class="mdi mdi-plus"></i></span>
         </a>
@@ -36,7 +36,7 @@
       <header class="card-header">
         <p class="card-header-title">
           <span class="icon"><span class="mdi mdi-shopping-outline"></span></span>
-          {{ users|length }} Utilisateurs
+          {{ chevaux|length }} Chevaux
         </p>
         <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
       </header>
@@ -47,65 +47,30 @@
               <thead>
                 <tr>
                   <th>Nom</th>
-                  <th>Prenom</th>
-                  <th>Email</th>
-                  <th>Rue</th>
-                  <th>Ville</th>
-                  <th>Code postal</th>
-                  <th>Pays</th>
-                  <th>Roles</th>
-                  <th>Entreprises</th>
-                  <th>Chevaux</th>
-                  <th>Enregistré le</th>
-
+                  <th>Race</th>
+                  <th>Sexe</th>
+                  <th>Date de naissance</th>
+                  <th>Propriétaire</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {% for item in users %}
+                {% for item in chevaux %}
                   <tr>
                     <td data-label="Description">{{ item.nom }}</td>
-                    <td data-label="Description">{{ item.prenom }}</td>
-                    <td data-label="Description">{{ item.email }}</td>
-                    <td data-label="Description">{{ item.rue }}</td>
-                    <td data-label="Description">{{ item.ville }}</td>
-                    <td data-label="Description">{{ item.cp }}</td>
-                    <td data-label="Description">{{ item.pays }}</td>
-                    <td data-label="Roles">
-                      {% for role in item.roles %}
-                        {% if role == 'ROLE_ADMIN' %}
-                          <span class="tag is-danger">Admin</span>
-                        {% elseif role == 'ROLE_USER' %}
-                          <span class="tag is-info">User</span>
-                        {% elseif role == 'ROLE_CLIENT' %}
-                          <span class="tag is-info">Client</span>
-                        {% elseif role == 'ROLE_GESTIONNAIRE' %}
-                          <span class="tag is-info">Gestionnaire</span>
-                        {% elseif role == 'ROLE_COMPTABILITE' %}
-                          <span class="tag is-info">Comptabilité</span>
-                        {% endif %}
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% for entreprise in item.entreprise %}
-                        <span class="tag is-info">{{ entreprise.nom }}</span>{% if not loop.last %}{% endif %}
-                      {% else %}
-                        Aucune
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% for cheval in item.chevals %}
-                        <span class="tag is-info">{{ cheval.nom }}</span>{% if not loop.last %}{% endif %}
+                    <td data-label="Description">{{ item.race }}</td>
+                    <td data-label="Description">{{ item.sexe }}</td>
+                    <td data-label="Description">{{ item.dateNaissance ? item.dateNaissance|date('d/m/Y') : 'N/A' }}</td>
+                    <td data-label="Propriétaire">
+                      {% if item.proprietaire %}
+                        <span class="tag is-info">{{ item.proprietaire.prenom }} {{ item.proprietaire.nom }}</span>
                       {% else %}
                         Aucun
-                      {% endfor %}
-                    </td>
-                    <td data-label="Enregistré le">
-                      <small class="has-text-grey is-abbr-like" title="{{ item.createdAt|date('d M Y') }}">{{ item.createdAt|date('d M Y') }}</small>
+                      {% endif %}
                     </td>
                     <td class="is-actions-cell">
                       <div class="buttons is-right">
-                        <a href="{{ path('app_admin_user_update', { id: item.id }) }}" class="button is-small is-primary" type="button"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
+                        <a href="{{ path('app_admin_cheval_update', { id: item.id }) }}" class="button is-small is-primary" type="button"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
                         <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
                       </div>
                     </td>
@@ -118,11 +83,11 @@
                         <button class="delete jb-modal-close" aria-label="close"></button>
                       </header>
                       <section class="modal-card-body">
-                        <p>Voulez-vous vraiment supprimer l'utilisateur ?</p>
+                        <p>Voulez-vous vraiment supprimer le cheval ?</p>
                       </section>
                       <footer class="modal-card-foot">
                         <button class="button jb-modal-close">Annuler</button>
-                        <a href="{{ path('app_admin_user_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
+                        <a href="{{ path('app_admin_cheval_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
                       </footer>
                     </div>
                     <button class="modal-close is-large jb-modal-close" aria-label="close"></button>

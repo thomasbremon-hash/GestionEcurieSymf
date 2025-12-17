@@ -1,0 +1,137 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Ajouter une entreprise
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>BackOffice</li>
+            <li>Entreprises</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><span class="mdi mdi-office-building"></span></span>
+          {% if entrepriseId is not null %}
+            Modifier
+          {% else %}
+            Ajouter
+          {% endif %}une entreprise
+        </p>
+      </header>
+      <div class="card-content">
+        {{ form_start(formEntreprise) }}
+
+        {# Nom / Rue #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Nom / Rue</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formEntreprise.nom) }}
+              <p class="control is-expanded">{{ form_widget(formEntreprise.nom) }}</p>
+              {{ form_errors(formEntreprise.nom) }}
+            </div>
+            <div class="field">
+              {{ form_label(formEntreprise.rue) }}
+              <p class="control is-expanded">{{ form_widget(formEntreprise.rue) }}</p>
+              {{ form_errors(formEntreprise.rue) }}
+            </div>
+          </div>
+        </div>
+
+        {# Ville / Code postal #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Ville / Code postal</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formEntreprise.ville) }}
+              <p class="control is-expanded">{{ form_widget(formEntreprise.ville) }}</p>
+              {{ form_errors(formEntreprise.ville) }}
+            </div>
+            <div class="field">
+              {{ form_label(formEntreprise.cp) }}
+              <p class="control is-expanded">{{ form_widget(formEntreprise.cp) }}</p>
+              {{ form_errors(formEntreprise.cp) }}
+            </div>
+          </div>
+        </div>
+
+        {# Pays / Téléphone #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Pays / Téléphone</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formEntreprise.pays) }}
+              <p class="control is-expanded">{{ form_widget(formEntreprise.pays) }}</p>
+              {{ form_errors(formEntreprise.pays) }}
+            </div>
+            <div class="field">
+              {{ form_label(formEntreprise.telephone) }}
+              <p class="control is-expanded">{{ form_widget(formEntreprise.telephone) }}</p>
+              {{ form_errors(formEntreprise.telephone) }}
+            </div>
+          </div>
+        </div>
+
+        {# SIREN / SIRET #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">SIREN / SIRET</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formEntreprise.siren) }}
+              <p class="control is-expanded">{{ form_widget(formEntreprise.siren) }}</p>
+              {{ form_errors(formEntreprise.siren) }}
+            </div>
+            <div class="field">
+              {{ form_label(formEntreprise.siret) }}
+              <p class="control is-expanded">{{ form_widget(formEntreprise.siret) }}</p>
+              {{ form_errors(formEntreprise.siret) }}
+            </div>
+          </div>
+        </div>
+
+        {# Bouton de soumission #}
+        <hr />
+        <div class="field is-horizontal">
+          <div class="field-label"></div>
+          <div class="field-body">
+            <div class="field">
+              <div class="field is-grouped">
+                <div class="control">
+                  <button type="submit" class="button is-primary">
+                    {% if entrepriseId is not null %}
+                      Modifier
+                    {% else %}
+                      Ajouter
+                    {% endif %}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_end(formEntreprise) }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

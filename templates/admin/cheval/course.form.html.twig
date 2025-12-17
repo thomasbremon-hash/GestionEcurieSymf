@@ -1,0 +1,118 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Ajouter une course
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>BackOffice</li>
+            <li>Courses</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><span class="mdi mdi-horse"></span></span>
+          {% if courseId is not null %}
+            Modifier
+          {% else %}
+            Ajouter
+          {% endif %}une course
+        </p>
+      </header>
+
+      <div class="card-content">
+        {{ form_start(formCourse) }}
+
+        {# NOM / RACE #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Nom / Lieu</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formCourse.nom) }}
+              <p class="control is-expanded">{{ form_widget(formCourse.nom) }}</p>
+              {{ form_errors(formCourse.nom) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formCourse.lieu) }}
+              <p class="control is-expanded">{{ form_widget(formCourse.lieu) }}</p>
+              {{ form_errors(formCourse.lieu) }}
+            </div>
+          </div>
+        </div>
+
+        {# SEXE / DATE NAISSANCE #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Date / Distance</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formCourse.dateCourse) }}
+              <p class="control is-expanded">
+                <div class="select is-fullwidth">{{ form_widget(formCourse.dateCourse) }}</div>
+              </p>
+              {{ form_errors(formCourse.dateCourse) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formCourse.distance) }}
+              <p class="control is-expanded">{{ form_widget(formCourse.distance) }}</p>
+              {{ form_errors(formCourse.distance) }}
+            </div>
+          </div>
+        </div>
+
+        {# TYPE #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Type</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control is-expanded">
+                <div class="select is-fullwidth">{{ form_widget(formCourse.type) }}</div>
+              </p>
+              {{ form_errors(formCourse.type) }}
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        {# BOUTON #}
+        <div class="field is-horizontal">
+          <div class="field-label"></div>
+          <div class="field-body">
+            <div class="field">
+              <div class="buttons">
+                <button type="submit" class="button is-primary">
+                  {% if courseId %}
+                    Modifier
+                  {% else %}
+                    Ajouter
+                  {% endif %}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_end(formCourse) }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

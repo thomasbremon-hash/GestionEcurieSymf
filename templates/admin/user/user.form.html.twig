@@ -1,0 +1,208 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Ajouter un utilisateur
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>BackOffice</li>
+            <li>Utilisateurs</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><span class="mdi mdi-account-plus"></span></span>
+          {% if userId is not null %}
+            Modifier
+          {% else %}
+            Ajouter
+          {% endif %}un utilisateur
+        </p>
+      </header>
+      <div class="card-content">
+        {{ form_start(formUser) }}
+
+        {# Ligne Prénom / Nom #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Prénom / Nom</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formUser.prenom) }}
+              <p class="control is-expanded">{{ form_widget(formUser.prenom) }}</p>
+              {{ form_errors(formUser.prenom) }}
+            </div>
+            <div class="field">
+              {{ form_label(formUser.nom) }}
+              <p class="control is-expanded">{{ form_widget(formUser.nom) }}</p>
+              {{ form_errors(formUser.nom) }}
+            </div>
+          </div>
+        </div>
+
+        {# Ligne Email / Mot de passe #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            {% if userId is null %}
+              <label class="label">Email / Mot de passe</label>
+            {% else %}
+              <label class="label">Email</label>
+            {% endif %}
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formUser.email) }}
+              <p class="control is-expanded">{{ form_widget(formUser.email) }}</p>
+              {{ form_errors(formUser.email) }}
+            </div>
+
+            {% if userId is null %}
+              <div class="field">
+                {{ form_label(formUser.password) }}
+                <p class="control is-expanded">{{ form_widget(formUser.password) }}</p>
+                {{ form_errors(formUser.password) }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Ligne Rue / Ville #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Rue / Ville</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formUser.rue) }}
+              <p class="control is-expanded">{{ form_widget(formUser.rue) }}</p>
+              {{ form_errors(formUser.rue) }}
+            </div>
+            <div class="field">
+              {{ form_label(formUser.ville) }}
+              <p class="control is-expanded">{{ form_widget(formUser.ville) }}</p>
+              {{ form_errors(formUser.ville) }}
+            </div>
+          </div>
+        </div>
+
+        {# Ligne Code postal / Pays #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Code postal / Pays</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formUser.cp) }}
+              <p class="control is-expanded">{{ form_widget(formUser.cp) }}</p>
+              {{ form_errors(formUser.cp) }}
+            </div>
+            <div class="field">
+              {{ form_label(formUser.pays) }}
+              <p class="control is-expanded">{{ form_widget(formUser.pays) }}</p>
+              {{ form_errors(formUser.pays) }}
+            </div>
+          </div>
+        </div>
+
+        {# Ligne Rôles #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Rôles</label>
+          </div>
+          <div class="field-body">
+            <div class="field mt-2">
+              {% for choice in formUser.roles %}
+                <label class="checkbox">
+                  {{ form_widget(choice) }}
+                  {{ choice.vars.label }}
+                </label>
+              {% endfor %}
+
+              {{ form_errors(formUser.roles) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Entreprises</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-grouped is-grouped-multiline">
+              {% for entreprise in formUser.entreprise %}
+                <div class="control">
+                  <label class="checkbox">
+                    {{ form_widget(entreprise) }}
+                    {{ entreprise.vars.label }}
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+            {{ form_errors(formUser.entreprise) }}
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Chevaux</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-grouped is-grouped-multiline">
+              {% if (formUser.chevals|length) > 0 %}
+                {% for cheval in formUser.chevals %}
+                  <div class="control">
+                    <label class="checkbox">
+                      {{ form_widget(cheval) }}
+                      {{ cheval.vars.label }}
+                    </label>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p class="mt-2">Aucun cheval à assigner</p>
+              {% endif %}
+            </div>
+            {{ form_errors(formUser.chevals) }}
+          </div>
+        </div>
+
+        <hr />
+
+        {# Bouton de soumission #}
+        <div class="field is-horizontal">
+          <div class="field-label">
+            {# Vide pour alignement #}
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="field is-grouped">
+                <div class="control">
+                  <button type="submit" class="button is-primary">
+                    {% if userId is not null %}
+                      Modifier
+                    {% else %}
+                      Ajouter
+                    {% endif %}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_end(formUser) }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

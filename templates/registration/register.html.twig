@@ -1,4 +1,4 @@
-{% extends 'Layouts/base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}
   Famms | Créer votre compte
@@ -11,6 +11,7 @@
   {% set isInvalidRue = not registrationForm.rue.vars.valid %}
   {% set isInvalidVille = not registrationForm.ville.vars.valid %}
   {% set isInvalidCp = not registrationForm.cp.vars.valid %}
+  {% set isInvalidPays = not registrationForm.pays.vars.valid %}
   {% set isInvalidPassword = not registrationForm.password.vars.valid %}
   {% set isInvalidRoles = not registrationForm.roles.vars.valid %}
 
