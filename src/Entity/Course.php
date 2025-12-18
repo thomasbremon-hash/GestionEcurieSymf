@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\CourseRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CourseRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: CourseRepository::class)]
 class Course
@@ -21,8 +22,8 @@ class Course
     #[ORM\Column(length: 255)]
     private ?string $lieu = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $dateCourse = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $dateCourse = null;
 
     #[ORM\Column]
     private ?int $distance = null;
@@ -70,12 +71,12 @@ class Course
         return $this;
     }
 
-    public function getDateCourse(): ?string
+    public function getDateCourse(): ?\DateTimeInterface
     {
         return $this->dateCourse;
     }
 
-    public function setDateCourse(string $dateCourse): static
+    public function setDateCourse(\DateTimeInterface $dateCourse): static
     {
         $this->dateCourse = $dateCourse;
 

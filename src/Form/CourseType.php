@@ -53,7 +53,8 @@ class CourseType extends AbstractType
             // DATE DE LA COURSE
             ->add('dateCourse', DateType::class, [
                 'label' => 'Date de la course',
-                'widget' => 'single_text',
+                'widget' => 'single_text',  // très important
+                'html5' => true,
                 'attr' => [
                     'class' => 'input',
                 ],

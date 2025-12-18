@@ -53,30 +53,22 @@ final class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $nouveauxChevaux = $user->getChevals();
-            $chevauxAvant = $this->em->getRepository(Cheval::class)->findBy(['proprietaire' => $user]);
-
-            foreach ($chevauxAvant as $cheval) {
-                if (!$nouveauxChevaux->contains($cheval)) {
-                    $cheval->setProprietaire(null);
-                    $this->em->persist($cheval);
-                }
-            }
-
-            foreach ($nouveauxChevaux as $cheval) {
-                $cheval->setProprietaire($user);
-                $this->em->persist($cheval);
+            // On hash seulement si le champ existe (donc en création)
+            if (!$isEdit) {
+                $plainPassword = $form->get('password')->getData();
+                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+                $user->setPassword($hashedPassword);
             }
 
             $this->em->persist($user);
             $this->em->flush();
-
 
             $txt = $isEdit ? 'modifié' : 'enregistré';
             $this->addFlash('success', "L'utilisateur a été $txt avec succès !");
 
             return $this->redirectToRoute('app_admin_users');
         }
+
 
         return $this->render('admin/user/user.form.html.twig', [
             'formUser' => $form,

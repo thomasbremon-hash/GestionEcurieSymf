@@ -139,10 +139,10 @@ class RegistrationFormType extends AbstractType
 
 
 
-        // Ajouter le champ mot de passe uniquement si on crée un utilisateur
         if (!$isEdit) {
             $builder->add('password', PasswordType::class, [
                 'label' => 'Mot de passe',
+                'mapped' => false,
                 'attr' => [
                     'class' => 'input',
                     'placeholder' => 'Entrez votre mot de passe',
