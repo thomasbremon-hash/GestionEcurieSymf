@@ -1,0 +1,119 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+	BackOffice | Ajouter une participation
+{% endblock %}
+
+{% block body %}
+	<section class="section is-title-bar">
+		<div class="level">
+			<div class="level-left">
+				<div class="level-item">
+					<ul>
+						<li>BackOffice</li>
+						<li>Participations</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="section is-main-section">
+		<div class="card">
+			<header class="card-header">
+				<p class="card-header-title">
+					<span class="icon">
+						<span class="mdi mdi-horseshoe"></span>
+					</span>
+
+					{% if participationId is not null %}
+						Modifier
+					{% else %}
+						Ajouter
+					{% endif %}
+					une participation
+				</p>
+			</header>
+
+			<div class="card-content">
+				{{ form_start(formParticipation) }}
+
+				{# CHEVAL / COURSE #}
+				<div class="field is-horizontal">
+					<div class="field-label is-normal">
+						<label class="label">Cheval / Course</label>
+					</div>
+					<div class="field-body">
+
+						<div class="field">
+							{{ form_label(formParticipation.cheval) }}
+							<p class="control is-expanded">
+								<div class="select is-fullwidth">
+									{{ form_widget(formParticipation.cheval) }}
+								</div>
+							</p>
+							{{ form_errors(formParticipation.cheval) }}
+						</div>
+
+						<div class="field">
+							{{ form_label(formParticipation.course) }}
+							<p class="control is-expanded">
+								<div class="select is-fullwidth">
+									{{ form_widget(formParticipation.course) }}
+								</div>
+							</p>
+							{{ form_errors(formParticipation.course) }}
+						</div>
+
+					</div>
+				</div>
+
+				{# POSITION #}
+				<div class="field is-horizontal">
+					<div class="field-label is-normal">
+						<label class="label">Position</label>
+					</div>
+					<div class="field-body">
+
+						<div class="field">
+							{{ form_label(formParticipation.position) }}
+							<p class="control is-expanded">{{ form_widget(formParticipation.position) }}</p>
+							{{ form_errors(formParticipation.position) }}
+						</div>
+
+                        <div class="field">
+							{{ form_label(formParticipation.temps) }}
+							<p class="control is-expanded">{{ form_widget(formParticipation.temps) }}</p>
+							{{ form_errors(formParticipation.temps) }}
+						</div>
+
+					</div>
+				</div>
+
+				<hr/>
+
+				{# BOUTON #}
+				<div class="field is-horizontal">
+					<div class="field-label"></div>
+					<div class="field-body">
+						<div class="field">
+							<div class="buttons">
+								<button type="submit" class="button is-primary">
+
+									{% if participationId %}
+										Modifier
+									{% else %}
+										Ajouter
+									{% endif %}
+
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{{ form_end(formParticipation) }}
+			</div>
+		</div>
+	</section>
+{% endblock %}

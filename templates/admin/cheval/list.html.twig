@@ -1,103 +1,125 @@
 {% extends 'layouts/base.admin.html.twig' %}
 {% block title %}
-  BackOffice | Liste entreprise
+	BackOffice | Liste entreprise
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Cheval</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_cheval_new') }}" class="button is-small is-primary">
-          <span>Ajouter</span>
-          <span class="icon"><i class="mdi mdi-plus"></i></span>
-        </a>
-      </div>
-    </div>
-  </section>
-  <section class="section is-main-section">
-    {% for label, messages in app.flashes(['success', 'danger']) %}
-      {% for message in messages %}
-        <div class="notification is-{{ label }}">
-          <button class="delete"></button>
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endfor %}
+	<section class="section is-title-bar">
+		<div class="level">
+			<div class="level-left">
+				<div class="level-item">
+					<ul>
+						<li>Admin</li>
+						<li>Cheval</li>
+					</ul>
+				</div>
+			</div>
+			<div class="level-right">
+				<a href="{{ path('app_admin_cheval_new') }}" class="button is-small is-primary">
+					<span>Ajouter</span>
+					<span class="icon">
+						<i class="mdi mdi-plus"></i>
+					</span>
+				</a>
+			</div>
+		</div>
+	</section>
+	<section class="section is-main-section">
+		{% for label, messages in app.flashes(['success', 'danger']) %}
+			{% for message in messages %}
+				<div class="notification is-{{ label }}">
+					<button class="delete"></button>
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endfor %}
 
-    <div class="card has-table">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-shopping-outline"></span></span>
-          {{ chevaux|length }} Chevaux
-        </p>
-        <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
-      </header>
-      <div class="card-content">
-        <div class="b-table has-pagination">
-          <div class="table-wrapper has-mobile-cards">
-            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth" id="table">
-              <thead>
-                <tr>
-                  <th>Nom</th>
-                  <th>Race</th>
-                  <th>Sexe</th>
-                  <th>Date de naissance</th>
-                  <th>Propriétaire</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in chevaux %}
-                  <tr>
-                    <td data-label="Description">{{ item.nom }}</td>
-                    <td data-label="Description">{{ item.race }}</td>
-                    <td data-label="Description">{{ item.sexe }}</td>
-                    <td data-label="Description">{{ item.dateNaissance ? item.dateNaissance|date('d/m/Y') : 'N/A' }}</td>
-                    <td data-label="Propriétaire">
-                      {% if item.proprietaire %}
-                        <span class="tag is-info">{{ item.proprietaire.prenom }} {{ item.proprietaire.nom }}</span>
-                      {% else %}
-                        Aucun
-                      {% endif %}
-                    </td>
-                    <td class="is-actions-cell">
-                      <div class="buttons is-right">
-                        <a href="{{ path('app_admin_cheval_update', { id: item.id }) }}" class="button is-small is-primary" type="button"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
-                        <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <div id="sample-modal-{{ item.id }}" class="modal">
-                    <div class="modal-background jb-modal-close"></div>
-                    <div class="modal-card">
-                      <header class="modal-card-head">
-                        <p class="modal-card-title">Confirmer la suppression</p>
-                        <button class="delete jb-modal-close" aria-label="close"></button>
-                      </header>
-                      <section class="modal-card-body">
-                        <p>Voulez-vous vraiment supprimer le cheval ?</p>
-                      </section>
-                      <footer class="modal-card-foot">
-                        <button class="button jb-modal-close">Annuler</button>
-                        <a href="{{ path('app_admin_cheval_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
-                      </footer>
-                    </div>
-                    <button class="modal-close is-large jb-modal-close" aria-label="close"></button>
-                  </div>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+		<div class="card has-table">
+			<header class="card-header">
+				<p class="card-header-title">
+					<span class="icon">
+						<span class="mdi mdi-shopping-outline"></span>
+					</span>
+					{{ chevaux|length }}
+					Chevaux
+				</p>
+				<a href="#" class="card-header-icon">
+					<span class="icon">
+						<i class="mdi mdi-reload"></i>
+					</span>
+				</a>
+			</header>
+			<div class="card-content">
+				<div class="b-table has-pagination">
+					<div class="table-wrapper has-mobile-cards">
+						<table class="table is-fullwidth is-striped is-hoverable is-fullwidth" id="table">
+							<thead>
+								<tr>
+									<th>Nom</th>
+									<th>Race</th>
+									<th>Sexe</th>
+									<th>Date de naissance</th>
+									<th>Propriétaire</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in chevaux %}
+									<tr>
+										<td data-label="Description">{{ item.nom }}</td>
+										<td data-label="Description">{{ item.race }}</td>
+										<td data-label="Description">{{ item.sexe }}</td>
+										<td data-label="Description">{{ item.dateNaissance ? item.dateNaissance|date('d/m/Y') : 'N/A' }}</td>
+										<td data-label="Propriétaire">
+											{% if item.proprietaire|length > 0 %}
+												{% for user in item.proprietaire %}
+													<span class="tag is-info">
+														{{ user.prenom }}
+														{{ user.nom }}
+													</span>
+												{% endfor %}
+											{% else %}
+												<span class="tag is-light">Aucun</span>
+											{% endif %}
+										</td>
+										<td class="is-actions-cell">
+											<div class="buttons is-right">
+												<a href="{{ path('app_admin_cheval_update', { id: item.id }) }}" class="button is-small is-primary" type="button">
+													<span class="icon">
+														<i class="mdi mdi-pencil"></i>
+													</span>
+												</a>
+												<button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button">
+													<span class="icon">
+														<i class="mdi mdi-trash-can"></i>
+													</span>
+												</button>
+											</div>
+										</td>
+									</tr>
+									<div id="sample-modal-{{ item.id }}" class="modal">
+										<div class="modal-background jb-modal-close"></div>
+										<div class="modal-card">
+											<header class="modal-card-head">
+												<p class="modal-card-title">Confirmer la suppression</p>
+												<button class="delete jb-modal-close" aria-label="close"></button>
+											</header>
+											<section class="modal-card-body">
+												<p>Voulez-vous vraiment supprimer le cheval ?</p>
+											</section>
+											<footer class="modal-card-foot">
+												<button class="button jb-modal-close">Annuler</button>
+												<a href="{{ path('app_admin_cheval_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
+											</footer>
+										</div>
+										<button class="modal-close is-large jb-modal-close" aria-label="close"></button>
+									</div>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 {% endblock %}

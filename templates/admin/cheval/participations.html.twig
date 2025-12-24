@@ -1,0 +1,122 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Liste des participations
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>Admin</li>
+            <li>Participations</li>
+          </ul>
+        </div>
+      </div>
+      <div class="level-right">
+        <a href="{{ path('app_admin_participation_new') }}" class="button is-small is-primary">
+          <span>Ajouter</span>
+          <span class="icon"><i class="mdi mdi-plus"></i></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    {% for label, messages in app.flashes(['success', 'danger']) %}
+      {% for message in messages %}
+        <div class="notification is-{{ label }}">
+          <button class="delete"></button>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endfor %}
+
+    <div class="card has-table">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><span class="mdi mdi-trophy"></span></span>
+          {{ participations|length }} participations
+        </p>
+        <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
+      </header>
+
+      <div class="card-content">
+        <div class="b-table has-pagination">
+          <div class="table-wrapper has-mobile-cards">
+            <table class="table is-fullwidth is-striped is-hoverable" id="table">
+              <thead>
+                <tr>
+                  <th>Cheval</th>
+                  <th>Course</th>
+                  <th>Lieu</th>
+                  <th>Date</th>
+                  <th>Position</th>
+                  <th>Temps</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in participations %}
+                  <tr>
+                    <td data-label="Cheval">{{ item.cheval.nom }}</td>
+                    <td data-label="Course">{{ item.course.nom }}</td>
+                    <td data-label="Lieu">{{ item.course.lieu }}</td>
+                    <td data-label="Date">{{ item.course.dateCourse ? item.course.dateCourse|date('d/m/Y') : 'N/A' }}</td>
+                    <td data-label="Position">
+                      {% if item.position is null %}
+                        -
+                      {% else %}
+                        {% if item.position == 1 %}
+                          <span class="icon has-text-warning"><i class="mdi mdi-trophy"></i></span> 1er
+                        {% elseif item.position == 2 %}
+                          <span class="icon has-text-info"><i class="mdi mdi-trophy-outline"></i></span> 2ème
+                        {% elseif item.position == 3 %}
+                          <span class="icon has-text-danger"><i class="mdi mdi-trophy-variant-outline"></i></span> 3ème
+                        {% else %}
+                          {{ item.position }}ème
+                        {% endif %}
+                      {% endif %}
+                    </td>
+                    <td data-label="Temps">{{ item.temps ? item.temps|date('i:s') : '—' }} minutes</td>
+                    <td class="is-actions-cell">
+                      <div class="buttons is-right">
+                        <a href="{{ path('app_admin_participation_update', { id: item.id }) }}" class="button is-small is-primary">
+                          <span class="icon"><i class="mdi mdi-pencil"></i></span>
+                        </a>
+                        <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button">
+                          <span class="icon"><i class="mdi mdi-trash-can"></i></span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <div id="sample-modal-{{ item.id }}" class="modal">
+                    <div class="modal-background jb-modal-close"></div>
+                    <div class="modal-card">
+                      <header class="modal-card-head">
+                        <p class="modal-card-title">Confirmer la suppression</p>
+                        <button class="delete jb-modal-close" aria-label="close"></button>
+                      </header>
+                      <section class="modal-card-body">
+                        <p>Voulez-vous vraiment supprimer cette participation ?</p>
+                      </section>
+                      <footer class="modal-card-foot">
+                        <button class="button jb-modal-close">Annuler</button>
+                        <a href="{{ path('app_admin_participation_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
+                      </footer>
+                    </div>
+                    <button class="modal-close is-large jb-modal-close" aria-label="close"></button>
+                  </div>
+
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

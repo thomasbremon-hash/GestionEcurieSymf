@@ -1,0 +1,107 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Ajouter un utilisateur
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>BackOffice</li>
+            <li>Structures</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><span class="mdi mdi-account-plus"></span></span>
+          {% if structureId is not null %}
+            Modifier
+          {% else %}
+            Ajouter
+          {% endif %}un utilisateur
+        </p>
+      </header>
+      <div class="card-content">
+        {{ form_start(formStructure) }}
+
+        {# Nom #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Nom</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formStructure.nom) }}
+              <p class="control is-expanded">{{ form_widget(formStructure.nom) }}</p>
+              {{ form_errors(formStructure.nom) }}
+            </div>
+          </div>
+        </div>
+
+        {# Rue / Ville / CP #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+
+              <label class="label">Rue / Ville / Code postal</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formStructure.rue) }}
+              <p class="control is-expanded">{{ form_widget(formStructure.rue) }}</p>
+              {{ form_errors(formStructure.rue) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formStructure.ville) }}
+              <p class="control is-expanded">{{ form_widget(formStructure.ville) }}</p>
+              {{ form_errors(formStructure.ville) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formStructure.cp) }}
+              <p class="control is-expanded">{{ form_widget(formStructure.cp) }}</p>
+              {{ form_errors(formStructure.cp) }}
+            </div>
+
+          </div>
+        </div>
+
+
+        <hr />
+
+        {# Bouton de soumission #}
+        <div class="field is-horizontal">
+          <div class="field-label">
+            {# Vide pour alignement #}
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="field is-grouped">
+                <div class="control">
+                  <button type="submit" class="button is-primary">
+                    {% if structureId is not null %}
+                      Modifier
+                    {% else %}
+                      Ajouter
+                    {% endif %}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_end(formStructure) }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -28,8 +28,6 @@ class Cheval
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $dateNaissance = null;
 
-    #[ORM\ManyToOne(inversedBy: 'chevals')]
-    private ?User $proprietaire = null;
 
     /**
      * @var Collection<int, Participation>
@@ -37,9 +35,29 @@ class Cheval
     #[ORM\OneToMany(targetEntity: Participation::class, mappedBy: 'cheval')]
     private Collection $participations;
 
+
+    #[ORM\ManyToOne(inversedBy: 'cheval')]
+    private ?Entreprise $entreprise = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'chevals')]
+    private Collection $proprietaire;
+
+    /**
+     * @var Collection<int, Deplacement>
+     */
+    #[ORM\OneToMany(targetEntity: Deplacement::class, mappedBy: 'cheval')]
+    private Collection $deplacements;
+
+
     public function __construct()
     {
         $this->participations = new ArrayCollection();
+        $this->proprietaire = new ArrayCollection();
+        $this->deplacements = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -95,17 +113,6 @@ class Cheval
         return $this;
     }
 
-    public function getProprietaire(): ?User
-    {
-        return $this->proprietaire;
-    }
-
-    public function setProprietaire(?User $proprietaire): static
-    {
-        $this->proprietaire = $proprietaire;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Participation>
@@ -136,4 +143,72 @@ class Cheval
 
         return $this;
     }
+
+    public function getEntreprise(): ?Entreprise
+    {
+        return $this->entreprise;
+    }
+
+    public function setEntreprise(?Entreprise $entreprise): static
+    {
+        $this->entreprise = $entreprise;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getProprietaire(): Collection
+    {
+        return $this->proprietaire;
+    }
+
+    public function addProprietaire(User $proprietaire): static
+    {
+        if (!$this->proprietaire->contains($proprietaire)) {
+            $this->proprietaire->add($proprietaire);
+        }
+
+        return $this;
+    }
+
+    public function removeProprietaire(User $proprietaire): static
+    {
+        $this->proprietaire->removeElement($proprietaire);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Deplacement>
+     */
+    public function getDeplacements(): Collection
+    {
+        return $this->deplacements;
+    }
+
+    public function addDeplacement(Deplacement $deplacement): static
+    {
+        if (!$this->deplacements->contains($deplacement)) {
+            $this->deplacements->add($deplacement);
+            $deplacement->setCheval($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeplacement(Deplacement $deplacement): static
+    {
+        if ($this->deplacements->removeElement($deplacement)) {
+            // set the owning side to null (unless already changed)
+            if ($deplacement->getCheval() === $this) {
+                $deplacement->setCheval(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }

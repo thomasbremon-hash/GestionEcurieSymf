@@ -24,8 +24,8 @@ class Participation
     #[ORM\Column(nullable: true)]
     private ?int $position = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $temps = null;
+    #[ORM\Column(type: 'time', nullable: true)]
+    private ?\DateTimeInterface $temps = null;
 
     public function getId(): ?int
     {
@@ -68,12 +68,12 @@ class Participation
         return $this;
     }
 
-    public function getTemps(): ?float
+    public function getTemps(): ?\DateTimeInterface
     {
         return $this->temps;
     }
 
-    public function setTemps(?float $temps): static
+    public function setTemps(?\DateTimeInterface $temps): static
     {
         $this->temps = $temps;
 

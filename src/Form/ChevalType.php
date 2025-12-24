@@ -83,8 +83,14 @@ class ChevalType extends AbstractType
                 'choice_label' => function (User $user) {
                     return $user->getPrenom() . ' ' . $user->getNom();
                 },
-                'label' => 'Propriétaire',
+                'label' => 'Propriétaires',
                 'required' => false,
+                'multiple' => true,        // plusieurs choix
+                'expanded' => true,        // checkbox au lieu de select
+                'by_reference' => false,   // nécessaire pour ManyToMany
+                'attr' => [
+                    'class' => 'p-2',
+                ],
             ]);
     }
 

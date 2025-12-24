@@ -4,7 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Entity\Course;
 use App\Form\CourseType;
+use App\Entity\Participation;
+use App\Form\ParticipationType;
 use App\Repository\CourseRepository;
+use App\Repository\ParticipationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -87,5 +90,73 @@ final class CourseController extends AbstractController
         );
 
         return $this->redirectToRoute('app_admin_courses');
+    }
+
+    #[Route('participations', name: 'app_admin_participations')]
+    public function participations(ParticipationRepository $participationRepository): Response
+    {
+        return $this->render('admin/cheval/participations.html.twig', [
+            'participations' => $participationRepository->findAll(),
+        ]);
+    }
+
+
+    #[Route('/participation/new', name: 'app_admin_participation_new')]
+    #[Route('/participation/update/{id}', name: 'app_admin_participation_update')]
+    public function formParticipation(Request $request, ?Participation $participation, ParticipationRepository $participationRepository): Response
+    {
+        $isEdit = $participation !== null;
+
+        if (!$participation) {
+            $participation = new Participation();
+        }
+
+        $form = $this->createForm(ParticipationType::class, $participation);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $cheval = $participation->getCheval();
+            $course = $participation->getCourse();
+
+            // Vérification si le cheval est déjà inscrit à la même course
+            $existingParticipation = $participationRepository->findOneBy([
+                'cheval' => $cheval,
+                'course' => $course,
+            ]);
+
+            if ($existingParticipation && (!$isEdit || $existingParticipation->getId() !== $participation->getId())) {
+                $this->addFlash('danger', sprintf(
+                    "Le cheval " . $cheval->getNom() . " est déjà inscrit à la course " . $course->getNom() . " !",
+                    $cheval->getNom(),
+                    $course->getNom()
+                ));
+                return $this->redirectToRoute('app_admin_participations');
+            }
+
+            $this->em->persist($participation);
+            $this->em->flush();
+
+            $txt = $isEdit ? "modifiée" : "ajoutée";
+            $this->addFlash('success', "La participation a été $txt avec succès !");
+            return $this->redirectToRoute('app_admin_participations');
+        }
+
+        return $this->render('admin/cheval/participation.form.html.twig', [
+            'formParticipation' => $form,
+            'participationId' => $participation->getId(),
+        ]);
+    }
+
+
+    #[Route('/participation/delete/{id}', name: 'app_admin_participation_delete')]
+    public function delete(Participation $participation): Response
+    {
+        $this->em->remove($participation);
+        $this->em->flush();
+
+        $this->addFlash('danger', 'La participation a été supprimée !');
+
+        return $this->redirectToRoute('app_admin_participations');
     }
 }

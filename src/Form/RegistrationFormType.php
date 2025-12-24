@@ -123,18 +123,6 @@ class RegistrationFormType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'required' => false,
-                'query_builder' => function (ChevalRepository $cr) use ($options) {
-                    $userId = $options['data']->getId(); // null si création
-                    $qb = $cr->createQueryBuilder('c')
-                        ->where('c.proprietaire IS NULL'); // chevaux libres
-
-                    if ($userId) {
-                        $qb->orWhere('c.proprietaire = :userId')
-                            ->setParameter('userId', $userId); // chevaux déjà assignés à cet user
-                    }
-
-                    return $qb;
-                },
             ]);
 
 

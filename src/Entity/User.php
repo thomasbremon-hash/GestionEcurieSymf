@@ -65,8 +65,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Cheval>
      */
-    #[ORM\OneToMany(targetEntity: Cheval::class, mappedBy: 'proprietaire')]
+    #[ORM\ManyToMany(targetEntity: Cheval::class, mappedBy: 'proprietaire')]
     private Collection $chevals;
+
 
     public function __construct()
     {
@@ -275,7 +276,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->chevals->contains($cheval)) {
             $this->chevals->add($cheval);
-            $cheval->setProprietaire($this);
+            $cheval->addProprietaire($this);
         }
 
         return $this;
@@ -284,12 +285,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeCheval(Cheval $cheval): static
     {
         if ($this->chevals->removeElement($cheval)) {
-            // set the owning side to null (unless already changed)
-            if ($cheval->getProprietaire() === $this) {
-                $cheval->setProprietaire(null);
-            }
+            $cheval->removeProprietaire($this);
         }
 
         return $this;
     }
+
 }

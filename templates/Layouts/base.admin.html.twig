@@ -102,7 +102,19 @@
                     <span>Courses</span>
                   </a>
                 </li>
+                <li>
+                  <a href="{{ path('app_admin_participations') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-ticket-confirmation"></i></span>
+                    <span>Participations</span>
+                  </a>
+                </li>
               </ul>
+            </li>
+            <li>
+              <a href="{{ path('app_admin_structures') }}" class="{% if currentPath == 'app_admin_structures' %}{% endif %} has-icon">
+                <span class="icon"><span class="mdi mdi-office-building"></span></span>
+                <span class="menu-item-label">Structures</span>
+              </a>
             </li>
 
             <li>

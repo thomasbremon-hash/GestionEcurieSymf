@@ -45,9 +45,16 @@ class Entreprise
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'entreprise')]
     private Collection $users;
 
+    /**
+     * @var Collection<int, Cheval>
+     */
+    #[ORM\OneToMany(targetEntity: Cheval::class, mappedBy: 'entreprise')]
+    private Collection $cheval;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->cheval = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,6 +180,36 @@ class Entreprise
     {
         if ($this->users->removeElement($user)) {
             $user->removeEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cheval>
+     */
+    public function getCheval(): Collection
+    {
+        return $this->cheval;
+    }
+
+    public function addCheval(Cheval $cheval): static
+    {
+        if (!$this->cheval->contains($cheval)) {
+            $this->cheval->add($cheval);
+            $cheval->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCheval(Cheval $cheval): static
+    {
+        if ($this->cheval->removeElement($cheval)) {
+            // set the owning side to null (unless already changed)
+            if ($cheval->getEntreprise() === $this) {
+                $cheval->setEntreprise(null);
+            }
         }
 
         return $this;
