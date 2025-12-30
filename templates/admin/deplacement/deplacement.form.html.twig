@@ -1,7 +1,7 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Ajouter une structure
+  BackOffice | Ajouter un déplacement
 {% endblock %}
 
 {% block body %}
@@ -11,7 +11,7 @@
         <div class="level-item">
           <ul>
             <li>BackOffice</li>
-            <li>Structures</li>
+            <li>Déplacements</li>
           </ul>
         </div>
       </div>
@@ -23,26 +23,32 @@
       <header class="card-header">
         <p class="card-header-title">
           <span class="icon"><span class="mdi mdi-account-plus"></span></span>
-          {% if structureId is not null %}
+          {% if deplacementId is not null %}
             Modifier
           {% else %}
             Ajouter
-          {% endif %}une structure
+          {% endif %}un déplacement
         </p>
       </header>
       <div class="card-content">
-        {{ form_start(formStructure) }}
+        {{ form_start(formDeplacement) }}
 
-        {# Nom #}
+        {# Nom / Distance #}
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">Nom</label>
+            <label class="label">Nom / Distance</label>
           </div>
           <div class="field-body">
             <div class="field">
-              {{ form_label(formStructure.nom) }}
-              <p class="control is-expanded">{{ form_widget(formStructure.nom) }}</p>
-              {{ form_errors(formStructure.nom) }}
+              {{ form_label(formDeplacement.nom) }}
+              <p class="control is-expanded">{{ form_widget(formDeplacement.nom) }}</p>
+              {{ form_errors(formDeplacement.nom) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formDeplacement.distance) }}
+              <p class="control is-expanded">{{ form_widget(formDeplacement.distance) }}</p>
+              {{ form_errors(formDeplacement.distance) }}
             </div>
           </div>
         </div>
@@ -51,25 +57,23 @@
         <div class="field is-horizontal">
           <div class="field-label is-normal">
 
-              <label class="label">Rue / Ville / Code postal</label>
+              <label class="label">Cheval / Structure</label>
           </div>
           <div class="field-body">
             <div class="field">
-              {{ form_label(formStructure.rue) }}
-              <p class="control is-expanded">{{ form_widget(formStructure.rue) }}</p>
-              {{ form_errors(formStructure.rue) }}
+              {{ form_label(formDeplacement.cheval) }}
+              <p class="control is-expanded">
+                <div class="select is-fullwidth">{{ form_widget(formDeplacement.cheval) }}</div>
+              </p>
+              {{ form_errors(formDeplacement.cheval) }}
             </div>
 
             <div class="field">
-              {{ form_label(formStructure.ville) }}
-              <p class="control is-expanded">{{ form_widget(formStructure.ville) }}</p>
-              {{ form_errors(formStructure.ville) }}
-            </div>
-
-            <div class="field">
-              {{ form_label(formStructure.cp) }}
-              <p class="control is-expanded">{{ form_widget(formStructure.cp) }}</p>
-              {{ form_errors(formStructure.cp) }}
+              {{ form_label(formDeplacement.structure) }}
+              <p class="control is-expanded">
+                <div class="select is-fullwidth">{{ form_widget(formDeplacement.structure) }}</div>
+              </p>
+              {{ form_errors(formDeplacement.structure) }}
             </div>
 
           </div>
@@ -88,7 +92,7 @@
               <div class="field is-grouped">
                 <div class="control">
                   <button type="submit" class="button is-primary">
-                    {% if structureId is not null %}
+                    {% if deplacementId is not null %}
                       Modifier
                     {% else %}
                       Ajouter
@@ -100,7 +104,7 @@
           </div>
         </div>
 
-        {{ form_end(formStructure) }}
+        {{ form_end(formDeplacement) }}
       </div>
     </div>
   </section>

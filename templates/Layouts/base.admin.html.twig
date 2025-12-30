@@ -118,6 +118,13 @@
             </li>
 
             <li>
+              <a href="{{ path('app_admin_deplacements') }}" class="{% if currentPath == 'app_admin_deplacements' %}{% endif %} has-icon">
+                <span class="icon"><span class="mdi mdi-car"></span></span>
+                <span class="menu-item-label">Déplacement</span>
+              </a>
+            </li>
+
+            <li>
               <a href="{{ path('app_home') }}" title="Log out" class="has-icon">
                 <span class="icon"><i class="mdi mdi-logout"></i></span>
                 <span>Quitter</span>
