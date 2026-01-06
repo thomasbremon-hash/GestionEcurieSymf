@@ -1,6 +1,6 @@
 {% extends 'layouts/base.admin.html.twig' %}
 {% block title %}
-	BackOffice | Liste deplacement
+	BackOffice | Liste produit
 {% endblock %}
 
 {% block body %}
@@ -10,12 +10,12 @@
 				<div class="level-item">
 					<ul>
 						<li>Admin</li>
-						<li>deplacement</li>
+						<li>Produit</li>
 					</ul>
 				</div>
 			</div>
 			<div class="level-right">
-				<a href="{{ path('app_admin_deplacement_new') }}" class="button is-small is-primary">
+				<a href="{{ path('app_admin_produit_new') }}" class="button is-small is-primary">
 					<span>Ajouter</span>
 					<span class="icon">
 						<i class="mdi mdi-plus"></i>
@@ -40,8 +40,8 @@
 					<span class="icon">
 						<span class="mdi mdi-shopping-outline"></span>
 					</span>
-					{{ deplacements|length }}
-					déplacements
+					{{ produits|length }}
+					produits
 				</p>
 				<a href="#" class="card-header-icon">
 					<span class="icon">
@@ -56,41 +56,22 @@
 							<thead>
 								<tr>
 									<th>Nom</th>
-									<th>Distance</th>
-									<th>Cheval</th>
-									<th>Structure</th>
+									<th>Description</th>
+									<th>Prix</th>
 									<th></th>
 								</tr>
 							</thead>
 							<tbody>
-								{% for item in deplacements %}
+								{% for item in produits %}
 									<tr>
 										<td data-label="Description">{{ item.nom }}</td>
-										<td data-label="Description">{{ item.distance }}km</td>
-										<td data-label="Cheval">
-											{% if item.cheval %}
-												<span class="tag is-info">
-													{{ item.cheval.nom }}
-												</span>
-											{% else %}
-												<span class="tag is-light">—</span>
-											{% endif %}
-										</td>
-
-										<td data-label="Structure">
-											{% if item.structure %}
-												<span class="tag is-info">
-													{{ item.structure.nom }}
-												</span>
-											{% else %}
-												<span class="tag is-light">—</span>
-											{% endif %}
-										</td>
+										<td data-label="Description">{{ item.description }}</td>
+										<td data-label="Description">{{ item.prix }}€</td>
 
 
 										<td class="is-actions-cell">
 											<div class="buttons is-right">
-												<a href="{{ path('app_admin_deplacement_update', { id: item.id }) }}" class="button is-small is-primary" type="button">
+												<a href="{{ path('app_admin_produit_update', { id: item.id }) }}" class="button is-small is-primary" type="button">
 													<span class="icon">
 														<i class="mdi mdi-pencil"></i>
 													</span>
@@ -111,11 +92,11 @@
 												<button class="delete jb-modal-close" aria-label="close"></button>
 											</header>
 											<section class="modal-card-body">
-												<p>Voulez-vous vraiment supprimer le deplacement ?</p>
+												<p>Voulez-vous vraiment supprimer le produit ?</p>
 											</section>
 											<footer class="modal-card-foot">
 												<button class="button jb-modal-close">Annuler</button>
-												<a href="{{ path('app_admin_deplacement_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
+												<a href="{{ path('app_admin_produit_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
 											</footer>
 										</div>
 										<button class="modal-close is-large jb-modal-close" aria-label="close"></button>

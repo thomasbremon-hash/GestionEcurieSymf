@@ -51,10 +51,18 @@ class Entreprise
     #[ORM\OneToMany(targetEntity: Cheval::class, mappedBy: 'entreprise')]
     private Collection $cheval;
 
+    /**
+     * @var Collection<int, ProduitEntrepriseTaxes>
+     */
+    #[ORM\OneToMany(targetEntity: ProduitEntrepriseTaxes::class, mappedBy: 'entreprise')]
+    private Collection $produitEntrepriseTaxe;
+
+  
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->cheval = new ArrayCollection();
+        $this->produitEntrepriseTaxe = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -214,4 +222,36 @@ class Entreprise
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, ProduitEntrepriseTaxes>
+     */
+    public function getProduitEntrepriseTaxe(): Collection
+    {
+        return $this->produitEntrepriseTaxe;
+    }
+
+    public function addProduitEntrepriseTaxe(ProduitEntrepriseTaxes $produitEntrepriseTaxe): static
+    {
+        if (!$this->produitEntrepriseTaxe->contains($produitEntrepriseTaxe)) {
+            $this->produitEntrepriseTaxe->add($produitEntrepriseTaxe);
+            $produitEntrepriseTaxe->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduitEntrepriseTaxe(ProduitEntrepriseTaxes $produitEntrepriseTaxe): static
+    {
+        if ($this->produitEntrepriseTaxe->removeElement($produitEntrepriseTaxe)) {
+            // set the owning side to null (unless already changed)
+            if ($produitEntrepriseTaxe->getEntreprise() === $this) {
+                $produitEntrepriseTaxe->setEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }

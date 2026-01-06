@@ -1,0 +1,87 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+	BackOffice | Ajouter une taxe
+{% endblock %}
+
+{% block body %}
+	<section class="section is-title-bar">
+		<div class="level">
+			<div class="level-left">
+				<div class="level-item">
+					<ul>
+						<li>BackOffice</li>
+						<li>Taxes</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="section is-main-section">
+		<div class="card">
+			<header class="card-header">
+				<p class="card-header-title">
+					<span class="icon">
+						<span class="mdi mdi-account-plus"></span>
+					</span>
+					{% if taxesId is not null %}
+						Modifier
+					{% else %}
+						Ajouter
+					{% endif %}une taxe
+				</p>
+			</header>
+			<div class="card-content">
+				{{ form_start(formTaxes) }}
+
+				{# Libelle / Pourcentage #}
+				<div class="field is-horizontal">
+					<div class="field-label is-normal">
+						<label class="label">Libellé / Pourcentage</label>
+					</div>
+					<div class="field-body">
+						<div class="field">
+							{{ form_label(formTaxes.libelle) }}
+							<p class="control is-expanded">{{ form_widget(formTaxes.libelle) }}</p>
+							{{ form_errors(formTaxes.libelle) }}
+						</div>
+
+						<div class="field">
+							{{ form_label(formTaxes.pourcentage) }}
+							<p class="control is-expanded">{{ form_widget(formTaxes.pourcentage) }}</p>
+							{{ form_errors(formTaxes.pourcentage) }}
+						</div>
+					</div>
+				</div>
+
+
+				<hr/>
+
+				{# Bouton de soumission #}
+				<div class="field is-horizontal">
+					<div
+						class="field-label">{# Vide pour alignement #}
+					</div>
+					<div class="field-body">
+						<div class="field">
+							<div class="field is-grouped">
+								<div class="control">
+									<button type="submit" class="button is-primary">
+										{% if taxesId is not null %}
+											Modifier
+										{% else %}
+											Ajouter
+										{% endif %}
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{{ form_end(formTaxes) }}
+			</div>
+		</div>
+	</section>
+{% endblock %}
