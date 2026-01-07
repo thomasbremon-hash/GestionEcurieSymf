@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\DeplacementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DeplacementRepository::class)]
@@ -26,6 +27,9 @@ class Deplacement
 
     #[ORM\ManyToOne(inversedBy: 'deplacements')]
     private ?Structure $structure = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable:true)]
+    private ?\DateTimeInterface $date = null;
 
 
     public function __construct()
@@ -82,6 +86,18 @@ class Deplacement
     public function setStructure(?Structure $structure): static
     {
         $this->structure = $structure;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }

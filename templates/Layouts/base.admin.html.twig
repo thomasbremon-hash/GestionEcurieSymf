@@ -134,14 +134,36 @@
 							</ul>
 						</li>
 
-
 						<li>
-							<a href="{{ path('app_admin_structures') }}" class="{% if currentPath == 'app_admin_structures' %}{% endif %} has-icon">
-								<span class="icon">
-									<span class="mdi mdi-office-building"></span>
+							<a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
+								<span class="is-flex is-align-items-center">
+									<span class="icon">
+										<i class="mdi mdi-map-marker-outline"></i>
+									</span>
+									<span class="menu-item-label">Structure & Distance</span>
 								</span>
-								<span class="menu-item-label">Structures</span>
+								<span class="icon arrow">
+									<i class="mdi mdi-chevron-down"></i>
+								</span>
 							</a>
+							<ul class="submenu" style="display: none;">
+								<li>
+									<a href="{{ path('app_admin_structures') }}" class="is-flex is-align-items-center">
+										<span class="icon">
+											<i class="mdi mdi-office-building"></i>
+										</span>
+										<span>Structure</span>
+									</a>
+								</li>
+								<li>
+									<a href="{{ path('app_admin_distances') }}" class="is-flex is-align-items-center">
+										<span class="icon">
+											<i class="mdi mdi-map-marker-distance"></i>
+										</span>
+										<span>Distances</span>
+									</a>
+								</li>
+							</ul>
 						</li>
 
 						<li>

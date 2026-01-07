@@ -1,6 +1,6 @@
 {% extends 'layouts/base.admin.html.twig' %}
 {% block title %}
-	BackOffice | Liste deplacement
+	BackOffice | Liste distance
 {% endblock %}
 
 {% block body %}
@@ -10,12 +10,12 @@
 				<div class="level-item">
 					<ul>
 						<li>Admin</li>
-						<li>deplacement</li>
+						<li>Distance</li>
 					</ul>
 				</div>
 			</div>
 			<div class="level-right">
-				<a href="{{ path('app_admin_deplacement_new') }}" class="button is-small is-primary">
+				<a href="{{ path('app_admin_distance_new') }}" class="button is-small is-primary">
 					<span>Ajouter</span>
 					<span class="icon">
 						<i class="mdi mdi-plus"></i>
@@ -40,8 +40,8 @@
 					<span class="icon">
 						<span class="mdi mdi-shopping-outline"></span>
 					</span>
-					{{ deplacements|length }}
-					déplacements
+					{{ distances|length }}
+					Distance
 				</p>
 				<a href="#" class="card-header-icon">
 					<span class="icon">
@@ -55,49 +55,49 @@
 						<table class="table is-fullwidth is-striped is-hoverable is-fullwidth" id="table">
 							<thead>
 								<tr>
-									<th>Nom</th>
 									<th>Distance</th>
-									<th>Cheval</th>
+									<th>Entreprise</th>
 									<th>Structure</th>
-									<th>Date</th>
 									<th></th>
 								</tr>
 							</thead>
+
 							<tbody>
-								{% for item in deplacements %}
+								{% for item in distances %}
 									<tr>
-										<td data-label="Nom">{{ item.nom }}</td>
-										<td data-label="Distance">{{ item.distance }}
-											km</td>
-										<td data-label="Cheval">
-											{% if item.cheval %}
-												<span class="tag is-info">{{ item.cheval.nom }}</span>
+										<td data-label="Distance">
+											{{ item.distance }}
+											km
+										</td>
+
+										<td data-label="Entreprise">
+											{% if item.entreprise %}
+												<span class="tag is-info">
+													{{ item.entreprise.nom }}
+												</span>
 											{% else %}
 												<span class="tag is-light">—</span>
 											{% endif %}
 										</td>
+
 										<td data-label="Structure">
 											{% if item.structure %}
-												<span class="tag is-info">{{ item.structure.nom }}</span>
+												<span class="tag is-info">
+													{{ item.structure.nom }}
+												</span>
 											{% else %}
 												<span class="tag is-light">—</span>
 											{% endif %}
 										</td>
-										<td data-label="Date">
-											{% if item.date %}
-												{{ item.date|date('d/m/Y') }}
-												{# format jour/mois/année #}
-											{% else %}
-												<span class="tag is-light">—</span>
-											{% endif %}
-										</td>
+
 										<td class="is-actions-cell">
 											<div class="buttons is-right">
-												<a href="{{ path('app_admin_deplacement_update', { id: item.id }) }}" class="button is-small is-primary">
+												<a href="{{ path('app_admin_distance_update', { id: item.id }) }}" class="button is-small is-primary">
 													<span class="icon">
 														<i class="mdi mdi-pencil"></i>
 													</span>
 												</a>
+
 												<button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}">
 													<span class="icon">
 														<i class="mdi mdi-trash-can"></i>
@@ -106,7 +106,8 @@
 											</div>
 										</td>
 									</tr>
-									{# modal pour suppression ici #}
+
+									{# Modal de suppression ici si besoin #}
 								{% endfor %}
 							</tbody>
 						</table>

@@ -3,17 +3,18 @@
 namespace App\Form;
 
 use App\Entity\Cheval;
-use App\Entity\Deplacement;
 use App\Entity\Structure;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Deplacement;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class DeplacementType extends AbstractType
 {
@@ -49,18 +50,28 @@ class DeplacementType extends AbstractType
                     new Positive(['message' => 'La distance doit être positive'])
                 ]
             ])
-
-            // CHEVAL
-            ->add('cheval', EntityType::class, [
-                'class' => Cheval::class,
-                'choice_label' => 'nom', // adapte si besoin (ex: getNom())
-                'label' => 'Cheval',
-                'placeholder' => 'Sélectionner un cheval',
+            // DATE DU DÉPLACEMENT
+            ->add('date', DateType::class, [
+                'label' => 'Date du déplacement',
+                'widget' => 'single_text',
                 'attr' => [
-                    'class' => 'select'
+                    'class' => 'input'
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Le cheval est obligatoire'])
+                    new NotBlank(['message' => 'La date est obligatoire'])
+                ]
+            ])
+
+
+
+            ->add('cheval', EntityType::class, [
+                'class' => Cheval::class,
+                'choice_label' => 'nom',
+                'label' => 'Chevaux',
+                'multiple' => true,
+                'expanded' => true, // affichage en checkbox
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez sélectionner au moins un cheval'])
                 ]
             ])
 

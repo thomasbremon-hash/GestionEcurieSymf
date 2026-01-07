@@ -70,15 +70,6 @@ final class TaxesController extends AbstractController
             return $this->redirectToRoute('app_admin_taxes');
         }
 
-        // Vérification si un propriétaire est associé
-        if ($taxes->getProduitEntrepriseTaxes() !== null) {
-             $this->addFlash(
-                 'danger',
-                 "Impossible de supprimer la taxe « " . $taxes->getLibelle() . " » car elle est associée à un produit."
-             );
-             return $this->redirectToRoute('app_admin_taxes');
-         }
-
         $this->em->remove($taxes);
         $this->em->flush();
 
