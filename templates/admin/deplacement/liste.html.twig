@@ -106,7 +106,24 @@
 											</div>
 										</td>
 									</tr>
-									{# modal pour suppression ici #}
+
+									<div id="sample-modal-{{ item.id }}" class="modal">
+										<div class="modal-background jb-modal-close"></div>
+										<div class="modal-card">
+											<header class="modal-card-head">
+												<p class="modal-card-title">Confirmer la suppression</p>
+												<button class="delete jb-modal-close" aria-label="close"></button>
+											</header>
+											<section class="modal-card-body">
+												<p>Voulez-vous vraiment supprimer le déplacement ?</p>
+											</section>
+											<footer class="modal-card-foot">
+												<button class="button jb-modal-close">Annuler</button>
+												<a href="{{ path('app_admin_deplacement_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
+											</footer>
+										</div>
+										<button class="modal-close is-large jb-modal-close" aria-label="close"></button>
+									</div>
 								{% endfor %}
 							</tbody>
 						</table>

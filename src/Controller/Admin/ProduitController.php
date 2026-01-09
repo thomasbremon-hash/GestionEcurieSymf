@@ -59,7 +59,7 @@ final class ProduitController extends AbstractController
         ]);
     }
 
-     #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/delete/{id}', name: 'app_admin_produit_delete')]
     public function adminChevauxRemove(?produit $produit)
     {
@@ -67,15 +67,6 @@ final class ProduitController extends AbstractController
             $this->addFlash('danger', "produit introuvable.");
             return $this->redirectToRoute('app_admin_produits');
         }
-
-        // Vérification si un propriétaire est associé
-         if ($produit->getProduitEntrepriseTaxes() !== null) {
-             $this->addFlash(
-                 'danger',
-                 "Impossible de supprimer le produit « " . $produit->getNom() . " » car il est associé à une taxe."
-             );
-             return $this->redirectToRoute('app_admin_chevaux');
-         }
 
         $this->em->remove($produit);
         $this->em->flush();

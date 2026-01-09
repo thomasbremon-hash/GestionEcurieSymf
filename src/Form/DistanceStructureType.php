@@ -19,19 +19,6 @@ class DistanceStructureType extends AbstractType
     {
         $builder
 
-            // DISTANCE
-            ->add('distance', IntegerType::class, [
-                'label' => 'Distance (km)',
-                'attr' => [
-                    'class' => 'input',
-                    'placeholder' => 'Entrez la distance'
-                ],
-                'constraints' => [
-                    new NotBlank(['message' => 'La distance est obligatoire']),
-                    new Positive(['message' => 'La distance doit être positive'])
-                ]
-            ])
-
             // STRUCTURE
             ->add('structure', EntityType::class, [
                 'class' => Structure::class,

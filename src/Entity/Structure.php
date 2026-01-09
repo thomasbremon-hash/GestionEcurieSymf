@@ -159,4 +159,13 @@ class Structure
         return $this;
     }
 
+    public function getAdresseComplete(): string
+    {
+        return trim(sprintf(
+            '%s %s %s',
+            $this->getRue(),
+            $this->getCp(),
+            $this->getVille()
+        ));
+    }
 }

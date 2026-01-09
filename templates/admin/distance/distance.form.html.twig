@@ -1,0 +1,114 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+    BackOffice | Distance
+{% endblock %}
+
+{% block body %}
+<section class="section is-title-bar">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <ul>
+                    <li>BackOffice</li>
+                    <li>Distances</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section is-main-section">
+    <div class="card">
+        <header class="card-header">
+            <p class="card-header-title">
+                <span class="icon">
+                    <i class="mdi mdi-map-marker-distance"></i>
+                </span>
+                {% if distanceId is not null %}
+                    Modifier une distance
+                {% else %}
+                    Ajouter une distance
+                {% endif %}
+            </p>
+        </header>
+
+        <div class="card-content">
+            {{ form_start(formDistance) }}
+
+            {# Entreprise / Structure #}
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Localisation</label>
+                </div>
+                <div class="field-body">
+
+                    <div class="field">
+                        {{ form_label(formDistance.entreprise) }}
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                {{ form_widget(formDistance.entreprise) }}
+                            </div>
+                        </div>
+                        {{ form_errors(formDistance.entreprise) }}
+                    </div>
+
+                    <div class="field">
+                        {{ form_label(formDistance.structure) }}
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                {{ form_widget(formDistance.structure) }}
+                            </div>
+                        </div>
+                        {{ form_errors(formDistance.structure) }}
+                    </div>
+
+                </div>
+            </div>
+
+            {# Distance calculée
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Distance</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            {{ form_widget(formDistance.distance, {
+                                attr: {
+                                    readonly: true,
+                                    class: 'input'
+                                }
+                            }) }}
+                        </div>
+                        <p class="help">Calculée automatiquement à partir des adresses</p>
+                    </div>
+                </div>
+            </div> #}
+
+
+            <hr>
+
+            {# Bouton #}
+            <div class="field is-horizontal">
+                <div class="field-label"></div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-primary">
+                                {% if distanceId is not null %}
+                                    Modifier
+                                {% else %}
+                                    Ajouter
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{ form_end(formDistance) }}
+        </div>
+    </div>
+</section>
+{% endblock %}

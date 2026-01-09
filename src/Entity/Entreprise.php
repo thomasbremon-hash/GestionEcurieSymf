@@ -63,7 +63,7 @@ class Entreprise
     #[ORM\OneToMany(targetEntity: DistanceStructure::class, mappedBy: 'entreprise')]
     private Collection $distanceEntreprise;
 
-  
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -290,5 +290,13 @@ class Entreprise
         return $this;
     }
 
-
+    public function getAdresseComplete(): string
+    {
+        return trim(sprintf(
+            '%s %s %s',
+            $this->getRue(),
+            $this->getCp(),
+            $this->getVille()
+        ));
+    }
 }
