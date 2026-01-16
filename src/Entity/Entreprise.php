@@ -63,6 +63,12 @@ class Entreprise
     #[ORM\OneToMany(targetEntity: DistanceStructure::class, mappedBy: 'entreprise')]
     private Collection $distanceEntreprise;
 
+    /**
+     * @var Collection<int, Deplacement>
+     */
+    #[ORM\OneToMany(targetEntity: Deplacement::class, mappedBy: 'entreprise')]
+    private Collection $deplacement;
+
 
     public function __construct()
     {
@@ -70,6 +76,7 @@ class Entreprise
         $this->cheval = new ArrayCollection();
         $this->produitEntrepriseTaxe = new ArrayCollection();
         $this->distanceEntreprise = new ArrayCollection();
+        $this->deplacement = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -298,5 +305,35 @@ class Entreprise
             $this->getCp(),
             $this->getVille()
         ));
+    }
+
+    /**
+     * @return Collection<int, Deplacement>
+     */
+    public function getDeplacement(): Collection
+    {
+        return $this->deplacement;
+    }
+
+    public function addDeplacement(Deplacement $deplacement): static
+    {
+        if (!$this->deplacement->contains($deplacement)) {
+            $this->deplacement->add($deplacement);
+            $deplacement->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeplacement(Deplacement $deplacement): static
+    {
+        if ($this->deplacement->removeElement($deplacement)) {
+            // set the owning side to null (unless already changed)
+            if ($deplacement->getEntreprise() === $this) {
+                $deplacement->setEntreprise(null);
+            }
+        }
+
+        return $this;
     }
 }

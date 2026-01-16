@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Deplacement;
 use App\Form\DeplacementType;
+use App\Service\DistanceCalculator;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DeplacementRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class DeplacementController extends AbstractController
 {
 
-     private $em;
+    private $em;
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
@@ -35,7 +36,7 @@ final class DeplacementController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_deplacement_new')]
     #[Route('/edit/{id}', name: 'app_admin_deplacement_update')]
-    public function form(Request $request, EntityManagerInterface $em, ?Deplacement $deplacement): Response
+    public function form(Request $request, EntityManagerInterface $em, ?Deplacement $deplacement, DistanceCalculator $distanceCalculator): Response
     {
         $isEdit = true;
         if (!$deplacement) {
@@ -47,6 +48,16 @@ final class DeplacementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $entreprise = $deplacement->getEntreprise();
+            $structure = $deplacement->getStructure();
+
+            $distanceKm = $distanceCalculator->calculate(
+                $entreprise->getAdresseComplete(),
+                $structure->getAdresseComplete()
+            );
+
+            $deplacement->setDistance($distanceKm);
+
             $em->persist($deplacement);
             $em->flush();
 
@@ -61,7 +72,7 @@ final class DeplacementController extends AbstractController
         ]);
     }
 
-     #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/delete/{id}', name: 'app_admin_deplacement_delete')]
     public function adminChevauxRemove(?Deplacement $deplacement)
     {
@@ -70,23 +81,14 @@ final class DeplacementController extends AbstractController
             return $this->redirectToRoute('app_admin_deplacements');
         }
 
-        // Vérification si un cheval est associé
-         if ($deplacement->getCheval() !== null) {
-             $this->addFlash(
+        // Vérification si une structure est associé
+        if ($deplacement->getStructure() !== null) {
+            $this->addFlash(
                 'danger',
-                 "Impossible de supprimer le deplacement « " . $deplacement->getNom() . " » car il est associé à un cheval."
-             );
-             return $this->redirectToRoute('app_admin_deplacements');
-         }
-
-         // Vérification si une structure est associé
-         if ($deplacement->getStructure() !== null) {
-             $this->addFlash(
-                'danger',
-                 "Impossible de supprimer le deplacement « " . $deplacement->getNom() . " » car il est associé à une structure."
-             );
-             return $this->redirectToRoute('app_admin_deplacements');
-         }
+                "Impossible de supprimer le deplacement « " . $deplacement->getNom() . " » car il est associé à une structure."
+            );
+            return $this->redirectToRoute('app_admin_deplacements');
+        }
 
         $this->em->remove($deplacement);
         $this->em->flush();

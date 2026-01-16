@@ -4,10 +4,12 @@ namespace App\Form;
 
 use App\Entity\Cheval;
 use App\Entity\Structure;
+use App\Entity\Entreprise;
 use App\Entity\Deplacement;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
@@ -64,14 +66,20 @@ class DeplacementType extends AbstractType
 
 
 
-            ->add('cheval', EntityType::class, [
+            ->add('chevaux', EntityType::class, [
                 'class' => Cheval::class,
                 'choice_label' => 'nom',
                 'label' => 'Chevaux',
+                'attr' => [
+                    'class' => 'choice-multiple is-fullwidth'
+                ],
                 'multiple' => true,
-                'expanded' => true, // affichage en checkbox
+                'expanded' => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez sélectionner au moins un cheval'])
+                    new Count([
+                        'min' => 1,
+                        'minMessage' => 'Veuillez sélectionner au moins un cheval'
+                    ])
                 ]
             ])
 
@@ -86,6 +94,20 @@ class DeplacementType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'La structure est obligatoire'])
+                ]
+            ])
+
+            // ENTREPRISE
+            ->add('entreprise', EntityType::class, [
+                'class' => Entreprise::class,
+                'choice_label' => 'nom', // adapte selon ton entity
+                'label' => 'Entreprise',
+                'placeholder' => 'Sélectionner une entreprise',
+                'attr' => [
+                    'class' => 'select'
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => "L'entreprise est obligatoire"])
                 ]
             ])
         ;

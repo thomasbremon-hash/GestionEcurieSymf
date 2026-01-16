@@ -1,7 +1,7 @@
 {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[twig]": {
-        "editor.defaultFormatter": "serhatkaya.twig-formatter"
+        "editor.defaultFormatter": "junstyle.twig-language"
     },
     "[php]": {
         "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"

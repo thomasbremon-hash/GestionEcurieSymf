@@ -2,13 +2,12 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\distance;
-use App\Form\distanceType;
 use App\Entity\DistanceStructure;
 use App\Form\DistanceStructureType;
 use App\Repository\distanceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use App\Service\DistanceCalculator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\DistanceStructureRepository;
@@ -37,7 +36,7 @@ final class DistanceController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_distance_new')]
     #[Route('/edit/{id}', name: 'app_admin_distance_update')]
-    public function form(Request $request, EntityManagerInterface $em, ?DistanceStructure $distance): Response
+    public function form(Request $request, EntityManagerInterface $em, ?DistanceStructure $distance, DistanceCalculator $distanceCalculator): Response
     {
         $isEdit = true;
         if (!$distance) {
@@ -49,6 +48,17 @@ final class DistanceController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $entreprise = $distance->getEntreprise();
+            $structure = $distance->getStructure();
+
+            $distanceKm = $distanceCalculator->calculate(
+                $entreprise->getAdresseComplete(),
+                $structure->getAdresseComplete()
+            );
+
+            $distance->setDistance($distanceKm);
+
             $em->persist($distance);
             $em->flush();
 
@@ -63,7 +73,7 @@ final class DistanceController extends AbstractController
         ]);
     }
 
-     #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/delete/{id}', name: 'app_admin_distance_delete')]
     public function adminDistanceRemove(?DistanceStructure $distance)
     {
@@ -91,6 +101,4 @@ final class DistanceController extends AbstractController
 
         return $this->redirectToRoute('app_admin_distances');
     }
-
-
 }

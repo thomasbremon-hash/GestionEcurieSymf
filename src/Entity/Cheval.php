@@ -48,7 +48,7 @@ class Cheval
     /**
      * @var Collection<int, Deplacement>
      */
-    #[ORM\OneToMany(targetEntity: Deplacement::class, mappedBy: 'cheval')]
+    #[ORM\ManyToMany(targetEntity: Deplacement::class, inversedBy: 'chevaux')]
     private Collection $deplacements;
 
 
@@ -57,7 +57,6 @@ class Cheval
         $this->participations = new ArrayCollection();
         $this->proprietaire = new ArrayCollection();
         $this->deplacements = new ArrayCollection();
-
     }
 
     public function getId(): ?int
@@ -183,7 +182,7 @@ class Cheval
     /**
      * @return Collection<int, Deplacement>
      */
-    public function getDeplacements(): Collection
+    public function getDeplacement(): Collection
     {
         return $this->deplacements;
     }
@@ -192,7 +191,6 @@ class Cheval
     {
         if (!$this->deplacements->contains($deplacement)) {
             $this->deplacements->add($deplacement);
-            $deplacement->setCheval($this);
         }
 
         return $this;
@@ -200,15 +198,8 @@ class Cheval
 
     public function removeDeplacement(Deplacement $deplacement): static
     {
-        if ($this->deplacements->removeElement($deplacement)) {
-            // set the owning side to null (unless already changed)
-            if ($deplacement->getCheval() === $this) {
-                $deplacement->setCheval(null);
-            }
-        }
+        $this->deplacements->removeElement($deplacement);
 
         return $this;
     }
-
-
 }

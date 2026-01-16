@@ -23,18 +23,25 @@ class Deplacement
     private ?int $distance = null;
 
     #[ORM\ManyToOne(inversedBy: 'deplacements')]
-    private ?Cheval $cheval = null;
-
-    #[ORM\ManyToOne(inversedBy: 'deplacements')]
     private ?Structure $structure = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable:true)]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date = null;
+
+    #[ORM\ManyToOne(inversedBy: 'deplacement')]
+    private ?Entreprise $entreprise = null;
+
+    /**
+     * @var Collection<int, Cheval>
+     */
+    #[ORM\ManyToMany(targetEntity: Cheval::class, inversedBy: 'deplacements')]
+    #[ORM\JoinTable(name: 'deplacement_cheval')]
+    private Collection $chevaux;
 
 
     public function __construct()
     {
-
+        $this->chevaux = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -66,18 +73,6 @@ class Deplacement
         return $this;
     }
 
-    public function getCheval(): ?Cheval
-    {
-        return $this->cheval;
-    }
-
-    public function setCheval(?Cheval $cheval): static
-    {
-        $this->cheval = $cheval;
-
-        return $this;
-    }
-
     public function getStructure(): ?Structure
     {
         return $this->structure;
@@ -102,4 +97,42 @@ class Deplacement
         return $this;
     }
 
+    public function getEntreprise(): ?Entreprise
+    {
+        return $this->entreprise;
+    }
+
+    public function setEntreprise(?Entreprise $entreprise): static
+    {
+        $this->entreprise = $entreprise;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cheval>
+     */
+    public function getChevaux(): Collection
+    {
+        return $this->chevaux;
+    }
+
+    public function addCheval(Cheval $cheval): static
+    {
+        if (!$this->chevaux->contains($cheval)) {
+            $this->chevaux->add($cheval);
+            $cheval->addDeplacement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCheval(Cheval $cheval): static
+    {
+        if ($this->chevaux->removeElement($cheval)) {
+            $cheval->removeDeplacement($this);
+        }
+
+        return $this;
+    }
 }

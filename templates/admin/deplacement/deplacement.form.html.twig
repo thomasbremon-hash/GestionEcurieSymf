@@ -1,127 +1,129 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-    BackOffice | Déplacement
+  BackOffice | Déplacement
 {% endblock %}
 
 {% block body %}
-<section class="section is-title-bar">
+  <section class="section is-title-bar">
     <div class="level">
-        <div class="level-left">
-            <div class="level-item">
-                <ul>
-                    <li>BackOffice</li>
-                    <li>Déplacements</li>
-                </ul>
-            </div>
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>BackOffice</li>
+            <li>Déplacements</li>
+          </ul>
         </div>
+      </div>
     </div>
-</section>
+  </section>
 
-<section class="section is-main-section">
+  <section class="section is-main-section">
     <div class="card">
-        <header class="card-header">
-            <p class="card-header-title">
-                <span class="icon">
-                    <i class="mdi mdi-truck"></i>
-                </span>
-                {% if deplacementId is not null %}
-                    Modifier un déplacement
-                {% else %}
-                    Ajouter un déplacement
-                {% endif %}
-            </p>
-        </header>
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><i class="mdi mdi-truck"></i></span>
+          {% if deplacementId is not null %}
+            Modifier un déplacement
+          {% else %}
+            Ajouter un déplacement
+          {% endif %}
+        </p>
+      </header>
 
-        <div class="card-content">
-            {{ form_start(formDeplacement) }}
+      <div class="card-content">
+        {{ form_start(formDeplacement) }}
 
-            {# Nom / Distance / Date #}
-            <div class="field is-horizontal">
-                <div class="field-label is-normal">
-                    <label class="label">Informations</label>
-                </div>
-                <div class="field-body">
-
-                    <div class="field">
-                        {{ form_label(formDeplacement.nom) }}
-                        <div class="control">
-                            {{ form_widget(formDeplacement.nom) }}
-                        </div>
-                        {{ form_errors(formDeplacement.nom) }}
-                    </div>
-
-                    <div class="field">
-                        {{ form_label(formDeplacement.distance) }}
-                        <div class="control">
-                            {{ form_widget(formDeplacement.distance) }}
-                        </div>
-                        {{ form_errors(formDeplacement.distance) }}
-                    </div>
-
-                    <div class="field">
-                        {{ form_label(formDeplacement.date) }}
-                        <div class="control">
-                            {{ form_widget(formDeplacement.date) }}
-                        </div>
-                        {{ form_errors(formDeplacement.date) }}
-                    </div>
-
-                </div>
+        {# Nom / Distance / Date #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Informations</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formDeplacement.nom) }}
+              <div class="control">{{ form_widget(formDeplacement.nom) }}</div>
+              {{ form_errors(formDeplacement.nom) }}
             </div>
 
-            {# Cheval / Structure #}
-            <div class="field is-horizontal">
-                <div class="field-label is-normal">
-                    <label class="label">Associations</label>
-                </div>
-                <div class="field-body">
-
-                    <div class="field">
-                        {{ form_label(formDeplacement.cheval) }}
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                {{ form_widget(formDeplacement.cheval) }}
-                            </div>
-                        </div>
-                        {{ form_errors(formDeplacement.cheval) }}
-                    </div>
-
-                    <div class="field">
-                        {{ form_label(formDeplacement.structure) }}
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                {{ form_widget(formDeplacement.structure) }}
-                            </div>
-                        </div>
-                        {{ form_errors(formDeplacement.structure) }}
-                    </div>
-
-                </div>
+            <div class="field">
+              {{ form_label(formDeplacement.distance) }}
+              <div class="control">{{ form_widget(formDeplacement.distance) }}</div>
+              {{ form_errors(formDeplacement.distance) }}
             </div>
 
-            <hr>
-
-            {# Bouton #}
-            <div class="field is-horizontal">
-                <div class="field-label"></div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <button type="submit" class="button is-primary">
-                                {% if deplacementId is not null %}
-                                    Modifier
-                                {% else %}
-                                    Ajouter
-                                {% endif %}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div class="field">
+              {{ form_label(formDeplacement.date) }}
+              <div class="control">{{ form_widget(formDeplacement.date) }}</div>
+              {{ form_errors(formDeplacement.date) }}
             </div>
-
-            {{ form_end(formDeplacement) }}
+          </div>
         </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Structure / Entreprise</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formDeplacement.structure) }}
+              <div class="control">
+                <div class="select is-fullwidth">{{ form_widget(formDeplacement.structure) }}</div>
+              </div>
+              {{ form_errors(formDeplacement.structure) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formDeplacement.entreprise) }}
+              <div class="control">
+                <div class="select is-fullwidth">{{ form_widget(formDeplacement.entreprise) }}</div>
+              </div>
+              {{ form_errors(formDeplacement.entreprise) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Chevaux</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-grouped is-grouped-multiline">
+              {% for cheval in formDeplacement.chevaux %}
+                <div class="control p-2">
+                  <label class="checkbox">
+                    {{ form_widget(cheval) }}
+                    {{ cheval.vars.label }}
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+            {{ form_errors(formDeplacement.chevaux) }}
+          </div>
+        </div>
+
+        <hr />
+
+        {# Bouton #}
+        <div class="field is-horizontal">
+          <div class="field-label"></div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <button type="submit" class="button is-primary">
+                  {% if deplacementId is not null %}
+                    Modifier
+                  {% else %}
+                    Ajouter
+                  {% endif %}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_end(formDeplacement) }}
+      </div>
     </div>
-</section>
+  </section>
 {% endblock %}
