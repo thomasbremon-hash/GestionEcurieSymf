@@ -1,0 +1,70 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Facturation
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>Admin</li>
+            <li>Facturation</li>
+          </ul>
+        </div>
+      </div>
+      <div class="level-right">
+        <a href="{{ path('app_admin_facturation_liste') }}" class="button is-small is-primary">
+          <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+          <span>Retour</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><i class="mdi mdi-file-document-box-multiple"></i></span>
+          Facturation du mois {{ moisDeGestion.mois }}/{{ moisDeGestion.annee }}
+        </p>
+      </header>
+
+      <div class="card-content">
+        {{ form_start(formFacturation) }}
+
+        <div class="table-container">
+          <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+              <tr>
+                <th>Entreprise</th>
+                <th>Total (€)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for facture in formFacturation %}
+                <tr>
+                  <td>{{ facture.vars.data.entreprise.nom }}</td>
+                  <td>{{ form_widget(facture.total) }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <hr />
+
+        <div class="field">
+          <div class="control">
+            <button type="submit" class="button is-primary">Générer/Enregistrer</button>
+          </div>
+        </div>
+
+        {{ form_end(formFacturation) }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

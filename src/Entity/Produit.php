@@ -31,9 +31,16 @@ class Produit
     #[ORM\OneToMany(targetEntity: ProduitEntrepriseTaxes::class, mappedBy: 'produit')]
     private Collection $produitEntrepriseTaxes;
 
+    /**
+     * @var Collection<int, ChevalProduit>
+     */
+    #[ORM\OneToMany(targetEntity: ChevalProduit::class, mappedBy: 'produit')]
+    private Collection $chevalProduits;
+
     public function __construct()
     {
         $this->produitEntrepriseTaxes = new ArrayCollection();
+        $this->chevalProduits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -101,6 +108,36 @@ class Produit
             // set the owning side to null (unless already changed)
             if ($produitEntrepriseTax->getProduit() === $this) {
                 $produitEntrepriseTax->setProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ChevalProduit>
+     */
+    public function getChevalProduits(): Collection
+    {
+        return $this->chevalProduits;
+    }
+
+    public function addChevalProduit(ChevalProduit $chevalProduit): static
+    {
+        if (!$this->chevalProduits->contains($chevalProduit)) {
+            $this->chevalProduits->add($chevalProduit);
+            $chevalProduit->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChevalProduit(ChevalProduit $chevalProduit): static
+    {
+        if ($this->chevalProduits->removeElement($chevalProduit)) {
+            // set the owning side to null (unless already changed)
+            if ($chevalProduit->getProduit() === $this) {
+                $chevalProduit->setProduit(null);
             }
         }
 

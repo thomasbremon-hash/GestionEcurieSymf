@@ -47,12 +47,6 @@
             </div>
 
             <div class="field">
-              {{ form_label(formDeplacement.distance) }}
-              <div class="control">{{ form_widget(formDeplacement.distance) }}</div>
-              {{ form_errors(formDeplacement.distance) }}
-            </div>
-
-            <div class="field">
               {{ form_label(formDeplacement.date) }}
               <div class="control">{{ form_widget(formDeplacement.date) }}</div>
               {{ form_errors(formDeplacement.date) }}
@@ -62,23 +56,23 @@
 
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">Structure / Entreprise</label>
+            <label class="label">Entreprise / Structure</label>
           </div>
           <div class="field-body">
-            <div class="field">
-              {{ form_label(formDeplacement.structure) }}
-              <div class="control">
-                <div class="select is-fullwidth">{{ form_widget(formDeplacement.structure) }}</div>
-              </div>
-              {{ form_errors(formDeplacement.structure) }}
-            </div>
-
             <div class="field">
               {{ form_label(formDeplacement.entreprise) }}
               <div class="control">
                 <div class="select is-fullwidth">{{ form_widget(formDeplacement.entreprise) }}</div>
               </div>
               {{ form_errors(formDeplacement.entreprise) }}
+            </div>
+
+            <div class="field">
+              {{ form_label(formDeplacement.structure) }}
+              <div class="control">
+                <div class="select is-fullwidth">{{ form_widget(formDeplacement.structure) }}</div>
+              </div>
+              {{ form_errors(formDeplacement.structure) }}
             </div>
           </div>
         </div>

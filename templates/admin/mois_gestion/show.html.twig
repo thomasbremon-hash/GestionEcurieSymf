@@ -1,0 +1,88 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Détails du mois
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>Admin</li>
+            <li>Détails du mois</li>
+          </ul>
+        </div>
+      </div>
+      <div class="level-right">
+        <a href="{{ path('app_admin_mois_gestion') }}" class="button is-small is-primary">
+          <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+          <span>Retour</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    <div class="columns is-multiline">
+      {% set total_mois = 0 %}
+      {% for cheval in chevaux %}
+        <div class="column is-half">
+          <div class="card">
+            <header class="card-header" style="background-color: #00d1b2; color: #fff;">
+              <p class="card-header-title">{{ cheval.nom }}</p>
+            </header>
+            <div class="card-content">
+              <div class="content">
+                <table class="table is-fullwidth is-striped is-hoverable">
+                  <thead>
+                    <tr>
+                      <th>Produit</th>
+                      <th>Qté</th>
+                      <th>Prix</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% set total_cheval = 0 %}
+                    {% for cp in moisDeGestion.chevalProduits %}
+                      {% if cp.cheval.id == cheval.id %}
+                        {% set total_produit = cp.quantite * cp.prixUnitaire %}
+                        {% set total_cheval = total_cheval + total_produit %}
+                        {% set total_mois = total_mois + total_produit %}
+                        <tr>
+                          <td>{{ cp.produit.nom }}</td>
+                          <td>{{ cp.quantite }}</td>
+                          <td>{{ cp.prixUnitaire|number_format(2, ',', ' ') }} €</td>
+                          <td>{{ total_produit|number_format(2, ',', ' ') }} €</td>
+                        </tr>
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr style="font-weight:bold; background-color:#f0f0f0;">
+                      <td colspan="3">Total cheval</td>
+                      <td>{{ total_cheval|number_format(2, ',', ' ') }} €</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {# Total général du mois #}
+    <div class="notification" style="
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+    background-color: #ffffff;  /* gris clair */
+    color: #333;                 /* texte sombre */
+    border-left: 5px solid #3273dc; /* accent bleu */
+">Total du mois : {{ total_mois|number_format(2, ',', ' ') }} €</div>
+  </section>
+{% endblock %}

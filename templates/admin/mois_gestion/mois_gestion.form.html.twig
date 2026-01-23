@@ -15,6 +15,12 @@
           </ul>
         </div>
       </div>
+      <div class="level-right">
+        <a href="{{ path('app_admin_mois_gestion') }}" class="button is-small is-primary">
+          <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
+          <span>Retour</span>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -36,9 +42,17 @@
 
         {# Informations du mois #}
         <div class="columns">
-          <div class="column is-one-quarter">{{ form_row(formMoisDeGestion.mois) }}</div>
-          <div class="column is-one-quarter">{{ form_row(formMoisDeGestion.annee) }}</div>
-          <div class="column is-one-quarter">{{ form_row(formMoisDeGestion.entreprise) }}</div>
+          <div class="column is-one-quarter">
+            <div class="field">{{ form_label(formMoisDeGestion.mois) }}
+              {{ form_widget(formMoisDeGestion.mois) }}
+              {{ form_errors(formMoisDeGestion.mois) }}</div>
+          </div>
+
+          <div class="column is-one-quarter">
+            <div class="field">{{ form_label(formMoisDeGestion.annee) }}
+              {{ form_widget(formMoisDeGestion.annee) }}
+              {{ form_errors(formMoisDeGestion.annee) }}</div>
+          </div>
         </div>
 
         <hr />
@@ -50,7 +64,10 @@
               <tr>
                 <th>Cheval</th>
                 {% for produit in produits %}
-                  <th>{{ produit.nom }}</th>
+                  <th>
+                    {{ produit.nom }}<br />
+                    <small>{{ produit.prix|number_format(2, '.', ',') }} €</small>
+                  </th>
                 {% endfor %}
               </tr>
             </thead>
@@ -59,14 +76,20 @@
                 <tr>
                   <td>{{ cheval.nom }}</td>
                   {% for produit in produits %}
-                    {% set quantite = 0 %}
-                    {% for cp in cheval.chevalProduits %}
-                      {% if cp.produit.id == produit.id %}
-                        {% set quantite = cp.quantite %}
+                    {% set cp_field = null %}
+                    {% for cp in formMoisDeGestion.chevalProduits %}
+                      {% if cp.vars.data.cheval.id == cheval.id and cp.vars.data.produit.id == produit.id %}
+                        {% set cp_field = cp %}
                       {% endif %}
                     {% endfor %}
+
                     <td>
-                      <input type="number" name="chevalProduits[{{ cheval.id }}][{{ produit.id }}]" value="{{ quantite }}" min="0" step="1" class="input is-small" />
+                      {% if cp_field %}
+                        {{ form_widget(cp_field.quantite) }}
+                        {{ form_errors(cp_field.quantite) }}
+                      {% else %}
+                        <input type="number" value="0" min="0" step="1" class="input is-small" disabled />
+                      {% endif %}
                     </td>
                   {% endfor %}
                 </tr>
@@ -77,6 +100,7 @@
 
         <hr />
 
+        {# Bouton de soumission #}
         <div class="field">
           <div class="control">
             <button type="submit" class="button is-primary">

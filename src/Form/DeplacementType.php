@@ -40,18 +40,6 @@ class DeplacementType extends AbstractType
                 ]
             ])
 
-            // DISTANCE
-            ->add('distance', IntegerType::class, [
-                'label' => 'Distance (km)',
-                'attr' => [
-                    'class' => 'input',
-                    'placeholder' => 'Entrez la distance'
-                ],
-                'constraints' => [
-                    new NotBlank(['message' => 'La distance est obligatoire']),
-                    new Positive(['message' => 'La distance doit être positive'])
-                ]
-            ])
             // DATE DU DÉPLACEMENT
             ->add('date', DateType::class, [
                 'label' => 'Date du déplacement',

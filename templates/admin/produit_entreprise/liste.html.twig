@@ -1,6 +1,6 @@
 {% extends 'layouts/base.admin.html.twig' %}
 {% block title %}
-  BackOffice | Liste deplacement
+  BackOffice | Liste Produit | Entreprise | Taxe
 {% endblock %}
 
 {% block body %}
@@ -10,12 +10,12 @@
         <div class="level-item">
           <ul>
             <li>Admin</li>
-            <li>deplacement</li>
+            <li>Produit | Entreprise | Taxe</li>
           </ul>
         </div>
       </div>
       <div class="level-right">
-        <a href="{{ path('app_admin_deplacement_new') }}" class="button is-small is-primary">
+        <a href="{{ path('app_admin_produit_entreprise_new') }}" class="button is-small is-primary">
           <span>Ajouter</span>
           <span class="icon"><i class="mdi mdi-plus"></i></span>
         </a>
@@ -36,8 +36,8 @@
       <header class="card-header">
         <p class="card-header-title">
           <span class="icon"><span class="mdi mdi-shopping-outline"></span></span>
-          {{ deplacements|length }}
-          déplacements
+          {{ produitEntreprise|length }}
+          Produit | Entreprise | Taxe
         </p>
         <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
       </header>
@@ -47,38 +47,15 @@
             <table class="table is-fullwidth is-striped is-hoverable is-fullwidth" id="table">
               <thead>
                 <tr>
-                  <th>Nom</th>
-                  <th>Distance</th>
-                  <th>Cheval</th>
-                  <th>Structure</th>
+                  <th>Produit</th>
                   <th>Entreprise</th>
-                  <th>Date</th>
+                  <th>Taxe</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {% for item in deplacements %}
+                {% for item in produitEntreprise %}
                   <tr>
-                    <td data-label="Nom">{{ item.nom }}</td>
-                    <td data-label="Distance">{{ item.distance }}
-                      km</td>
-                    <td data-label="Structure">
-                      {% if (item.chevaux|length) > 0 %}
-                        {% for cheval in item.chevaux %}
-                          <span class="tag is-info">{{ cheval.nom }}</span>
-                        {% endfor %}
-                      {% else %}
-                        <span class="tag is-light">—</span>
-                      {% endif %}
-                    </td>
-                    <td data-label="Structure">
-                      {% if item.structure %}
-                        <span class="tag is-info">{{ item.structure.nom }}</span>
-                      {% else %}
-                        <span class="tag is-light">—</span>
-                      {% endif %}
-                    </td>
-
                     <td data-label="Entreprise">
                       {% if item.entreprise %}
                         <span class="tag is-info">{{ item.entreprise.nom }}</span>
@@ -87,22 +64,29 @@
                       {% endif %}
                     </td>
 
-                    <td data-label="Date">
-                      {% if item.date %}
-                        {{ item.date|date('d/m/Y') }}
-                        {# format jour/mois/année #}
+                    <td data-label="Produit">
+                      {% if item.produit %}
+                        <span class="tag is-info">{{ item.produit.nom }}</span>
                       {% else %}
                         <span class="tag is-light">—</span>
                       {% endif %}
                     </td>
+
+                    <td data-label="Taxe">
+                      {% if item.taxes %}
+                        <span class="tag is-info">{{ item.taxes.pourcentage }} %</span>
+                      {% else %}
+                        <span class="tag is-light">—</span>
+                      {% endif %}
+                    </td>
+
                     <td class="is-actions-cell">
                       <div class="buttons is-right">
-                        <a href="{{ path('app_admin_deplacement_update', { id: item.id }) }}" class="button is-small is-primary"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
-                        <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
+                        <a href="{{ path('app_admin_produit_entreprise_update', { id: item.id }) }}" class="button is-small is-primary" type="button"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
+                        <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
                       </div>
                     </td>
                   </tr>
-
                   <div id="sample-modal-{{ item.id }}" class="modal">
                     <div class="modal-background jb-modal-close"></div>
                     <div class="modal-card">
@@ -111,11 +95,11 @@
                         <button class="delete jb-modal-close" aria-label="close"></button>
                       </header>
                       <section class="modal-card-body">
-                        <p>Voulez-vous vraiment supprimer le déplacement ?</p>
+                        <p>Voulez-vous vraiment supprimer le produit ?</p>
                       </section>
                       <footer class="modal-card-foot">
                         <button class="button jb-modal-close">Annuler</button>
-                        <a href="{{ path('app_admin_deplacement_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
+                        <a href="{{ path('app_admin_produit_entreprise_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
                       </footer>
                     </div>
                     <button class="modal-close is-large jb-modal-close" aria-label="close"></button>

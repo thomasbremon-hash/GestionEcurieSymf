@@ -69,6 +69,12 @@ class Entreprise
     #[ORM\OneToMany(targetEntity: Deplacement::class, mappedBy: 'entreprise')]
     private Collection $deplacement;
 
+    /**
+     * @var Collection<int, FacturationEntreprise>
+     */
+    #[ORM\OneToMany(targetEntity: FacturationEntreprise::class, mappedBy: 'entreprise')]
+    private Collection $facturationEntreprises;
+
 
     public function __construct()
     {
@@ -77,6 +83,7 @@ class Entreprise
         $this->produitEntrepriseTaxe = new ArrayCollection();
         $this->distanceEntreprise = new ArrayCollection();
         $this->deplacement = new ArrayCollection();
+        $this->facturationEntreprises = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -331,6 +338,36 @@ class Entreprise
             // set the owning side to null (unless already changed)
             if ($deplacement->getEntreprise() === $this) {
                 $deplacement->setEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FacturationEntreprise>
+     */
+    public function getFacturationEntreprises(): Collection
+    {
+        return $this->facturationEntreprises;
+    }
+
+    public function addFacturationEntreprise(FacturationEntreprise $facturationEntreprise): static
+    {
+        if (!$this->facturationEntreprises->contains($facturationEntreprise)) {
+            $this->facturationEntreprises->add($facturationEntreprise);
+            $facturationEntreprise->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFacturationEntreprise(FacturationEntreprise $facturationEntreprise): static
+    {
+        if ($this->facturationEntreprises->removeElement($facturationEntreprise)) {
+            // set the owning side to null (unless already changed)
+            if ($facturationEntreprise->getEntreprise() === $this) {
+                $facturationEntreprise->setEntreprise(null);
             }
         }
 

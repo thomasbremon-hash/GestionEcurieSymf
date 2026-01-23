@@ -51,12 +51,19 @@ class Cheval
     #[ORM\ManyToMany(targetEntity: Deplacement::class, inversedBy: 'chevaux')]
     private Collection $deplacements;
 
+    /**
+     * @var Collection<int, ChevalProduit>
+     */
+    #[ORM\OneToMany(targetEntity: ChevalProduit::class, mappedBy: 'cheval')]
+    private Collection $chevalProduits;
+
 
     public function __construct()
     {
         $this->participations = new ArrayCollection();
         $this->proprietaire = new ArrayCollection();
         $this->deplacements = new ArrayCollection();
+        $this->chevalProduits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -199,6 +206,36 @@ class Cheval
     public function removeDeplacement(Deplacement $deplacement): static
     {
         $this->deplacements->removeElement($deplacement);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ChevalProduit>
+     */
+    public function getChevalProduits(): Collection
+    {
+        return $this->chevalProduits;
+    }
+
+    public function addChevalProduit(ChevalProduit $chevalProduit): static
+    {
+        if (!$this->chevalProduits->contains($chevalProduit)) {
+            $this->chevalProduits->add($chevalProduit);
+            $chevalProduit->setCheval($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChevalProduit(ChevalProduit $chevalProduit): static
+    {
+        if ($this->chevalProduits->removeElement($chevalProduit)) {
+            // set the owning side to null (unless already changed)
+            if ($chevalProduit->getCheval() === $this) {
+                $chevalProduit->setCheval(null);
+            }
+        }
 
         return $this;
     }

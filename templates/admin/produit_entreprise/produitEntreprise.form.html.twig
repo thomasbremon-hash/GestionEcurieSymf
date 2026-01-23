@@ -1,0 +1,94 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  BackOffice | Ajouter un produit
+{% endblock %}
+
+{% block body %}
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>BackOffice</li>
+            <li>Produit | Entreprise | Taxe</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section is-main-section">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><span class="mdi mdi-account-plus"></span></span>
+          {% if produitEntrepriseId is not null %}
+            Modifier
+          {% else %}
+            Ajouter
+          {% endif %}un produit | entreprise | taxe
+        </p>
+      </header>
+      <div class="card-content">
+        {{ form_start(formProduitEntreprise) }}
+
+        {# Nom / Prix #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Produit / Entreprise / Taxe</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formProduitEntreprise.produit) }}
+              <div class="control">
+                <div class="select is-fullwidth">{{ form_widget(formProduitEntreprise.produit) }}</div>
+              </div>
+              {{ form_errors(formProduitEntreprise.produit) }}
+            </div>
+            <div class="field">
+              {{ form_label(formProduitEntreprise.entreprise) }}
+              <div class="control">
+                <div class="select is-fullwidth">{{ form_widget(formProduitEntreprise.entreprise) }}</div>
+              </div>
+              {{ form_errors(formProduitEntreprise.entreprise) }}
+            </div>
+            <div class="field">
+              {{ form_label(formProduitEntreprise.taxes) }}
+              <div class="control">
+                <div class="select is-fullwidth">{{ form_widget(formProduitEntreprise.taxes) }}</div>
+              </div>
+              {{ form_errors(formProduitEntreprise.taxes) }}
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        {# Bouton de soumission #}
+        <div class="field is-horizontal">
+          <div class="field-label">
+            {# Vide pour alignement #}
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="field is-grouped">
+                <div class="control">
+                  <button type="submit" class="button is-primary">
+                    {% if produitEntrepriseId is not null %}
+                      Modifier
+                    {% else %}
+                      Ajouter
+                    {% endif %}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_end(formProduitEntreprise) }}
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -1,251 +1,231 @@
 <!DOCTYPE html>
 <html lang="fr" class="has-aside-left has-aside-mobile-transition has-navbar-fixed-top has-aside-expanded">
-	<head>
-		<meta charset="utf-8"/>
-		<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Famms | BackOffice</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Famms | BackOffice</title>
 
-		<!-- Bulma is included -->
-		<link rel="stylesheet" href="{{ asset('assets/css/main.min.css') }}"/>
-		<link rel="stylesheet" href="{{ asset('assets/css/main.min.css') }}"/>
+    <!-- Bulma is included -->
+    <link rel="stylesheet" href="{{ asset('assets/css/main.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/main.min.css') }}" />
 
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-		<link
-		rel="stylesheet" href="https://cdn.datatables.net/2.3.5/css/dataTables.bulma.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.5/css/dataTables.bulma.css" />
 
-		<!-- Fonts -->
-		<link rel="dns-prefetch" href="https://fonts.gstatic.com"/>
-		<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css"/>
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css" />
 
-		<style>
-			#table_wrapper {
-				padding: 1em;
-			}
-		</style>
-	</head>
+    <style>
+      #table_wrapper {
+        padding: 1em;
+      }
+    </style>
+  </head>
 
-	<body>
-		<div id="app">
-			<nav id="navbar-main" class="navbar is-fixed-top">
-				<div class="navbar-brand">
-					<a class="navbar-item is-hidden-desktop jb-aside-mobile-toggle">
-						<span class="icon">
-							<i class="mdi mdi-forwardburger mdi-24px"></i>
-						</span>
-					</a>
-				</div>
-				<div class="navbar-menu fadeIn animated faster" id="navbar-menu">
-					<div class="navbar-end">
-						<div class="navbar-item has-dropdown has-dropdown-with-icons has-divider has-user-avatar is-hoverable">
-							<a class="navbar-link is-arrowless">
-								<div class="is-user-avatar">
-									<img src="https://avatars.dicebear.com/v2/initials/john-doe.svg" alt="John Doe"/>
-								</div>
-								<!-- <span class="icon"><i class="mdi mdi-chevron-down"></i></span> -->
-							</a>
-						</div>
-						<a href="{{ path('app_logout') }}" title="Log out" class="navbar-item is-desktop-icon-only">
-							<span class="icon">
-								<i class="mdi mdi-logout"></i>
-							</span>
-							<span>Déconnexion</span>
-						</a>
-					</div>
-				</div>
-			</nav>
-			<aside class="aside is-placed-left is-expanded">
-				<div class="aside-tools">
-					<div class="aside-tools-label">
-						<span>
-							<b>Gestion écurie</b>
-							BackOffice
-						</span>
-					</div>
-				</div>
-				{% set currentPath = app.request.attributes.get('_route') %}
-				<div class="menu is-menu-main">
-					<p class="menu-label">General</p>
-					<ul class="menu-list">
-						<li>
-							<a href="{{ path('app_admin') }}" class="{% if currentPath == 'app_admin' %}{% endif %}has-icon">
-								<span class="icon {% if currentPath == 'app_admin' %}{% endif %}">
-									<i class="mdi mdi-desktop-mac"></i>
-								</span>
-								<span class="menu-item-label">Tableau de bord</span>
-							</a>
-						</li>
-					</ul>
-					<p class="menu-label">MENU</p>
-					<ul class="menu-list">
-						<li>
-							<a href="{{ path('app_admin_users') }}" class="{% if currentPath == 'app_admin_users' %}{% endif %} has-icon">
-								<span class="icon">
-									<span class="mdi mdi-account-circle"></span>
-								</span>
-								<span class="menu-item-label">Utilisateurs</span>
-							</a>
-						</li>
-						<li>
-							<a href="{{ path('app_admin_entreprises') }}" class="has-icon">
-								<span class="icon">
-									<span class="mdi mdi-domain"></span>
-								</span>
-								<span class="menu-item-label">Entreprises</span>
-							</a>
-						</li>
-						<li>
-							<a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
-								<span class="is-flex is-align-items-center">
-									<span class="icon">
-										<i class="mdi mdi-horseshoe"></i>
-									</span>
-									<span class="menu-item-label">Chevaux & Courses</span>
-								</span>
-								<span class="icon arrow">
-									<i class="mdi mdi-chevron-down"></i>
-								</span>
-							</a>
-							<ul class="submenu" style="display: none;">
-								<li>
-									<a href="{{ path('app_admin_chevaux') }}" class="is-flex is-align-items-center">
-										<span class="icon">
-											<i class="mdi mdi-chess-knight"></i>
-										</span>
-										<span>Chevaux</span>
-									</a>
-								</li>
-								<li>
-									<a href="{{ path('app_admin_courses') }}" class="is-flex is-align-items-center">
-										<span class="icon">
-											<i class="mdi mdi-flag-checkered"></i>
-										</span>
-										<span>Courses</span>
-									</a>
-								</li>
-								<li>
-									<a href="{{ path('app_admin_participations') }}" class="is-flex is-align-items-center">
-										<span class="icon">
-											<i class="mdi mdi-ticket-confirmation"></i>
-										</span>
-										<span>Participations</span>
-									</a>
-								</li>
-							</ul>
-						</li>
+  <body>
+    <div id="app">
+      <nav id="navbar-main" class="navbar is-fixed-top">
+        <div class="navbar-brand">
+          <a class="navbar-item is-hidden-desktop jb-aside-mobile-toggle"><span class="icon"><i class="mdi mdi-forwardburger mdi-24px"></i></span></a>
+        </div>
+        <div class="navbar-menu fadeIn animated faster" id="navbar-menu">
+          <div class="navbar-end">
+            <div class="navbar-item has-dropdown has-dropdown-with-icons has-divider has-user-avatar is-hoverable">
+              <a class="navbar-link is-arrowless">
+                <div class="is-user-avatar">
+                  <img src="https://avatars.dicebear.com/v2/initials/john-doe.svg" alt="John Doe" />
+                </div>
+                <!-- <span class="icon"><i class="mdi mdi-chevron-down"></i></span> -->
+              </a>
+            </div>
+            <a href="{{ path('app_logout') }}" title="Log out" class="navbar-item is-desktop-icon-only">
+              <span class="icon"><i class="mdi mdi-logout"></i></span>
+              <span>Déconnexion</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+      <aside class="aside is-placed-left is-expanded">
+        <div class="aside-tools">
+          <div class="aside-tools-label">
+            <span>
+              <b>Gestion écurie</b>
+              BackOffice
+            </span>
+          </div>
+        </div>
+        {% set currentPath = app.request.attributes.get('_route') %}
+        <div class="menu is-menu-main">
+          <p class="menu-label">General</p>
+          <ul class="menu-list">
+            <li>
+              <a href="{{ path('app_admin') }}" class="{% if currentPath == 'app_admin' %}{% endif %}has-icon">
+                <span class="icon {% if currentPath == 'app_admin' %}{% endif %}"><i class="mdi mdi-desktop-mac"></i></span>
+                <span class="menu-item-label">Tableau de bord</span>
+              </a>
+            </li>
+          </ul>
+          <p class="menu-label">MENU</p>
+          <ul class="menu-list">
+            <li>
+              <a href="{{ path('app_admin_users') }}" class="{% if currentPath == 'app_admin_users' %}{% endif %} has-icon">
+                <span class="icon"><span class="mdi mdi-account-circle"></span></span>
+                <span class="menu-item-label">Utilisateurs</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('app_admin_entreprises') }}" class="has-icon">
+                <span class="icon"><span class="mdi mdi-domain"></span></span>
+                <span class="menu-item-label">Entreprises</span>
+              </a>
+            </li>
 
-						<li>
-							<a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
-								<span class="is-flex is-align-items-center">
-									<span class="icon">
-										<i class="mdi mdi-map-marker-outline"></i>
-									</span>
-									<span class="menu-item-label">Structure & Distance</span>
-								</span>
-								<span class="icon arrow">
-									<i class="mdi mdi-chevron-down"></i>
-								</span>
-							</a>
-							<ul class="submenu" style="display: none;">
-								<li>
-									<a href="{{ path('app_admin_structures') }}" class="is-flex is-align-items-center">
-										<span class="icon">
-											<i class="mdi mdi-office-building"></i>
-										</span>
-										<span>Structure</span>
-									</a>
-								</li>
-								<li>
-									<a href="{{ path('app_admin_distances') }}" class="is-flex is-align-items-center">
-										<span class="icon">
-											<i class="mdi mdi-map-marker-distance"></i>
-										</span>
-										<span>Distances</span>
-									</a>
-								</li>
-							</ul>
-						</li>
+            <li>
+              <a href="{{ path('app_admin_mois_gestion') }}" class="has-icon">
+                <span class="icon"><span class="mdi mdi-finance"></span></span>
+                <span class="menu-item-label">Relevés</span>
+              </a>
+            </li>
 
-						<li>
-							<a href="{{ path('app_admin_deplacements') }}" class="{% if currentPath == 'app_admin_deplacements' %}{% endif %} has-icon">
-								<span class="icon">
-									<span class="mdi mdi-car"></span>
-								</span>
-								<span class="menu-item-label">Déplacement</span>
-							</a>
-						</li>
+            <li>
+              <a href="{{ path('app_admin_facturation') }}" class="has-icon">
+                <span class="icon"><span class="mdi mdi-finance"></span></span>
+                <span class="menu-item-label">Facturation</span>
+              </a>
+            </li>
 
-						<li>
-							<a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
-								<span class="is-flex is-align-items-center">
-									<span class="icon">
-										<i class="mdi mdi-bank-transfer"></i>
-									</span>
-									<span class="menu-item-label">Produits & Taxes</span>
-								</span>
-								<span class="icon arrow">
-									<i class="mdi mdi-chevron-down"></i>
-								</span>
-							</a>
-							<ul class="submenu" style="display: none;">
-								<li>
-									<a href="{{ path('app_admin_produits') }}" class="is-flex is-align-items-center">
-										<span class="icon">
-											<i class="mdi mdi-barcode-scan"></i>
-										</span>
-										<span>Produits</span>
-									</a>
-								</li>
-								<li>
-									<a href="{{ path('app_admin_taxes') }}" class="is-flex is-align-items-center">
-										<span class="icon">
-											<i class="mdi mdi-cash"></i>
-										</span>
-										<span>Taxes</span>
-									</a>
-								</li>
-							</ul>
-						</li>
+            <li>
+              <a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
+                <span class="is-flex is-align-items-center">
+                  <span class="icon"><i class="mdi mdi-horseshoe"></i></span>
+                  <span class="menu-item-label">Chevaux & Courses</span>
+                </span>
+                <span class="icon arrow"><i class="mdi mdi-chevron-down"></i></span>
+              </a>
+              <ul class="submenu" style="display: none;">
+                <li>
+                  <a href="{{ path('app_admin_chevaux') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-chess-knight"></i></span>
+                    <span>Chevaux</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ path('app_admin_courses') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-flag-checkered"></i></span>
+                    <span>Courses</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ path('app_admin_participations') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-ticket-confirmation"></i></span>
+                    <span>Participations</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
 
-						<li>
-							<a href="{{ path('app_home') }}" title="Log out" class="has-icon">
-								<span class="icon">
-									<i class="mdi mdi-logout"></i>
-								</span>
-								<span>Quitter</span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			</aside>
+            <li>
+              <a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
+                <span class="is-flex is-align-items-center">
+                  <span class="icon"><i class="mdi mdi-map-marker-outline"></i></span>
+                  <span class="menu-item-label">Structure & Distance</span>
+                </span>
+                <span class="icon arrow"><i class="mdi mdi-chevron-down"></i></span>
+              </a>
+              <ul class="submenu" style="display: none;">
+                <li>
+                  <a href="{{ path('app_admin_structures') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-office-building"></i></span>
+                    <span>Structure</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ path('app_admin_distances') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-map-marker-distance"></i></span>
+                    <span>Distances</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
 
-			{% block body %}{% endblock %}
-			<footer class="footer">
-				<div class="container-fluid">
-					<div class="level">
-						<div class="level-left">
-							<div class="level-item">© 2025-2026, Logiciel pour tous</div>
-						</div>
-					</div>
-				</div>
-			</footer>
-		</div>
+            <li>
+              <a href="{{ path('app_admin_deplacements') }}" class="{% if currentPath == 'app_admin_deplacements' %}{% endif %} has-icon">
+                <span class="icon"><span class="mdi mdi-car"></span></span>
+                <span class="menu-item-label">Déplacement</span>
+              </a>
+            </li>
 
-		<!-- Scripts below are for demo only -->
-		 <script type="text/javascript" src="{{ asset('assets/js/main.min.js') }}"></script>
+            <li>
+              <a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
+                <span class="is-flex is-align-items-center">
+                  <span class="icon"><i class="mdi mdi-bank-transfer"></i></span>
+                  <span class="menu-item-label">Produits & Taxes</span>
+                </span>
+                <span class="icon arrow"><i class="mdi mdi-chevron-down"></i></span>
+              </a>
+              <ul class="submenu" style="display: none;">
+                <li>
+                  <a href="{{ path('app_admin_produit_entreprise') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-calculator-variant"></i></span>
+                    <span>Produits | Entreprises</span>
+                  </a>
+                </li>
 
-		 <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.js"></script>
-		 <script type="text/javascript" src="https://cdn.datatables.net/2.3.5/js/dataTables.js"></script>
-		 <script type="text/javascript" src="https://cdn.datatables.net/2.3.5/js/dataTables.bulma.js"></script>
+                <li>
+                  <a href="{{ path('app_admin_produits') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-barcode-scan"></i></span>
+                    <span>Produits</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ path('app_admin_taxes') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-cash"></i></span>
+                    <span>Taxes</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
 
-		<!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
-	<link
-		rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css"/>  <script>
-																																																																																																																																	      new DataTable('#table', {
-																																																																																																																																	        language: {
-																																																																																																																																	          url: 'https://cdn.datatables.net/plug-ins/2.3.5/i18n/fr-FR.json'
-																																																																																																																																	        }
-																																																																																																																																	      })
-																																																																																																																																	    </script>
-	</body>
+            <li>
+              <a href="{{ path('app_home') }}" title="Log out" class="has-icon">
+                <span class="icon"><i class="mdi mdi-logout"></i></span>
+                <span>Quitter</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      {% block body %}
+
+      {% endblock %}
+      <footer class="footer">
+        <div class="container-fluid">
+          <div class="level">
+            <div class="level-left">
+              <div class="level-item">© 2025-2026, Logiciel pour tous</div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Scripts below are for demo only -->
+    <script type="text/javascript" src="{{ asset('assets/js/main.min.js') }}"></script>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/2.3.5/js/dataTables.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/2.3.5/js/dataTables.bulma.js"></script>
+
+    <!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css" /> <script>
+                                                                                                                  new DataTable('#table', {
+                                                                                                                    language: {
+                                                                                                                      url: 'https://cdn.datatables.net/plug-ins/2.3.5/i18n/fr-FR.json'
+                                                                                                                    }
+                                                                                                                  })
+                                                                                                                </script>
+  </body>
 </html>
