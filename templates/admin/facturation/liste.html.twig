@@ -16,8 +16,8 @@
         </div>
       </div>
       <div class="level-right">
-        <a href="{{ path('app_admin_facturation_generer', { moisId: currentMois.id }) }}" class="button is-small is-primary">
-          <span>Générer factures</span>
+        <a href="{{ path('app_admin_facturation_generer') }}" class="button is-small is-primary">
+          <span>Générer des factures</span>
           <span class="icon"><i class="mdi mdi-plus"></i></span>
         </a>
       </div>
@@ -38,38 +38,40 @@
       <header class="card-header">
         <p class="card-header-title">
           <span class="icon"><span class="mdi mdi-file-document-box-multiple-outline"></span></span>
-          {{ factures|length }} factures générées
+          {{ factures|length }} factures
         </p>
-        <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
       </header>
 
       <div class="card-content">
-        <div class="b-table has-pagination">
+        <div class="b-table">
           <div class="table-wrapper has-mobile-cards">
-            <table class="table is-fullwidth is-striped is-hoverable" id="table">
+            <table class="table is-fullwidth is-striped is-hoverable">
               <thead>
                 <tr>
-                  <th class="has-text-left">Entreprise</th>
-                  <th class="has-text-left">Mois / Année</th>
-                  <th class="has-text-left">Total (€)</th>
+                  <th>Entreprise</th>
+                  <th>Mois / Année</th>
+                  <th>Total (€)</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
+                {% set currentMonth = null %}
                 {% for facture in factures %}
+                  {% set monthYear = ('%02d'|format(facture.moisDeGestion.mois)) ~ '/' ~ facture.moisDeGestion.annee %}
+
+                  {% if monthYear != currentMonth %}
+                    <tr class="has-background-light">
+                      <td colspan="4">
+                        <strong>Mois : {{ monthYear }}</strong>
+                      </td>
+                    </tr>
+                    {% set currentMonth = monthYear %}
+                  {% endif %}
+
                   <tr>
-                    <td data-label="Entreprise" class="has-text-left">
-                      <span class="tag is-info">{{ facture.entreprise.nom }}</span>
-                    </td>
-
-                    <td data-label="Mois / Année" class="has-text-left">
-                      <span class="tag is-info">{{ '%02d'|format(facture.moisDeGestion.mois) }}/{{ facture.moisDeGestion.annee }}</span>
-                    </td>
-
-                    <td data-label="Total (€)" class="has-text-left">
-                      <span class="tag is-success">{{ facture.total|number_format(2, ',', ' ') }} €</span>
-                    </td>
-
+                    <td data-label="Entreprise">{{ facture.entreprise.nom }}</td>
+                    <td data-label="Mois / Année">{{ monthYear }}</td>
+                    <td data-label="Total (€)">{{ facture.total|number_format(2, ',', ' ') }} €</td>
                     <td class="is-actions-cell">
                       <div class="buttons is-right">
                         <a href="{{ path('app_admin_facturation_show', { id: facture.id }) }}" class="button is-small is-info"><span class="icon"><i class="mdi mdi-eye"></i></span></a>
@@ -77,6 +79,27 @@
                       </div>
                     </td>
                   </tr>
+
+                  {# Modal suppression #}
+                  <div id="modal-delete-{{ facture.id }}" class="modal">
+                    <div class="modal-background jb-modal-close"></div>
+                    <div class="modal-card">
+                      <header class="modal-card-head">
+                        <p class="modal-card-title">Confirmer la suppression</p>
+                        <button class="delete jb-modal-close" aria-label="close"></button>
+                      </header>
+
+                      <section class="modal-card-body">
+                        <p>Voulez-vous vraiment supprimer cette facture ?</p>
+                      </section>
+
+                      <footer class="modal-card-foot">
+                        <button class="button jb-modal-close">Annuler</button>
+                        <a href="{{ path('app_admin_facturation_delete', { id: facture.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
+                      </footer>
+                    </div>
+                    <button class="modal-close is-large jb-modal-close" aria-label="close"></button>
+                  </div>
                 {% endfor %}
               </tbody>
             </table>

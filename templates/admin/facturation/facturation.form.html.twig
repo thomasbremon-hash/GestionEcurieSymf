@@ -1,25 +1,18 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Facturation
+  BackOffice | Générer factures
 {% endblock %}
 
 {% block body %}
   <section class="section is-title-bar">
     <div class="level">
       <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Facturation</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_facturation_liste') }}" class="button is-small is-primary">
-          <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
-          <span>Retour</span>
-        </a>
+        <ul>
+          <li>Admin</li>
+          <li>Facturation</li>
+          <li>Génération</li>
+        </ul>
       </div>
     </div>
   </section>
@@ -28,42 +21,23 @@
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">
-          <span class="icon"><i class="mdi mdi-file-document-box-multiple"></i></span>
-          Facturation du mois {{ moisDeGestion.mois }}/{{ moisDeGestion.annee }}
+          <span class="icon"><i class="mdi mdi-file-document"></i></span>
+          Générer les factures
         </p>
       </header>
 
       <div class="card-content">
-        {{ form_start(formFacturation) }}
+        {{ form_start(form) }}
 
-        <div class="table-container">
-          <table class="table is-fullwidth is-striped is-hoverable">
-            <thead>
-              <tr>
-                <th>Entreprise</th>
-                <th>Total (€)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for facture in formFacturation %}
-                <tr>
-                  <td>{{ facture.vars.data.entreprise.nom }}</td>
-                  <td>{{ form_widget(facture.total) }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-
-        <hr />
+        <div class="field">{{ form_label(form.moisDeGestion) }}
+          {{ form_widget(form.moisDeGestion) }}
+          {{ form_errors(form.moisDeGestion) }}</div>
 
         <div class="field">
-          <div class="control">
-            <button type="submit" class="button is-primary">Générer/Enregistrer</button>
-          </div>
+          <button class="button is-primary">Générer</button>
         </div>
 
-        {{ form_end(formFacturation) }}
+        {{ form_end(form) }}
       </div>
     </div>
   </section>
