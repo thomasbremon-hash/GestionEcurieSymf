@@ -1,7 +1,7 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Gestion Mensuelle
+  BackOffice | {{ chevalId is not null ? 'Modifier un cheval' : 'Ajouter un cheval' }}
 {% endblock %}
 
 {% block body %}
@@ -10,8 +10,8 @@
       <div class="level-left">
         <div class="level-item">
           <ul>
-            <li>Admin</li>
-            <li>Mois de gestion</li>
+            <li>BackOffice</li>
+            <li>Chevaux</li>
           </ul>
         </div>
       </div>
@@ -22,75 +22,200 @@
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">
-          <span class="icon"><i class="mdi mdi-calendar-month"></i></span>
-          {% if moisDeGestionId is not null %}
-            Modifier un mois
-          {% else %}
-            Ajouter un mois
-          {% endif %}
+          <span class="icon"><span class="mdi mdi-horse"></span></span>
+          {{ chevalId is not null ? 'Modifier' : 'Ajouter' }} un cheval
         </p>
       </header>
-
       <div class="card-content">
-        {{ form_start(formMoisDeGestion) }}
+        {{ form_start(formCheval) }}
 
-        {# Informations du mois #}
-        <div class="columns">
-          <div class="column is-one-quarter">{{ form_row(formMoisDeGestion.mois) }}</div>
-          <div class="column is-one-quarter">{{ form_row(formMoisDeGestion.annee) }}</div>
-          <div class="column is-one-quarter">{{ form_row(formMoisDeGestion.entreprise) }}</div>
-        </div>
+        {# Nom / Race / Sexe #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Nom / Race / Sexe</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formCheval.nom) }}
+              <p class="control is-expanded">{{ form_widget(formCheval.nom) }}</p>
+              {{ form_errors(formCheval.nom) }}
+            </div>
 
-        <hr />
+            <div class="field">
+              {{ form_label(formCheval.race) }}
+              <p class="control is-expanded">{{ form_widget(formCheval.race) }}</p>
+              {{ form_errors(formCheval.race) }}
+            </div>
 
-        {# Tableau chevaux x produits #}
-        <div class="table-container">
-          <table class="table is-fullwidth is-striped is-hoverable">
-            <thead>
-              <tr>
-                <th>Cheval</th>
-                {% for produit in produits %}
-                  <th>{{ produit.nom }}</th>
-                {% endfor %}
-              </tr>
-            </thead>
-            <tbody>
-              {% for cheval in chevaux %}
-                <tr>
-                  <td>{{ cheval.nom }}</td>
-                  {% for produit in produits %}
-                    {% set quantite = 0 %}
-                    {% for cp in cheval.chevalProduits %}
-                      {% if cp.produit.id == produit.id %}
-                        {% set quantite = cp.quantite %}
-                      {% endif %}
-                    {% endfor %}
-                    <td>
-                      <input type="number" name="chevalProduits[{{ cheval.id }}][{{ produit.id }}]" value="{{ quantite }}" min="0" step="1" class="input is-small" />
-                    </td>
-                  {% endfor %}
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-
-        <hr />
-
-        <div class="field">
-          <div class="control">
-            <button type="submit" class="button is-primary">
-              {% if moisDeGestionId is not null %}
-                Modifier
-              {% else %}
-                Ajouter
-              {% endif %}
-            </button>
+            <div class="field">
+              {{ form_label(formCheval.sexe) }}
+              <p class="control is-expanded">
+                <div class="select is-fullwidth">{{ form_widget(formCheval.sexe) }}</div>
+              </p>
+              {{ form_errors(formCheval.sexe) }}
+            </div>
           </div>
         </div>
 
-        {{ form_end(formMoisDeGestion) }}
+        {# Date de naissance #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Date de naissance</label>
+          </div>
+          <div class="field-body">
+            <div class="field">{{ form_widget(formCheval.dateNaissance) }}
+              {{ form_errors(formCheval.dateNaissance) }}</div>
+          </div>
+        </div>
+
+        {# Propriétaires (CollectionType) #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Propriétaires</label>
+          </div>
+          <div class="field-body">
+            <div id="chevalProprietaires-wrapper">
+              {% for cp in formCheval.chevalProprietaires %}
+                <div class="field is-grouped is-grouped-multiline collection-item">
+                  {# Sélecteur utilisateur #}
+                  <div class="control is-expanded">
+                    {{ form_label(cp.proprietaire, 'Propriétaire') }}
+                    <div class="select is-fullwidth">{{ form_widget(cp.proprietaire) }}</div>
+                    {{ form_errors(cp.proprietaire) }}
+                  </div>
+
+                  {# Pourcentage #}
+                  <div class="control is-narrow">
+                    {{ form_label(cp.pourcentage, 'Pourcentage') }}
+                    <div class="control">{{ form_widget(cp.pourcentage) }}</div>
+                    <p class="help is-danger pourcentage-error" style="display:none;">Total des pourcentages ne peut pas dépasser 100%</p>
+                    {{ form_errors(cp.pourcentage) }}
+                  </div>
+
+                  {# Bouton supprimer ligne #}
+                  <div class="control is-narrow" style="align-self: flex-end;">
+                    <button type="button" class="button is-danger jb-remove-collection">Supprimer</button>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {{ form_errors(formCheval.chevalProprietaires) }}
+          </div>
+        </div>
+
+        {# Bouton ajouter une ligne #}
+        <div class="field">
+          <div class="control">
+            <button type="button" class="button is-primary jb-add-collection">Ajouter un propriétaire</button>
+          </div>
+        </div>
+
+        <hr />
+
+        {# Bouton de soumission #}
+        <div class="field is-horizontal">
+          <div class="field-label"></div>
+          <div class="field-body">
+            <div class="field is-grouped">
+              <div class="control">
+                <button type="submit" class="button is-primary">{{ chevalId is not null ? 'Modifier' : 'Ajouter' }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ form_end(formCheval) }}
       </div>
     </div>
   </section>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+
+const wrapper = document.getElementById('chevalProprietaires-wrapper');
+const addBtn = document.querySelector('.jb-add-collection');
+const submitBtn = document.querySelector('button[type="submit"]');
+
+
+function updateIndexes() {
+wrapper.querySelectorAll('.collection-item').forEach((el, idx) => {
+el.querySelectorAll('select, input').forEach(input => {
+const name = input.getAttribute('name');
+if(name){
+input.setAttribute('name', name.replace(/\[\d+\]/, '[' + idx + ']'));
+}
+});
+});
+}
+
+
+function updateTotal() {
+let total = 0;
+let errorShown = false;
+
+
+wrapper.querySelectorAll('.collection-item').forEach(item => {
+const input = item.querySelector('input[type="number"]');
+if(input){
+total += parseFloat(input.value) || 0;
+}
+});
+
+
+if(total > 100){
+submitBtn.disabled = true;
+wrapper.querySelectorAll('.pourcentage-error').forEach(p => p.style.display = 'block');
+errorShown = true;
+} else {
+submitBtn.disabled = false;
+wrapper.querySelectorAll('.pourcentage-error').forEach(p => p.style.display = 'none');
+}
+
+
+return errorShown;
+}
+
+
+// Événement sur inputs pourcentage
+wrapper.addEventListener('input', e => {
+if(e.target.tagName === 'INPUT' && e.target.getAttribute('type') === 'number'){
+updateTotal();
+}
+});
+
+
+// Supprimer une ligne
+wrapper.addEventListener('click', e => {
+if(e.target.classList.contains('jb-remove-collection')){
+e.target.closest('.collection-item').remove();
+updateIndexes();
+updateTotal();
+}
+});
+
+
+// Ajouter une ligne
+addBtn.addEventListener('click', () => {
+const prototype = wrapper.querySelector('.collection-item');
+if(!prototype) return;
+
+
+const clone = prototype.cloneNode(true);
+clone.querySelectorAll('input, select').forEach(input => {
+if(input.tagName === 'INPUT') input.value = '';
+if(input.tagName === 'SELECT') input.selectedIndex = 0;
+});
+
+
+wrapper.appendChild(clone);
+updateIndexes();
+updateTotal();
+});
+
+
+// Initial check
+updateTotal();
+});
+</script>
 {% endblock %}

@@ -19,7 +19,7 @@ class Taxes
     private ?string $libelle = null;
 
     #[ORM\Column]
-    private ?int $pourcentage = null;
+    private ?float $pourcentage = null;
 
     /**
      * @var Collection<int, ProduitEntrepriseTaxes>
@@ -50,12 +50,12 @@ class Taxes
         return $this;
     }
 
-    public function getPourcentage(): ?int
+    public function getPourcentage(): ?float
     {
         return $this->pourcentage;
     }
 
-    public function setPourcentage(int $pourcentage): static
+    public function setPourcentage(float $pourcentage): static
     {
         $this->pourcentage = $pourcentage;
 

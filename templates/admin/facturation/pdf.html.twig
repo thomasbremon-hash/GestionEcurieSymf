@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: DejaVu Sans, sans-serif;
+        font-size: 11px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 5px;
+      }
+      th {
+        background: #eee;
+      }
+      .right {
+        text-align: right;
+      }
+      .center {
+        text-align: center;
+      }
+      .no-border {
+        border: none;
+      }
+      .mt-20 {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Facture Utilisateur</h2>
+
+    <table class="no-border">
+      <tr>
+        <td class="no-border">
+          <strong>Facturé à :</strong><br />
+          {{ user.prenom }} {{ user.nom }}<br />
+          {{ user.email }}
+        </td>
+        <td class="no-border right">
+          {% set entreprise = user.entreprise.first %}
+          <strong>{{ entreprise.nom }}</strong><br />
+          {{ entreprise.rue }}<br />
+          {{ entreprise.cp }} {{ entreprise.ville }}<br />
+          {{ entreprise.pays }}
+        </td>
+      </tr>
+    </table>
+
+    <p class="mt-20">
+      <strong>Période :</strong> {{ '%02d'|format(mois.mois) }}/{{ mois.annee }}
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Cheval</th>
+          <th>Produit</th>
+          <th>Qté</th>
+          <th>Prix unitaire</th>
+          <th>Montant HT</th>
+          <th>TVA</th>
+          <th>Montant TVA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in lignes %}
+          <tr>
+            <td>{{ ligne.cheval }} ({{ ligne.pourcentage }}%)</td>
+            <td>{{ ligne.description }}</td>
+            <td class="center">{{ ligne.quantite }}</td>
+            <td class="right">{{ ligne.prixUnitaire|number_format(2, ',', ' ') }} €</td>
+            <td class="right">{{ ligne.montantHT|number_format(2, ',', ' ') }} €</td>
+            <td class="center">{{ ligne.tauxTVA }}%</td>
+            <td class="right">{{ ligne.montantTVA|number_format(2, ',', ' ') }} €</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <table class="mt-20">
+      <tr>
+        <td class="right">
+          <strong>Total HT :</strong>
+        </td>
+        <td class="right">{{ totalHT|number_format(2, ',', ' ') }} €</td>
+      </tr>
+      {% for taux, montant in totalTVA %}
+        <tr>
+          <td class="right">TVA {{ taux }} %</td>
+          <td class="right">{{ montant|number_format(2, ',', ' ') }} €</td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td class="right">
+          <strong>Total TTC :</strong>
+        </td>
+        <td class="right">
+          <strong>{{ totalTTC|number_format(2, ',', ' ') }} €</strong>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

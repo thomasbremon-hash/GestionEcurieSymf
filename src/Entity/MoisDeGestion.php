@@ -33,10 +33,17 @@ class MoisDeGestion
     #[ORM\OneToMany(targetEntity: FacturationEntreprise::class, mappedBy: 'moisDeGestion')]
     private Collection $facturationEntreprises;
 
+    /**
+     * @var Collection<int, FacturationUtilisateur>
+     */
+    #[ORM\OneToMany(targetEntity: FacturationUtilisateur::class, mappedBy: 'moisDeGestion')]
+    private Collection $facturationUtilisateurs;
+
     public function __construct()
     {
         $this->chevalProduits = new ArrayCollection();
         $this->facturationEntreprises = new ArrayCollection();
+        $this->facturationUtilisateurs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -123,6 +130,36 @@ class MoisDeGestion
             // set the owning side to null (unless already changed)
             if ($facturationEntreprise->getMoisDeGestion() === $this) {
                 $facturationEntreprise->setMoisDeGestion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FacturationUtilisateur>
+     */
+    public function getFacturationUtilisateurs(): Collection
+    {
+        return $this->facturationUtilisateurs;
+    }
+
+    public function addFacturationUtilisateur(FacturationUtilisateur $facturationUtilisateur): static
+    {
+        if (!$this->facturationUtilisateurs->contains($facturationUtilisateur)) {
+            $this->facturationUtilisateurs->add($facturationUtilisateur);
+            $facturationUtilisateur->setMoisDeGestion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFacturationUtilisateur(FacturationUtilisateur $facturationUtilisateur): static
+    {
+        if ($this->facturationUtilisateurs->removeElement($facturationUtilisateur)) {
+            // set the owning side to null (unless already changed)
+            if ($facturationUtilisateur->getMoisDeGestion() === $this) {
+                $facturationUtilisateur->setMoisDeGestion(null);
             }
         }
 

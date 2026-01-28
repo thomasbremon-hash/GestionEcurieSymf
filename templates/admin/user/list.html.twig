@@ -94,11 +94,17 @@
                       {% endfor %}
                     </td>
                     <td>
-                      {% for cheval in item.chevals %}
-                        <span class="tag is-info">{{ cheval.nom }}</span>{% if not loop.last %}{% endif %}
+                      {% set chevaux = [] %}
+                      {% for cp in item.chevalProprietaires %}
+                        {% set chevaux = chevaux|merge([cp.cheval]) %}
+                      {% endfor %}
+                      {% if chevaux is not empty %}
+                        {% for cheval in chevaux %}
+                          <span class="tag is-info">{{ cheval.nom }}</span>{% if not loop.last %}, {% endif %}
+                        {% endfor %}
                       {% else %}
                         Aucun
-                      {% endfor %}
+                      {% endif %}
                     </td>
                     <td data-label="Enregistré le">
                       <small class="has-text-grey is-abbr-like" title="{{ item.createdAt|date('d M Y') }}">{{ item.createdAt|date('d M Y') }}</small>

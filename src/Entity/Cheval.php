@@ -2,13 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\ChevalRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ChevalRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ChevalRepository::class)]
+#[Assert\Callback('validatePourcentages')]
 class Cheval
 {
     #[ORM\Id]
@@ -39,11 +42,6 @@ class Cheval
     #[ORM\ManyToOne(inversedBy: 'cheval')]
     private ?Entreprise $entreprise = null;
 
-    /**
-     * @var Collection<int, User>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'chevals')]
-    private Collection $proprietaire;
 
     /**
      * @var Collection<int, Deplacement>
@@ -57,13 +55,24 @@ class Cheval
     #[ORM\OneToMany(targetEntity: ChevalProduit::class, mappedBy: 'cheval')]
     private Collection $chevalProduits;
 
+    /**
+     * @var Collection<int, ChevalProprietaire>
+     */
+    #[ORM\OneToMany(
+        targetEntity: ChevalProprietaire::class,
+        mappedBy: 'cheval',
+        cascade: ['persist', 'remove'], // <- ajoute le cascade ici
+        orphanRemoval: true // optionnel mais pratique pour supprimer via le formulaire
+    )]
+    private Collection $chevalProprietaires;
+
 
     public function __construct()
     {
         $this->participations = new ArrayCollection();
-        $this->proprietaire = new ArrayCollection();
         $this->deplacements = new ArrayCollection();
         $this->chevalProduits = new ArrayCollection();
+        $this->chevalProprietaires = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,30 +172,6 @@ class Cheval
     }
 
     /**
-     * @return Collection<int, User>
-     */
-    public function getProprietaire(): Collection
-    {
-        return $this->proprietaire;
-    }
-
-    public function addProprietaire(User $proprietaire): static
-    {
-        if (!$this->proprietaire->contains($proprietaire)) {
-            $this->proprietaire->add($proprietaire);
-        }
-
-        return $this;
-    }
-
-    public function removeProprietaire(User $proprietaire): static
-    {
-        $this->proprietaire->removeElement($proprietaire);
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Deplacement>
      */
     public function getDeplacement(): Collection
@@ -238,5 +223,54 @@ class Cheval
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, ChevalProprietaire>
+     */
+    public function getChevalProprietaires(): Collection
+    {
+        return $this->chevalProprietaires;
+    }
+
+    public function addChevalProprietaire(ChevalProprietaire $chevalProprietaire): static
+    {
+        if (!$this->chevalProprietaires->contains($chevalProprietaire)) {
+            $this->chevalProprietaires->add($chevalProprietaire);
+            $chevalProprietaire->setCheval($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChevalProprietaire(ChevalProprietaire $chevalProprietaire): static
+    {
+        if ($this->chevalProprietaires->removeElement($chevalProprietaire)) {
+            // set the owning side to null (unless already changed)
+            if ($chevalProprietaire->getCheval() === $this) {
+                $chevalProprietaire->setCheval(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function validatePourcentages(ExecutionContextInterface $context): void
+    {
+        $total = 0;
+
+
+        foreach ($this->getChevalProprietaires() as $cp) {
+            $total += (float) $cp->getPourcentage();
+        }
+
+
+        if ($total > 100) {
+            $context
+                ->buildViolation('Le total des pourcentages ne peut pas dépasser 100 % (actuellement {{ total }} %).')
+                ->setParameter('{{ total }}', number_format($total, 2, ',', ' '))
+                ->atPath('chevalProprietaires')
+                ->addViolation();
+        }
     }
 }

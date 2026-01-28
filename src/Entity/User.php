@@ -63,16 +63,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $entreprise;
 
     /**
-     * @var Collection<int, Cheval>
+     * @var Collection<int, ChevalProprietaire>
      */
-    #[ORM\ManyToMany(targetEntity: Cheval::class, mappedBy: 'proprietaire')]
-    private Collection $chevals;
+    #[ORM\OneToMany(targetEntity: ChevalProprietaire::class, mappedBy: 'proprietaire')]
+    private Collection $chevalProprietaires;
+
+    /**
+     * @var Collection<int, FacturationUtilisateur>
+     */
+    #[ORM\OneToMany(targetEntity: FacturationUtilisateur::class, mappedBy: 'utilisateur')]
+    private Collection $facturationUtilisateurs;
 
 
     public function __construct()
     {
         $this->entreprise = new ArrayCollection();
-        $this->chevals = new ArrayCollection();
+        $this->chevalProprietaires = new ArrayCollection();
+        $this->facturationUtilisateurs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -138,18 +145,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-        
+
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
 
         return $data;
     }
-    
+
     #[\Deprecated]
     public function eraseCredentials(): void
     {
@@ -265,30 +272,62 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Cheval>
+     * @return Collection<int, ChevalProprietaire>
      */
-    public function getChevals(): Collection
+    public function getChevalProprietaires(): Collection
     {
-        return $this->chevals;
+        return $this->chevalProprietaires;
     }
 
-    public function addCheval(Cheval $cheval): static
+    public function addChevalProprietaire(ChevalProprietaire $chevalProprietaire): static
     {
-        if (!$this->chevals->contains($cheval)) {
-            $this->chevals->add($cheval);
-            $cheval->addProprietaire($this);
+        if (!$this->chevalProprietaires->contains($chevalProprietaire)) {
+            $this->chevalProprietaires->add($chevalProprietaire);
+            $chevalProprietaire->setProprietaire($this);
         }
 
         return $this;
     }
 
-    public function removeCheval(Cheval $cheval): static
+    public function removeChevalProprietaire(ChevalProprietaire $chevalProprietaire): static
     {
-        if ($this->chevals->removeElement($cheval)) {
-            $cheval->removeProprietaire($this);
+        if ($this->chevalProprietaires->removeElement($chevalProprietaire)) {
+            // set the owning side to null (unless already changed)
+            if ($chevalProprietaire->getProprietaire() === $this) {
+                $chevalProprietaire->setProprietaire(null);
+            }
         }
 
         return $this;
     }
 
+    /**
+     * @return Collection<int, FacturationUtilisateur>
+     */
+    public function getFacturationUtilisateurs(): Collection
+    {
+        return $this->facturationUtilisateurs;
+    }
+
+    public function addFacturationUtilisateur(FacturationUtilisateur $facturationUtilisateur): static
+    {
+        if (!$this->facturationUtilisateurs->contains($facturationUtilisateur)) {
+            $this->facturationUtilisateurs->add($facturationUtilisateur);
+            $facturationUtilisateur->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFacturationUtilisateur(FacturationUtilisateur $facturationUtilisateur): static
+    {
+        if ($this->facturationUtilisateurs->removeElement($facturationUtilisateur)) {
+            // set the owning side to null (unless already changed)
+            if ($facturationUtilisateur->getUtilisateur() === $this) {
+                $facturationUtilisateur->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
 }

@@ -116,13 +116,6 @@ class RegistrationFormType extends AbstractType
                 'expanded' => true,
                 'label' => 'Entreprises',
                 'required' => false,
-            ])
-            ->add('chevals', EntityType::class, [
-                'class' => Cheval::class,
-                'choice_label' => 'nom',
-                'multiple' => true,
-                'expanded' => true,
-                'required' => false,
             ]);
 
 

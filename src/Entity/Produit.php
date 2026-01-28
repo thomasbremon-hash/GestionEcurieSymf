@@ -37,6 +37,9 @@ class Produit
     #[ORM\OneToMany(targetEntity: ChevalProduit::class, mappedBy: 'produit')]
     private Collection $chevalProduits;
 
+    #[ORM\Column]
+    private ?float $tauxTVA = null;
+
     public function __construct()
     {
         $this->produitEntrepriseTaxes = new ArrayCollection();
@@ -140,6 +143,18 @@ class Produit
                 $chevalProduit->setProduit(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTauxTVA(): ?float
+    {
+        return $this->tauxTVA;
+    }
+
+    public function setTauxTVA(float $tauxTVA): static
+    {
+        $this->tauxTVA = $tauxTVA;
 
         return $this;
     }

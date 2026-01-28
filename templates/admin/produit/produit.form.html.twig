@@ -1,103 +1,104 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-	BackOffice | Ajouter un produit
+  BackOffice | Ajouter un produit
 {% endblock %}
 
 {% block body %}
-	<section class="section is-title-bar">
-		<div class="level">
-			<div class="level-left">
-				<div class="level-item">
-					<ul>
-						<li>BackOffice</li>
-						<li>Produits</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</section>
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>BackOffice</li>
+            <li>Produits</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-	<section class="section is-main-section">
-		<div class="card">
-			<header class="card-header">
-				<p class="card-header-title">
-					<span class="icon">
-						<span class="mdi mdi-account-plus"></span>
-					</span>
-					{% if produitId is not null %}
-						Modifier
-					{% else %}
-						Ajouter
-					{% endif %}un produit
-				</p>
-			</header>
-			<div class="card-content">
-				{{ form_start(formProduit) }}
+  <section class="section is-main-section">
+    <div class="card">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><span class="mdi mdi-account-plus"></span></span>
+          {% if produitId is not null %}
+            Modifier
+          {% else %}
+            Ajouter
+          {% endif %}un produit
+        </p>
+      </header>
+      <div class="card-content">
+        {{ form_start(formProduit) }}
 
-				{# Nom / Prix #}
-				<div class="field is-horizontal">
-					<div class="field-label is-normal">
-						<label class="label">Nom / Prix</label>
-					</div>
-					<div class="field-body">
-						<div class="field">
-							{{ form_label(formProduit.nom) }}
-							<p class="control is-expanded">{{ form_widget(formProduit.nom) }}</p>
-							{{ form_errors(formProduit.nom) }}
-						</div>
+        {# Nom / Prix #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Nom / Prix / Taux TVA</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formProduit.nom) }}
+              <p class="control is-expanded">{{ form_widget(formProduit.nom) }}</p>
+              {{ form_errors(formProduit.nom) }}
+            </div>
 
-						<div class="field">
-							{{ form_label(formProduit.prix) }}
-							<p class="control is-expanded">{{ form_widget(formProduit.prix) }}</p>
-							{{ form_errors(formProduit.prix) }}
-						</div>
-					</div>
-				</div>
+            <div class="field">
+              {{ form_label(formProduit.prix) }}
+              <p class="control is-expanded">{{ form_widget(formProduit.prix) }}</p>
+              {{ form_errors(formProduit.prix) }}
+            </div>
 
-				{# Description #}
-				<div class="field is-horizontal">
-					<div class="field-label is-normal">
+            <div class="field">
+              {{ form_label(formProduit.tauxTVA) }}
+              <p class="control is-expanded">{{ form_widget(formProduit.tauxTVA) }}</p>
+              {{ form_errors(formProduit.tauxTVA) }}
+            </div>
+          </div>
+        </div>
 
-						<label class="label">Description</label>
-					</div>
-					<div class="field-body">
-						<div class="field">
-							{{ form_label(formProduit.description) }}
-							<p class="control is-expanded">{{ form_widget(formProduit.description) }}</p>
-							{{ form_errors(formProduit.description) }}
-						</div>
+        {# Description #}
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Description</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              {{ form_label(formProduit.description) }}
+              <p class="control is-expanded">{{ form_widget(formProduit.description) }}</p>
+              {{ form_errors(formProduit.description) }}
+            </div>
+          </div>
+        </div>
 
-					</div>
-				</div>
+        <hr />
 
+        {# Bouton de soumission #}
+        <div class="field is-horizontal">
+          <div class="field-label">
+            {# Vide pour alignement #}
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="field is-grouped">
+                <div class="control">
+                  <button type="submit" class="button is-primary">
+                    {% if produitId is not null %}
+                      Modifier
+                    {% else %}
+                      Ajouter
+                    {% endif %}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-				<hr/>
-
-				{# Bouton de soumission #}
-				<div class="field is-horizontal">
-					<div
-						class="field-label">{# Vide pour alignement #}
-					</div>
-					<div class="field-body">
-						<div class="field">
-							<div class="field is-grouped">
-								<div class="control">
-									<button type="submit" class="button is-primary">
-										{% if produitId is not null %}
-											Modifier
-										{% else %}
-											Ajouter
-										{% endif %}
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{{ form_end(formProduit) }}
-			</div>
-		</div>
-	</section>
+        {{ form_end(formProduit) }}
+      </div>
+    </div>
+  </section>
 {% endblock %}

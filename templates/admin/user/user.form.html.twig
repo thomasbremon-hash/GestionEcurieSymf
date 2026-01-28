@@ -154,29 +154,6 @@
           </div>
         </div>
 
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Chevaux</label>
-          </div>
-          <div class="field-body">
-            <div class="field is-grouped is-grouped-multiline">
-              {% if (formUser.chevals|length) > 0 %}
-                {% for cheval in formUser.chevals %}
-                  <div class="control">
-                    <label class="checkbox">
-                      {{ form_widget(cheval) }}
-                      {{ cheval.vars.label }}
-                    </label>
-                  </div>
-                {% endfor %}
-              {% else %}
-                <p class="mt-2">Aucun cheval à assigner</p>
-              {% endif %}
-            </div>
-            {{ form_errors(formUser.chevals) }}
-          </div>
-        </div>
-
         <hr />
 
         {# Bouton de soumission #}

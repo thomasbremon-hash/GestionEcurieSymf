@@ -37,7 +37,7 @@
     <div class="card has-table">
       <header class="card-header">
         <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-file-document-box-multiple-outline"></span></span>
+          <span class="icon"><i class="mdi mdi-file-document-box-multiple-outline"></i></span>
           {{ factures|length }} factures
         </p>
       </header>
@@ -50,30 +50,44 @@
                 <tr>
                   <th>Entreprise</th>
                   <th>Mois / Année</th>
-                  <th>Total (€)</th>
-                  <th></th>
+                  <th>Total</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {% set currentMonth = null %}
+
                 {% for facture in factures %}
                   {% set monthYear = ('%02d'|format(facture.moisDeGestion.mois)) ~ '/' ~ facture.moisDeGestion.annee %}
 
                   {% if monthYear != currentMonth %}
                     <tr class="has-background-light">
                       <td colspan="4">
-                        <strong>Mois : {{ monthYear }}</strong>
+                        <strong>
+                          Mois :
+                          <span class="tag is-info">{{ monthYear }}</span>
+                        </strong>
                       </td>
                     </tr>
                     {% set currentMonth = monthYear %}
                   {% endif %}
 
                   <tr>
-                    <td data-label="Entreprise">{{ facture.entreprise.nom }}</td>
-                    <td data-label="Mois / Année">{{ monthYear }}</td>
-                    <td data-label="Total (€)">{{ facture.total|number_format(2, ',', ' ') }} €</td>
+                    <td data-label="Entreprise">
+                      <span class="tag is-light">{{ facture.entreprise.nom }}</span>
+                    </td>
+
+                    <td data-label="Mois / Année">
+                      <span class="tag is-info">{{ monthYear }}</span>
+                    </td>
+
+                    <td data-label="Total">
+                      <span class="tag is-success">{{ facture.total|number_format(2, ',', ' ') }} €</span>
+                    </td>
+
                     <td class="is-actions-cell">
                       <div class="buttons is-right">
+                        <a href="{{ path('app_admin_facturation_pdf', { id: facture.id }) }}" class="button is-small is-warning"><span class="icon"><i class="mdi mdi-file-pdf-box"></i></span></a>
                         <a href="{{ path('app_admin_facturation_show', { id: facture.id }) }}" class="button is-small is-info"><span class="icon"><i class="mdi mdi-eye"></i></span></a>
                         <button class="button is-small is-danger jb-modal" data-target="modal-delete-{{ facture.id }}"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
                       </div>
@@ -98,7 +112,6 @@
                         <a href="{{ path('app_admin_facturation_delete', { id: facture.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
                       </footer>
                     </div>
-                    <button class="modal-close is-large jb-modal-close" aria-label="close"></button>
                   </div>
                 {% endfor %}
               </tbody>

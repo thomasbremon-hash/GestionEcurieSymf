@@ -44,7 +44,7 @@ class TaxesType extends AbstractType
                     'placeholder' => 'Ex : 20',
                     'step' => '0.01',
                     'min' => 0,
-                    'max' => 100
+                    'max' => 100,
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'Le pourcentage est obligatoire']),

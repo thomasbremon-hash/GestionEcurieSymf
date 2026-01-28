@@ -43,17 +43,29 @@ final class ChevalController extends AbstractController
             $isEdit = false;
         }
 
+
+        // ⚡ Pré-remplir la collection avec au moins un propriétaire vide
+        if ($cheval->getChevalProprietaires()->isEmpty()) {
+            $chevalProprietaire = new \App\Entity\ChevalProprietaire();
+            $cheval->addChevalProprietaire($chevalProprietaire);
+        }
+
+
         $form = $this->createForm(ChevalType::class, $cheval);
         $form->handleRequest($request);
+
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($cheval);
             $em->flush();
 
+
             $this->addFlash('success', $isEdit ? 'Cheval modifiée !' : 'Cheval créée !');
+
 
             return $this->redirectToRoute('app_admin_chevaux');
         }
+
 
         return $this->render('admin/cheval/cheval.form.html.twig', [
             'formCheval' => $form,
@@ -71,7 +83,7 @@ final class ChevalController extends AbstractController
         }
 
         // Vérification si un propriétaire est associé
-        if ($cheval->getProprietaire() !== null) {
+        if ($cheval->getChevalProprietaires() !== null && !$cheval->getChevalProprietaires()->isEmpty()) {
             $this->addFlash(
                 'danger',
                 "Impossible de supprimer le cheval « " . $cheval->getNom() . " » car il est associé à un propriétaire."

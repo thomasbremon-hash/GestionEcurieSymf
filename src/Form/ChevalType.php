@@ -2,16 +2,17 @@
 
 namespace App\Form;
 
-use App\Entity\Cheval;
 use App\Entity\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Cheval;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class ChevalType extends AbstractType
 {
@@ -77,21 +78,13 @@ class ChevalType extends AbstractType
                 ]
             ])
 
-            // PROPRIÉTAIRE
-            ->add('proprietaire', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getPrenom() . ' ' . $user->getNom();
-                },
-                'label' => 'Propriétaires',
-                'required' => false,
-                'multiple' => true,        // plusieurs choix
-                'expanded' => true,        // checkbox au lieu de select
-                'by_reference' => false,   // nécessaire pour ManyToMany
-                'attr' => [
-                    'class' => 'p-2',
-                ],
-            ]);
+            ->add('chevalProprietaires', CollectionType::class, [
+                'entry_type' => ChevalProprietaireType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
