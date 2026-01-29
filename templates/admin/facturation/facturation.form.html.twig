@@ -1,7 +1,7 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Générer factures
+  BackOffice | Générer factures utilisateurs
 {% endblock %}
 
 {% block body %}
@@ -11,6 +11,7 @@
         <ul>
           <li>Admin</li>
           <li>Facturation</li>
+          <li>Utilisateurs</li>
           <li>Génération</li>
         </ul>
       </div>
@@ -21,8 +22,8 @@
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">
-          <span class="icon"><i class="mdi mdi-file-document"></i></span>
-          Générer les factures
+          <span class="icon"><i class="mdi mdi-account-cash"></i></span>
+          Générer les factures utilisateurs
         </p>
       </header>
 
@@ -34,7 +35,7 @@
           {{ form_errors(form.moisDeGestion) }}</div>
 
         <div class="field">
-          <button class="button is-primary">Générer</button>
+          <button class="button is-primary">Générer les factures</button>
         </div>
 
         {{ form_end(form) }}
