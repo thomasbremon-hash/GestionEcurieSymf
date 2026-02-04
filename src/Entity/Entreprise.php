@@ -75,6 +75,9 @@ class Entreprise
     #[ORM\OneToMany(targetEntity: FacturationEntreprise::class, mappedBy: 'entreprise')]
     private Collection $facturationEntreprises;
 
+    #[ORM\Column(length: 255)]
+    private ?string $numTVA = null;
+
 
     public function __construct()
     {
@@ -370,6 +373,18 @@ class Entreprise
                 $facturationEntreprise->setEntreprise(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNumTVA(): ?string
+    {
+        return $this->numTVA;
+    }
+
+    public function setNumTVA(string $numTVA): static
+    {
+        $this->numTVA = $numTVA;
 
         return $this;
     }

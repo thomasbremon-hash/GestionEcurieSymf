@@ -6,106 +6,216 @@
       body {
         font-family: DejaVu Sans, sans-serif;
         font-size: 11px;
+        color: #333;
       }
+      
+      h1 {
+        font-size: 20px;
+        margin-bottom: 5px;
+      }
+      
+      h2 {
+        font-size: 14px;
+        margin: 0;
+        color: #666;
+      }
+      
+      .header {
+        border-bottom: 2px solid #444;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+      
+      .infos {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      
+      .infos td {
+        vertical-align: top;
+        padding: 5px;
+      }
+      
+      .box {
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      
+      .right {
+        text-align: right;
+      }
+      
+      .center {
+        text-align: center;
+      }
+      
       table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 15px;
       }
-      th,
-      td {
-        border: 1px solid #000;
-        padding: 5px;
+      
+      thead th {
+        background: #f5f5f5;
+        border-bottom: 2px solid #ccc;
+        padding: 8px;
+        font-weight: bold;
+        text-align: left;
       }
-      th {
-        background: #eee;
+      
+      tbody td {
+        padding: 7px;
+        border-bottom: 1px solid #eee;
       }
-      .right {
-        text-align: right;
+      
+      tbody tr:nth-child(even) {
+        background: #fafafa;
       }
-      .center {
-        text-align: center;
-      }
-      .no-border {
-        border: none;
-      }
-      .mt-20 {
+      
+      .totaux {
         margin-top: 20px;
+        width: 40%;
+        float: right;
+        border-collapse: collapse;
+      }
+      
+      .totaux td {
+        padding: 6px;
+      }
+      
+      .totaux tr.total-ttc td {
+        font-size: 13px;
+        font-weight: bold;
+        border-top: 2px solid #444;
+      }
+      
+      .badge {
+        background: #eef3ff;
+        color: #2c4ed8;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 10px;
+      }
+      
+      .muted {
+        color: #777;
+      }
+      
+      .clearfix {
+        clear: both;
       }
     </style>
   </head>
-  <body>
-    <h2>Facture Utilisateur</h2>
 
-    <table class="no-border">
+  <body>
+    <!-- EN-TÊTE -->
+    <div class="header">
+      <h1>Facture</h1>
+      <h2>Période {{ '%02d'|format(mois.mois) }}/{{ mois.annee }}</h2>
+      <p>
+        <strong>Facture n° :</strong>
+        {{ '%02d'|format(mois.mois) }}-{{ mois.annee }}-{{ facture.id }}<br />
+
+        <strong>Date :</strong>
+        {{ 'now'|date('d/m/Y') }}
+      </p>
+    </div>
+
+    <!-- INFOS ENTREPRISE ET CLIENT -->
+    <table class="infos">
       <tr>
-        <td class="no-border">
-          <strong>Facturé à :</strong><br />
-          {{ user.prenom }} {{ user.nom }}<br />
-          {{ user.email }}
+        <td width="50%">
+          <div class="box">
+            <strong>Facturé à</strong><br />
+            {{ user.prenom }} {{ user.nom }}<br />
+            <span class="muted">{{ user.email }}</span>
+          </div>
         </td>
-        <td class="no-border right">
+        <td width="50%" class="right">
           {% set entreprise = user.entreprise.first %}
-          <strong>{{ entreprise.nom }}</strong><br />
-          {{ entreprise.rue }}<br />
-          {{ entreprise.cp }} {{ entreprise.ville }}<br />
-          {{ entreprise.pays }}
+          <div class="box">
+            <strong>{{ entreprise.nom }}</strong><br />
+            {{ entreprise.rue }}<br />
+            {{ entreprise.cp }} {{ entreprise.ville }}<br />
+            {{ entreprise.pays }}<br />
+            <strong>SIRET:</strong> {{ entreprise.siret }}<br />
+            {% if entreprise.numTVA %}
+              <strong>TVA intracom:</strong> {{ entreprise.numTVA }}<br />
+            {% endif %}
+          </div>
         </td>
       </tr>
     </table>
 
-    <p class="mt-20">
-      <strong>Période :</strong> {{ '%02d'|format(mois.mois) }}/{{ mois.annee }}
-    </p>
-
+    <!-- TABLE PRODUITS -->
     <table>
       <thead>
         <tr>
           <th>Cheval</th>
           <th>Produit</th>
-          <th>Qté</th>
-          <th>Prix unitaire</th>
-          <th>Montant HT</th>
-          <th>TVA</th>
-          <th>Montant TVA</th>
+          <th class="center">Qté</th>
+          <th class="right">PU HT</th>
+          <th class="right">Montant HT</th>
+          <th class="center">TVA</th>
+          <th class="right">TVA €</th>
         </tr>
       </thead>
       <tbody>
-        {% for ligne in lignes %}
+        {% for cheval, lignes in lignesParCheval %}
+          {# Ligne titre cheval #}
           <tr>
-            <td>{{ ligne.cheval }} ({{ ligne.pourcentage }}%)</td>
-            <td>{{ ligne.description }}</td>
-            <td class="center">{{ ligne.quantite }}</td>
-            <td class="right">{{ ligne.prixUnitaire|number_format(2, ',', ' ') }} €</td>
-            <td class="right">{{ ligne.montantHT|number_format(2, ',', ' ') }} €</td>
-            <td class="center">{{ ligne.tauxTVA }}%</td>
-            <td class="right">{{ ligne.montantTVA|number_format(2, ',', ' ') }} €</td>
+            <td colspan="7" style="background:#f5f5f5; font-weight:bold;">{{ cheval }} ({{ lignes[0].pourcentage }} %)</td>
+          </tr>
+
+          {# Produits du cheval #}
+          {% for ligne in lignes %}
+            <tr>
+              <td></td>
+              <td>{{ ligne.description }}</td>
+              <td class="center">{{ ligne.quantite }}</td>
+              <td class="right">{{ ligne.prixUnitaire|number_format(2, ',', ' ') }} €</td>
+              <td class="right">{{ ligne.montantHT|number_format(2, ',', ' ') }} €</td>
+              <td class="center">{{ ligne.tauxTVA }} %</td>
+              <td class="right">{{ ligne.montantTVA|number_format(2, ',', ' ') }} €</td>
+            </tr>
+          {% endfor %}
+
+          {# Ligne espace entre chevaux #}
+          <tr>
+            <td colspan="7" style="border:none;height:8px;"></td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
 
-    <table class="mt-20">
+    <!-- TOTAUX -->
+    <table class="totaux">
       <tr>
-        <td class="right">
-          <strong>Total HT :</strong>
-        </td>
+        <td class="right">Total HT</td>
         <td class="right">{{ totalHT|number_format(2, ',', ' ') }} €</td>
       </tr>
+
       {% for taux, montant in totalTVA %}
         <tr>
           <td class="right">TVA {{ taux }} %</td>
           <td class="right">{{ montant|number_format(2, ',', ' ') }} €</td>
         </tr>
       {% endfor %}
-      <tr>
-        <td class="right">
-          <strong>Total TTC :</strong>
-        </td>
-        <td class="right">
-          <strong>{{ totalTTC|number_format(2, ',', ' ') }} €</strong>
-        </td>
+
+      <tr class="total-ttc">
+        <td class="right">Total TTC</td>
+        <td class="right">{{ totalTTC|number_format(2, ',', ' ') }} €</td>
       </tr>
     </table>
+
+    <!-- MENTIONS LEGALES -->
+    <div class="box" style="margin-top:30px; font-size:10px;">
+      <p>
+        <strong>Conditions de paiement:</strong> Paiement à 30 jours. Pénalités de retard: taux légal. Indemnité forfaitaire: 40 €.
+      </p>
+      <p>TVA non applicable, article 293 B du CGI (si applicable).</p>
+    </div>
+    <div class="clearfix"></div>
   </body>
 </html>
