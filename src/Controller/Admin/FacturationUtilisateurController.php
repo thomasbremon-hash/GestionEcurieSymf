@@ -29,29 +29,54 @@ class FacturationUtilisateurController extends AbstractController
     }
 
     #[Route('/liste', name: 'app_admin_facturation_utilisateur')]
-    public function index(FacturationUtilisateurRepository $repo): Response
+    public function index(FacturationUtilisateurRepository $repo, FactureCalculator $calculator): Response
     {
         $factures = $repo->findAll();
 
-        // Tri par année/mois DESC, puis par utilisateur nom ASC
+        // 🔽 Tri : Entreprise → Année DESC → Mois DESC → Utilisateur
         usort($factures, function ($a, $b) {
-            $aMois = $a->getMoisDeGestion();
-            $bMois = $b->getMoisDeGestion();
+            // Entreprise facturante
+            $cmp = strcmp(
+                $a->getEntreprise()->getNom(),
+                $b->getEntreprise()->getNom()
+            );
+            if ($cmp !== 0) {
+                return $cmp;
+            }
 
-            // Trier par année descendante
-            $cmp = $bMois->getAnnee() <=> $aMois->getAnnee();
-            if ($cmp !== 0) return $cmp;
+            // Année DESC
+            $cmp = $b->getMoisDeGestion()->getAnnee() <=> $a->getMoisDeGestion()->getAnnee();
+            if ($cmp !== 0) {
+                return $cmp;
+            }
 
-            // Puis par mois descendante
-            $cmp = $bMois->getMois() <=> $aMois->getMois();
-            if ($cmp !== 0) return $cmp;
+            // Mois DESC
+            $cmp = $b->getMoisDeGestion()->getMois() <=> $a->getMoisDeGestion()->getMois();
+            if ($cmp !== 0) {
+                return $cmp;
+            }
 
-            // Enfin par nom d'utilisateur ascendant
-            return strcmp($a->getUtilisateur()->getNom(), $b->getUtilisateur()->getNom());
+            // Nom utilisateur ASC
+            return strcmp(
+                $a->getUtilisateur()->getNom(),
+                $b->getUtilisateur()->getNom()
+            );
         });
+
+        $totauxTtc = [];
+
+        foreach ($factures as $facture) {
+            $data = $calculator->calculerFactureUtilisateur(
+                $facture->getUtilisateur(),
+                $facture->getMoisDeGestion()
+            );
+
+            $totauxTtc[$facture->getId()] = $data['totalTTC'];
+        }
 
         return $this->render('admin/facturation/liste.html.twig', [
             'factures' => $factures,
+            'totauxTtc' => $totauxTtc,
         ]);
     }
 
@@ -123,6 +148,7 @@ class FacturationUtilisateurController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var MoisDeGestion $mois */
             $mois = $form->get('moisDeGestion')->getData();
+            $entreprise = $form->get('entreprise')->getData();
             if (!$mois) return $this->redirectToRoute('app_admin_facturation_utilisateur');
 
             // Récupérer tous les propriétaires pour ce mois
@@ -137,6 +163,7 @@ class FacturationUtilisateurController extends AbstractController
                 $facture = new FacturationUtilisateur();
                 $facture->setUtilisateur($user);
                 $facture->setMoisDeGestion($mois);
+                $facture->setEntreprise($entreprise);
 
                 $total = 0;
                 foreach ($mois->getChevalProduits() as $cp) {

@@ -1,111 +1,168 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Facturation Entreprises
+	BackOffice | Liste des déplacements
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Facturation</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_facturation_generer') }}" class="button is-small is-primary">
-          <span>Générer des factures</span>
-          <span class="icon"><i class="mdi mdi-plus"></i></span>
-        </a>
-      </div>
-    </div>
-  </section>
+	<section class="section is-title-bar">
+		<div class="level">
+			<div class="level-left">
+				<div class="level-item">
+					<ul>
+						<li>Admin</li>
+						<li>Déplacements</li>
+					</ul>
+				</div>
+			</div>
+			<div class="level-right">
+				<a href="{{ path('app_admin_deplacement_new') }}" class="button is-small is-primary">
+					<span>Ajouter</span>
+					<span class="icon">
+						<i class="mdi mdi-plus"></i>
+					</span>
+				</a>
+			</div>
+		</div>
+	</section>
 
-  <section class="section is-main-section">
-    {% for label, messages in app.flashes(['success', 'danger']) %}
-      {% for message in messages %}
-        <div class="notification is-{{ label }}">
-          <button class="delete"></button>
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endfor %}
+	<section class="section is-main-section">
 
-    <div class="card has-table">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-file-document-box-multiple-outline"></span></span>
-          {{ factures|length }} factures
-        </p>
-        <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
-      </header>
+		{% for label, messages in app.flashes(['success', 'danger']) %}
+			{% for message in messages %}
+				<div class="notification is-{{ label }}">
+					<button class="delete"></button>
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endfor %}
 
-      <div class="card-content">
-        <div class="b-table has-pagination">
-          <div class="table-wrapper has-mobile-cards">
-            <table class="table is-fullwidth is-striped is-hoverable" id="table">
-              <thead>
-                <tr>
-                  <th>Entreprise</th>
-                  <th>Mois / Année</th>
-                  <th>Total (€)</th>
-                  <th></th>
-                </tr>
-              </thead>
+		<div class="card has-table">
+			<header class="card-header">
+				<p class="card-header-title">
+					<span class="icon">
+						<i class="mdi mdi-map-marker-distance"></i>
+					</span>
+					{{ deplacements|length }}
+					déplacements
+				</p>
+				<a href="#" class="card-header-icon">
+					<span class="icon">
+						<i class="mdi mdi-reload"></i>
+					</span>
+				</a>
+			</header>
 
-              <tbody>
-                {% for facture in factures %}
-                  <tr>
-                    <td data-label="Entreprise">
-                      <span class="tag is-info">{{ facture.entreprise.nom }}</span>
-                    </td>
+			<div class="card-content">
+				<div class="b-table has-pagination">
+					<div class="table-wrapper has-mobile-cards">
+						<table class="table is-fullwidth is-striped is-hoverable">
+							<thead>
+								<tr>
+									<th>Nom</th>
+									<th>Date</th>
+									<th>Chevaux</th>
+									<th>Structure</th>
+									<th>Entreprise</th>
+									<th>Distance</th>
+									<th></th>
+								</tr>
+							</thead>
 
-                    <td data-label="Mois / Année">
-                      <span class="tag is-light">{{ '%02d'|format(facture.moisDeGestion.mois) }}/{{ facture.moisDeGestion.annee }}</span>
-                    </td>
 
-                    <td data-label="Total (€)">
-                      <span class="tag is-success">{{ facture.total|number_format(2, ',', ' ') }} €</span>
-                    </td>
+							<tbody>
+								{% for deplacement in deplacements %}
+									<tr>
+										<td data-label="Nom">
+											{{ deplacement.nom }}
+										</td>
 
-                    <td class="is-actions-cell">
-                      <div class="buttons is-right">
-                        <a href="{{ path('app_admin_facturation_show', { id: facture.id }) }}" class="button is-small is-info"><span class="icon"><i class="mdi mdi-eye"></i></span></a>
+										<td data-label="Date">
+											{{ deplacement.date ? deplacement.date|date('d/m/Y') : 'N/A' }}
+										</td>
 
-                        <button class="button is-small is-danger jb-modal" data-target="modal-delete-{{ facture.id }}"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
-                      </div>
-                    </td>
-                  </tr>
+										<td data-label="Chevaux">
+											{% if deplacement.chevaux|length > 0 %}
+												{% for cheval in deplacement.chevaux %}
+													<span class="tag is-info">{{ cheval.nom }}</span>
+												{% endfor %}
+											{% else %}
+												<span class="tag is-light">Aucun</span>
+											{% endif %}
+										</td>
 
-                  {# Modal suppression #}
-                  <div id="modal-delete-{{ facture.id }}" class="modal">
-                    <div class="modal-background jb-modal-close"></div>
-                    <div class="modal-card">
-                      <header class="modal-card-head">
-                        <p class="modal-card-title">Confirmer la suppression</p>
-                        <button class="delete jb-modal-close" aria-label="close"></button>
-                      </header>
+										<td data-label="Structure">
+											<span class="tag is-warning">
+												{{ deplacement.structure ? deplacement.structure.nom : 'N/A' }}
+											</span>
+										</td>
 
-                      <section class="modal-card-body">
-                        <p>Voulez-vous vraiment supprimer cette facture ?</p>
-                      </section>
+										<td data-label="Entreprise">
+											<span class="tag is-primary">
+												{{ deplacement.entreprise ? deplacement.entreprise.nom : 'N/A' }}
+											</span>
+										</td>
 
-                      <footer class="modal-card-foot">
-                        <button class="button jb-modal-close">Annuler</button>
-                        <a href="{{ path('app_admin_facturation_delete', { id: facture.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
-                      </footer>
-                    </div>
-                    <button class="modal-close is-large jb-modal-close" aria-label="close"></button>
-                  </div>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+										<td data-label="Distance">
+											{% if deplacement.distance is not null %}
+												<span class="tag is-success">
+													{{ deplacement.distance|number_format(2, ',', ' ') }}
+													km
+												</span>
+											{% else %}
+												<span class="tag is-light">N/A</span>
+											{% endif %}
+										</td>
+
+
+										<td class="is-actions-cell">
+											<div class="buttons is-right">
+												<a href="{{ path('app_admin_deplacement_update', { id: deplacement.id }) }}" class="button is-small is-primary">
+													<span class="icon">
+														<i class="mdi mdi-pencil"></i>
+													</span>
+												</a>
+
+												<button class="button is-small is-danger jb-modal" data-target="modal-{{ deplacement.id }}">
+													<span class="icon">
+														<i class="mdi mdi-trash-can"></i>
+													</span>
+												</button>
+											</div>
+										</td>
+									</tr>
+
+									{# Modal suppression #}
+									<div id="modal-{{ deplacement.id }}" class="modal">
+										<div class="modal-background jb-modal-close"></div>
+										<div class="modal-card">
+											<header class="modal-card-head">
+												<p class="modal-card-title">Confirmer la suppression</p>
+												<button class="delete jb-modal-close"></button>
+											</header>
+											<section class="modal-card-body">
+												<p>
+													Voulez-vous vraiment supprimer le déplacement
+																																							                        «
+													<strong>{{ deplacement.nom }}</strong>
+													» ?
+												</p>
+											</section>
+											<footer class="modal-card-foot">
+												<button class="button jb-modal-close">Annuler</button>
+												<a href="{{ path('app_admin_deplacement_delete', { id: deplacement.id }) }}" class="button is-danger jb-modal-close">
+													Supprimer
+												</a>
+											</footer>
+										</div>
+									</div>
+
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 {% endblock %}

@@ -78,6 +78,12 @@ class Entreprise
     #[ORM\Column(length: 255)]
     private ?string $numTVA = null;
 
+    /**
+     * @var Collection<int, FacturationUtilisateur>
+     */
+    #[ORM\OneToMany(targetEntity: FacturationUtilisateur::class, mappedBy: 'entreprise')]
+    private Collection $ManyToOne;
+
 
     public function __construct()
     {
@@ -87,6 +93,7 @@ class Entreprise
         $this->distanceEntreprise = new ArrayCollection();
         $this->deplacement = new ArrayCollection();
         $this->facturationEntreprises = new ArrayCollection();
+        $this->ManyToOne = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -385,6 +392,36 @@ class Entreprise
     public function setNumTVA(string $numTVA): static
     {
         $this->numTVA = $numTVA;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FacturationUtilisateur>
+     */
+    public function getManyToOne(): Collection
+    {
+        return $this->ManyToOne;
+    }
+
+    public function addManyToOne(FacturationUtilisateur $manyToOne): static
+    {
+        if (!$this->ManyToOne->contains($manyToOne)) {
+            $this->ManyToOne->add($manyToOne);
+            $manyToOne->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeManyToOne(FacturationUtilisateur $manyToOne): static
+    {
+        if ($this->ManyToOne->removeElement($manyToOne)) {
+            // set the owning side to null (unless already changed)
+            if ($manyToOne->getEntreprise() === $this) {
+                $manyToOne->setEntreprise(null);
+            }
+        }
 
         return $this;
     }

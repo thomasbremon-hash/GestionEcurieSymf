@@ -1,115 +1,171 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Facturation Utilisateurs
+	BackOffice | Facturation Utilisateurs
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Facturation</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_facturation_generer_utilisateur') }}" class="button is-small is-primary">
-          <span>Générer des factures</span>
-          <span class="icon"><i class="mdi mdi-plus"></i></span>
-        </a>
-      </div>
-    </div>
-  </section>
+	<section class="section is-title-bar">
+		<div class="level">
+			<div class="level-left">
+				<div class="level-item">
+					<ul>
+						<li>Admin</li>
+						<li>Facturation</li>
+					</ul>
+				</div>
+			</div>
+			<div class="level-right">
+				<a href="{{ path('app_admin_facturation_generer_utilisateur') }}" class="button is-small is-primary">
+					<span>Générer des factures</span>
+					<span class="icon">
+						<i class="mdi mdi-plus"></i>
+					</span>
+				</a>
+			</div>
+		</div>
+	</section>
 
-  <section class="section is-main-section">
-    {% for label, messages in app.flashes(['success', 'danger']) %}
-      {% for message in messages %}
-        <div class="notification is-{{ label }}">
-          <button class="delete"></button>
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endfor %}
+	<section class="section is-main-section">
+		{% for label, messages in app.flashes(['success', 'danger']) %}
+			{% for message in messages %}
+				<div class="notification is-{{ label }}">
+					<button class="delete"></button>
+					{{ message }}
+				</div>
+			{% endfor %}
+		{% endfor %}
 
-    <div class="card has-table">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><i class="mdi mdi-file-document-box-multiple-outline"></i></span>
-          {{ factures|length }} factures utilisateurs
-        </p>
-        <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
-      </header>
+		<div class="card has-table">
+			<header class="card-header">
+				<p class="card-header-title">
+					<span class="icon">
+						<i class="mdi mdi-file-document-box-multiple-outline"></i>
+					</span>
+					{{ factures|length }}
+					factures utilisateurs
+				</p>
+				<a href="#" class="card-header-icon">
+					<span class="icon">
+						<i class="mdi mdi-reload"></i>
+					</span>
+				</a>
+			</header>
 
-      <div class="card-content">
-        <div class="b-table has-pagination">
-          <div class="table-wrapper has-mobile-cards">
-            <table class="table is-fullwidth is-hoverable is-striped">
-              <thead>
-                <tr>
-                  <th>Utilisateur</th>
-                  <th>Mois / Année</th>
-                  <th>Total (HT)</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% set currentMonth = null %}
-                {% for facture in factures %}
-                  {% set monthYear = ('%02d'|format(facture.moisDeGestion.mois)) ~ '/' ~ facture.moisDeGestion.annee %}
+			<div class="card-content">
+				<div class="b-table has-pagination">
+					<div class="table-wrapper has-mobile-cards">
+						<table class="table is-fullwidth is-hoverable is-striped">
+							<thead>
+								<tr>
+									<th>Utilisateur</th>
+									<th>Mois / Année</th>
+									<th>Total (TTC)</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% set currentEntreprise = null %}
+								{% set currentMonth = null %}
 
-                  {% if monthYear != currentMonth %}
-                    <tr class="has-background-primary-light">
-                      <td colspan="4">
-                        <strong class="has-text-primary-dark">Mois : <span class="tag is-primary">{{ monthYear }}</span></strong>
-                      </td>
-                    </tr>
-                    {% set currentMonth = monthYear %}
-                  {% endif %}
+								{% for facture in factures %}
+									{% set entreprise = facture.entreprise.nom %}
+									{% set monthYear = ('%02d'|format(facture.moisDeGestion.mois)) ~ '/' ~ facture.moisDeGestion.annee %}
 
-                  <tr class="is-hoverable">
-                    <td data-label="Utilisateur">
-                      <span class="tag is-info">{{ facture.utilisateur.nom }} {{ facture.utilisateur.prenom }}</span>
-                    </td>
-                    <td data-label="Mois / Année">
-                      <span class="tag is-light">{{ monthYear }}</span>
-                    </td>
-                    <td data-label="Total (€)">
-                      <span class="tag is-success has-text-weight-bold">{{ facture.total|number_format(2, ',', ' ') }} €</span>
-                    </td>
-                    <td class="is-actions-cell">
-                      <div class="buttons is-right">
-                        <a href="{{ path('app_admin_facturation_pdf_utilisateur', { id: facture.id }) }}" class="button is-warning" title="PDF"><span class="icon"><i class="mdi mdi-file-pdf-box"></i></span></a>
-                        <button class="button is-danger jb-modal" data-target="modal-delete-{{ facture.id }}" title="Supprimer"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
-                      </div>
-                    </td>
-                  </tr>
+									{# 🏢 Séparateur ENTREPRISE #}
+									{% if entreprise != currentEntreprise %}
+										<tr class="has-background-link-light">
+											<td colspan="4">
+												<strong class="has-text-link-dark">
+													Entreprise facturante :
+													<span class="tag is-link">{{ entreprise }}</span>
+												</strong>
+											</td>
+										</tr>
 
-                  {# Modal suppression #}
-                  <div id="modal-delete-{{ facture.id }}" class="modal">
-                    <div class="modal-background jb-modal-close"></div>
-                    <div class="modal-card">
-                      <header class="modal-card-head">
-                        <p class="modal-card-title">Confirmer la suppression</p>
-                        <button class="delete jb-modal-close"></button>
-                      </header>
-                      <section class="modal-card-body">
-                        <p>Voulez-vous vraiment supprimer cette facture ?</p>
-                      </section>
-                      <footer class="modal-card-foot">
-                        <button class="button jb-modal-close">Annuler</button>
-                        <a href="{{ path('app_admin_facturation_delete_utilisateur', { id: facture.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
-                      </footer>
-                    </div>
-                  </div>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+										{% set currentEntreprise = entreprise %}
+										{% set currentMonth = null %}
+									{% endif %}
+
+									{# 📅 Séparateur MOIS #}
+									{% if monthYear != currentMonth %}
+										<tr class="has-background-primary-light">
+											<td colspan="4">
+												<strong class="has-text-primary-dark">
+													Mois :
+													<span class="tag is-primary">{{ monthYear }}</span>
+												</strong>
+											</td>
+										</tr>
+
+										{% set currentMonth = monthYear %}
+									{% endif %}
+
+									{# 🧾 Ligne facture #}
+									<tr class="is-hoverable">
+										<td data-label="Utilisateur">
+											<span class="tag is-info">
+												{{ facture.utilisateur.nom }}
+												{{ facture.utilisateur.prenom }}
+											</span>
+										</td>
+
+										<td data-label="Mois / Année">
+											<span class="tag is-light">{{ monthYear }}</span>
+										</td>
+
+										<td data-label="Total (€)">
+											<span class="tag is-success has-text-weight-bold">
+												{{ totauxTtc[facture.id]|number_format(2, ',', ' ') }}
+												€
+
+											</span>
+										</td>
+
+										<td class="is-actions-cell">
+											<div class="buttons is-right">
+												<a href="{{ path('app_admin_facturation_pdf_utilisateur', { id: facture.id }) }}" class="button is-warning" title="PDF">
+													<span class="icon">
+														<i class="mdi mdi-file-pdf-box"></i>
+													</span>
+												</a>
+
+												<button class="button is-danger jb-modal" data-target="modal-delete-{{ facture.id }}" title="Supprimer">
+													<span class="icon">
+														<i class="mdi mdi-trash-can"></i>
+													</span>
+												</button>
+											</div>
+										</td>
+									</tr>
+
+									{# 🗑 Modal suppression #}
+									<div id="modal-delete-{{ facture.id }}" class="modal">
+										<div class="modal-background jb-modal-close"></div>
+										<div class="modal-card">
+											<header class="modal-card-head">
+												<p class="modal-card-title">Confirmer la suppression</p>
+												<button class="delete jb-modal-close"></button>
+											</header>
+											<section class="modal-card-body">
+												<p>Voulez-vous vraiment supprimer cette facture ?</p>
+											</section>
+											<footer class="modal-card-foot">
+												<button class="button jb-modal-close">Annuler</button>
+												<a href="{{ path('app_admin_facturation_delete_utilisateur', { id: facture.id }) }}" class="button is-danger jb-modal-close">
+													Supprimer
+												</a>
+											</footer>
+										</div>
+									</div>
+
+								{% endfor %}
+							</tbody>
+
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 {% endblock %}

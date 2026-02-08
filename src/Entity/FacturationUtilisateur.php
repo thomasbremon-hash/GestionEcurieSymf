@@ -22,6 +22,9 @@ class FacturationUtilisateur
     #[ORM\ManyToOne(inversedBy: 'facturationUtilisateurs')]
     private ?MoisDeGestion $moisDeGestion = null;
 
+    #[ORM\ManyToOne(inversedBy: 'ManyToOne')]
+    private ?Entreprise $entreprise = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +62,18 @@ class FacturationUtilisateur
     public function setMoisDeGestion(?MoisDeGestion $moisDeGestion): static
     {
         $this->moisDeGestion = $moisDeGestion;
+
+        return $this;
+    }
+
+    public function getEntreprise(): ?Entreprise
+    {
+        return $this->entreprise;
+    }
+
+    public function setEntreprise(?Entreprise $entreprise): static
+    {
+        $this->entreprise = $entreprise;
 
         return $this;
     }

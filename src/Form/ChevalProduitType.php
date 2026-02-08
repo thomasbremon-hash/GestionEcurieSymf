@@ -11,20 +11,20 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 
 class ChevalProduitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('quantite', IntegerType::class, [
-                'attr' => [
-                    'min' => 0,
-                    'class' => 'input',
-                    'placeholder' => 'Entrez la quantité'
+            ->add('quantite', NumberType::class, [
+                'scale' => 2,
+                'constraints' => [
+                    new GreaterThanOrEqual(0),
                 ],
-                'constraints' => [new NotBlank()],
                 'label' => false,
             ]);
     }

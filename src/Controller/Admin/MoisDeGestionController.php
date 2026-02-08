@@ -45,23 +45,45 @@ final class MoisDeGestionController extends AbstractController
 
         if (!$moisDeGestion) {
             $moisDeGestion = new MoisDeGestion();
+        }
 
-            $chevaux = $chevalRepo->findAll();
-            $produits = $produitRepo->findAll();
+        $chevaux = $chevalRepo->findAll();
+        $produits = $produitRepo->findAll();
 
-            foreach ($chevaux as $cheval) {
-                foreach ($produits as $produit) {
-                    $ligne = new ChevalProduit();
-                    $ligne->setCheval($cheval);
-                    $ligne->setProduit($produit);
-                    $ligne->setQuantite(0);
-                    $moisDeGestion->addChevalProduit($ligne);
+        foreach ($chevaux as $cheval) {
+            foreach ($produits as $produit) {
+
+                $existe = false;
+
+                foreach ($moisDeGestion->getChevalProduits() as $cp) {
+                    if (
+                        $cp->getCheval() === $cheval &&
+                        $cp->getProduit() === $produit
+                    ) {
+                        $existe = true;
+                        break;
+                    }
+                }
+
+                if (!$existe) {
+                    $cp = new ChevalProduit();
+                    $cp->setCheval($cheval);
+                    $cp->setProduit($produit);
+                    $cp->setMoisDeGestion($moisDeGestion);
+                    $cp->setQuantite(0);
+                    $cp->setPrixUnitaire(0);
+                    $cp->setTotal(0);
+
+                    $this->em->persist($cp); // ⭐ TRÈS IMPORTANT
+                    $moisDeGestion->addChevalProduit($cp);
                 }
             }
         }
 
+
         $form = $this->createForm(MoisDeGestionType::class, $moisDeGestion);
         $form->handleRequest($request);
+
 
         if ($form->isSubmitted() && $form->isValid()) {
             foreach ($moisDeGestion->getChevalProduits() as $ligne) {

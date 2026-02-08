@@ -1,120 +1,127 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Gestion Mensuelle
+	BackOffice | Gestion Mensuelle
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Mois de gestion</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_mois_gestion') }}" class="button is-small is-primary">
-          <span class="icon"><i class="mdi mdi-arrow-left"></i></span>
-          <span>Retour</span>
-        </a>
-      </div>
-    </div>
-  </section>
+	<section class="section is-title-bar">
+		<div class="level">
+			<div class="level-left">
+				<div class="level-item">
+					<ul>
+						<li>Admin</li>
+						<li>Mois de gestion</li>
+					</ul>
+				</div>
+			</div>
+			<div class="level-right">
+				<a href="{{ path('app_admin_mois_gestion') }}" class="button is-small is-primary">
+					<span class="icon">
+						<i class="mdi mdi-arrow-left"></i>
+					</span>
+					<span>Retour</span>
+				</a>
+			</div>
+		</div>
+	</section>
 
-  <section class="section is-main-section">
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><i class="mdi mdi-calendar-month"></i></span>
-          {% if moisDeGestionId is not null %}
-            Modifier un mois
-          {% else %}
-            Ajouter un mois
-          {% endif %}
-        </p>
-      </header>
+	<section class="section is-main-section">
+		<div class="card">
+			<header class="card-header">
+				<p class="card-header-title">
+					<span class="icon">
+						<i class="mdi mdi-calendar-month"></i>
+					</span>
+					{% if moisDeGestionId is not null %}
+						Modifier un mois
+					{% else %}
+						Ajouter un mois
+					{% endif %}
+				</p>
+			</header>
 
-      <div class="card-content">
-        {{ form_start(formMoisDeGestion) }}
+			<div class="card-content">
+				{{ form_start(formMoisDeGestion) }}
 
-        {# Informations du mois #}
-        <div class="columns">
-          <div class="column is-one-quarter">
-            <div class="field">{{ form_label(formMoisDeGestion.mois) }}
-              {{ form_widget(formMoisDeGestion.mois) }}
-              {{ form_errors(formMoisDeGestion.mois) }}</div>
-          </div>
+				{# Informations du mois #}
+				<div class="columns">
+					<div class="column is-one-quarter">
+						<div class="field">{{ form_label(formMoisDeGestion.mois) }}
+							{{ form_widget(formMoisDeGestion.mois) }}
+							{{ form_errors(formMoisDeGestion.mois) }}</div>
+					</div>
 
-          <div class="column is-one-quarter">
-            <div class="field">{{ form_label(formMoisDeGestion.annee) }}
-              {{ form_widget(formMoisDeGestion.annee) }}
-              {{ form_errors(formMoisDeGestion.annee) }}</div>
-          </div>
-        </div>
+					<div class="column is-one-quarter">
+						<div class="field">{{ form_label(formMoisDeGestion.annee) }}
+							{{ form_widget(formMoisDeGestion.annee) }}
+							{{ form_errors(formMoisDeGestion.annee) }}</div>
+					</div>
+				</div>
 
-        <hr />
+				<hr/>
 
-        {# Tableau chevaux x produits #}
-        <div class="table-container">
-          <table class="table is-fullwidth is-striped is-hoverable">
-            <thead>
-              <tr>
-                <th>Cheval</th>
-                {% for produit in produits %}
-                  <th>
-                    {{ produit.nom }}<br />
-                    <small>{{ produit.prix|number_format(2, '.', ',') }} €</small>
-                  </th>
-                {% endfor %}
-              </tr>
-            </thead>
-            <tbody>
-              {% for cheval in chevaux %}
-                <tr>
-                  <td>{{ cheval.nom }}</td>
-                  {% for produit in produits %}
-                    {% set cp_field = null %}
-                    {% for cp in formMoisDeGestion.chevalProduits %}
-                      {% if cp.vars.data.cheval.id == cheval.id and cp.vars.data.produit.id == produit.id %}
-                        {% set cp_field = cp %}
-                      {% endif %}
-                    {% endfor %}
+				{# Tableau chevaux x produits #}
+				<div class="table-container">
+					<table class="table is-fullwidth is-striped is-hoverable">
+						<thead>
+							<tr>
+								<th>Cheval</th>
+								{% for produit in produits %}
+									<th>
+										{{ produit.nom }}<br/>
+										<small>{{ produit.prix|number_format(2, '.', ',') }}
+											€</small>
+									</th>
+								{% endfor %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for cheval in chevaux %}
+								<tr>
+									<td>{{ cheval.nom }}</td>
+									{% for produit in produits %}
+										{% set cp_field = null %}
+										{% for cp in formMoisDeGestion.chevalProduits %}
+											{% if cp.vars.data.cheval.id == cheval.id and cp.vars.data.produit.id == produit.id %}
+												{% set cp_field = cp %}
+											{% endif %}
+										{% endfor %}
 
-                    <td>
-                      {% if cp_field %}
-                        {{ form_widget(cp_field.quantite) }}
-                        {{ form_errors(cp_field.quantite) }}
-                      {% else %}
-                        <input type="number" value="0" min="0" step="1" class="input is-small" disabled />
-                      {% endif %}
-                    </td>
-                  {% endfor %}
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+										<td>
+											{% if cp_field %}
+												{{ form_widget(cp_field.quantite) }}
+												{{ form_errors(cp_field.quantite) }}
+											{% else %}
+												{# Ce else ne devrait jamais arriver si ton contrôleur ajoute toutes les lignes #}
+												<input type="number" value="0" min="0" step="1" class="input is-small"/>
+											{% endif %}
+										</td>
+									{% endfor %}
+								</tr>
+							{% endfor %}
 
-        <hr />
+						</tbody>
+					</table>
+				</div>
 
-        {# Bouton de soumission #}
-        <div class="field">
-          <div class="control">
-            <button type="submit" class="button is-primary">
-              {% if moisDeGestionId is not null %}
-                Modifier
-              {% else %}
-                Ajouter
-              {% endif %}
-            </button>
-          </div>
-        </div>
+				<hr/>
 
-        {{ form_end(formMoisDeGestion) }}
-      </div>
-    </div>
-  </section>
+				{# Bouton de soumission #}
+				<div class="field">
+					<div class="control">
+						<button type="submit" class="button is-primary">
+							{% if moisDeGestionId is not null %}
+								Modifier
+							{% else %}
+								Ajouter
+							{% endif %}
+						</button>
+					</div>
+				</div>
+
+				{{ form_end(formMoisDeGestion) }}
+			</div>
+		</div>
+	</section>
 {% endblock %}

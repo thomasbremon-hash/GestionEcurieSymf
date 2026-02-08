@@ -1,45 +1,64 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Générer factures utilisateurs
+	BackOffice | Générer factures utilisateurs
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <ul>
-          <li>Admin</li>
-          <li>Facturation</li>
-          <li>Utilisateurs</li>
-          <li>Génération</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+	<section class="section is-title-bar">
+		<div class="level">
+			<div class="level-left">
+				<ul>
+					<li>Admin</li>
+					<li>Facturation</li>
+					<li>Utilisateurs</li>
+					<li>Génération</li>
+				</ul>
+			</div>
+		</div>
+	</section>
 
-  <section class="section is-main-section">
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><i class="mdi mdi-account-cash"></i></span>
-          Générer les factures utilisateurs
-        </p>
-      </header>
+	<section class="section is-main-section">
+		<div class="card">
+			<header class="card-header">
+				<p class="card-header-title">
+					<span class="icon">
+						<i class="mdi mdi-account-cash"></i>
+					</span>
+					Générer les factures utilisateurs
+				</p>
+			</header>
 
-      <div class="card-content">
-        {{ form_start(form) }}
+			<div class="card-content">
+				{{ form_start(form) }}
 
-        <div class="field">{{ form_label(form.moisDeGestion) }}
-          {{ form_widget(form.moisDeGestion) }}
-          {{ form_errors(form.moisDeGestion) }}</div>
+				<div class="field">
+					{{ form_label(form.moisDeGestion) }}
+					<div class="control">
+						<div class="select">
+							{{ form_widget(form.moisDeGestion) }}
+						</div>
+					</div>
+					{{ form_errors(form.moisDeGestion) }}
+				</div>
 
-        <div class="field">
-          <button class="button is-primary">Générer les factures</button>
-        </div>
+				<div class="field">
+					{{ form_label(form.entreprise) }}
+					<div class="control">
+						<div class="select">
+							{{ form_widget(form.entreprise) }}
+						</div>
+					</div>
+					{{ form_errors(form.entreprise) }}
+				</div>
 
-        {{ form_end(form) }}
-      </div>
-    </div>
-  </section>
+
+				<div class="field">
+					<button class="button is-primary">Générer les factures</button>
+				</div>
+
+				{{ form_end(form) }}
+			</div>
+		</div>
+	</section>
 {% endblock %}
