@@ -74,6 +74,7 @@
             <label class="label">Propriétaires</label>
           </div>
           <div class="field-body">
+            <div id="chevalProprietaires-error" style="color: red; margin-bottom: 10px; display: none;">Impossible de supprimer la dernière ligne !</div>
             <div id="chevalProprietaires-wrapper">
               {% for cp in formCheval.chevalProprietaires %}
                 <div class="field is-grouped is-grouped-multiline collection-item">
@@ -94,7 +95,8 @@
 
                   {# Bouton supprimer ligne #}
                   <div class="control is-narrow" style="align-self: flex-end;">
-                    <button type="button" class="button is-danger jb-remove-collection">Supprimer</button>
+                    <button title="Cliquez pour ajouter un propriétaire" type="button" class="button is-primary jb-add-collection mdi mdi-plus"></button>
+                    <button title="Cliquez pour supprimer cette ligne" type="button" class="button is-danger jb-remove-collection mdi mdi-delete-sweep"></button>
                   </div>
                 </div>
               {% endfor %}
@@ -104,11 +106,7 @@
         </div>
 
         {# Bouton ajouter une ligne #}
-        <div class="field">
-          <div class="control">
-            <button type="button" class="button is-primary jb-add-collection">Ajouter un propriétaire</button>
-          </div>
-        </div>
+        <div class="field"></div>
 
         <hr />
 
@@ -131,91 +129,94 @@
 
   <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const wrapper = document.getElementById('chevalProprietaires-wrapper');
+  const submitBtn = document.querySelector('button[type="submit"]');
 
+  // Mettre à jour les indexes des inputs/selects
+  function updateIndexes() {
+    wrapper.querySelectorAll('.collection-item').forEach((el, idx) => {
+      el.querySelectorAll('select, input').forEach(input => {
+        const name = input.getAttribute('name');
+        if(name){
+          input.setAttribute('name', name.replace(/\[\d+\]/, '[' + idx + ']'));
+        }
+      });
+    });
+  }
 
-const wrapper = document.getElementById('chevalProprietaires-wrapper');
-const addBtn = document.querySelector('.jb-add-collection');
-const submitBtn = document.querySelector('button[type="submit"]');
+  // Calculer le total et gérer l'erreur si > 100
+  function updateTotal() {
+    let total = 0;
+    wrapper.querySelectorAll('.collection-item').forEach(item => {
+      const input = item.querySelector('input[type="number"]');
+      if(input){
+        total += parseFloat(input.value) || 0;
+      }
+    });
 
+    if(total > 100){
+      submitBtn.disabled = true;
+      wrapper.querySelectorAll('.pourcentage-error').forEach(p => p.style.display = 'block');
+    } else {
+      submitBtn.disabled = false;
+      wrapper.querySelectorAll('.pourcentage-error').forEach(p => p.style.display = 'none');
+    }
+  }
 
-function updateIndexes() {
-wrapper.querySelectorAll('.collection-item').forEach((el, idx) => {
-el.querySelectorAll('select, input').forEach(input => {
-const name = input.getAttribute('name');
-if(name){
-input.setAttribute('name', name.replace(/\[\d+\]/, '[' + idx + ']'));
-}
-});
-});
-}
+  // Mettre à jour l'état des boutons "Supprimer"
+  function updateRemoveButtons() {
+    const allItems = wrapper.querySelectorAll('.collection-item');
+    const removeBtns = wrapper.querySelectorAll('.jb-remove-collection');
 
+    if(allItems.length <= 1){
+      removeBtns.forEach(btn => btn.disabled = true);
+    } else {
+      removeBtns.forEach(btn => btn.disabled = false);
+    }
+  }
 
-function updateTotal() {
-let total = 0;
-let errorShown = false;
+  // Event delegation pour les clics sur Ajouter et Supprimer
+  wrapper.addEventListener('click', e => {
+    const target = e.target;
 
+    // Supprimer une ligne
+    if(target.classList.contains('jb-remove-collection')){
+      target.closest('.collection-item').remove();
+      updateIndexes();
+      updateTotal();
+      updateRemoveButtons();
+    }
 
-wrapper.querySelectorAll('.collection-item').forEach(item => {
-const input = item.querySelector('input[type="number"]');
-if(input){
-total += parseFloat(input.value) || 0;
-}
-});
+    // Ajouter une ligne
+    if(target.classList.contains('jb-add-collection')){
+      const prototype = wrapper.querySelector('.collection-item');
+      if(!prototype) return;
 
+      const clone = prototype.cloneNode(true);
 
-if(total > 100){
-submitBtn.disabled = true;
-wrapper.querySelectorAll('.pourcentage-error').forEach(p => p.style.display = 'block');
-errorShown = true;
-} else {
-submitBtn.disabled = false;
-wrapper.querySelectorAll('.pourcentage-error').forEach(p => p.style.display = 'none');
-}
+      // Vider les inputs et réinitialiser selects
+      clone.querySelectorAll('input, select').forEach(input => {
+        if(input.tagName === 'INPUT') input.value = '';
+        if(input.tagName === 'SELECT') input.selectedIndex = 0;
+      });
 
+      wrapper.appendChild(clone);
+      updateIndexes();
+      updateTotal();
+      updateRemoveButtons();
+    }
+  });
 
-return errorShown;
-}
+  // Mettre à jour le total si on modifie les inputs
+  wrapper.addEventListener('input', e => {
+    if(e.target.tagName === 'INPUT' && e.target.type === 'number'){
+      updateTotal();
+    }
+  });
 
-
-// Événement sur inputs pourcentage
-wrapper.addEventListener('input', e => {
-if(e.target.tagName === 'INPUT' && e.target.getAttribute('type') === 'number'){
-updateTotal();
-}
-});
-
-
-// Supprimer une ligne
-wrapper.addEventListener('click', e => {
-if(e.target.classList.contains('jb-remove-collection')){
-e.target.closest('.collection-item').remove();
-updateIndexes();
-updateTotal();
-}
-});
-
-
-// Ajouter une ligne
-addBtn.addEventListener('click', () => {
-const prototype = wrapper.querySelector('.collection-item');
-if(!prototype) return;
-
-
-const clone = prototype.cloneNode(true);
-clone.querySelectorAll('input, select').forEach(input => {
-if(input.tagName === 'INPUT') input.value = '';
-if(input.tagName === 'SELECT') input.selectedIndex = 0;
-});
-
-
-wrapper.appendChild(clone);
-updateIndexes();
-updateTotal();
-});
-
-
-// Initial check
-updateTotal();
+  // Initial check
+  updateTotal();
+  updateRemoveButtons();
 });
 </script>
 {% endblock %}

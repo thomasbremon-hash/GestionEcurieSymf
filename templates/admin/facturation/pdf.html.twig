@@ -1,241 +1,248 @@
 <!DOCTYPE html>
 <html lang="fr">
-	<head>
-		<meta charset="UTF-8"/>
-		<style>
-			body {
-				font-family: DejaVu Sans, sans-serif;
-				font-size: 11px;
-				color: #333;
-			}
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 11px;
+            color: #2b2b2b;
+            line-height: 1.4;
+        }
 
-			h1 {
-				font-size: 20px;
-				margin-bottom: 5px;
-			}
+        h1 {
+            font-size: 22px;
+            margin: 0;
+        }
 
-			h2 {
-				font-size: 14px;
-				margin: 0;
-				color: #666;
-			}
+        h2 {
+            font-size: 13px;
+            margin: 0;
+            color: #666;
+        }
 
-			.header {
-				border-bottom: 2px solid #444;
-				padding-bottom: 10px;
-				margin-bottom: 20px;
-			}
+        .header {
+            border-bottom: 3px solid #2c4ed8;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
 
-			.infos {
-				width: 100%;
-				margin-bottom: 20px;
-			}
+        .header-left {
+            float: left;
+        }
 
-			.infos td {
-				vertical-align: top;
-				padding: 5px;
-			}
+        .header-right {
+            float: right;
+            text-align: right;
+            font-size: 10px;
+            color: #555;
+        }
 
-			.box {
-				border: 1px solid #ddd;
-				padding: 10px;
-				border-radius: 4px;
-			}
+        .clearfix {
+            clear: both;
+        }
 
-			.right {
-				text-align: right;
-			}
+        .infos {
+            width: 100%;
+            margin-bottom: 25px;
+        }
 
-			.center {
-				text-align: center;
-			}
+        .infos td {
+            vertical-align: top;
+            padding: 5px;
+        }
 
-			table {
-				width: 100%;
-				border-collapse: collapse;
-				margin-top: 15px;
-			}
+        .box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
 
-			thead th {
-				background: #f5f5f5;
-				border-bottom: 2px solid #ccc;
-				padding: 8px;
-				font-weight: bold;
-				text-align: left;
-			}
+        .box-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+            margin-bottom: 5px;
+        }
 
-			tbody td {
-				padding: 7px;
-				border-bottom: 1px solid #eee;
-			}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
 
-			tbody tr:nth-child(even) {
-				background: #fafafa;
-			}
+        thead th {
+            background: #eef3ff;
+            border-bottom: 2px solid #2c4ed8;
+            padding: 8px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
 
-			.totaux {
-				margin-top: 20px;
-				width: 40%;
-				float: right;
-				border-collapse: collapse;
-			}
+        tbody td {
+            padding: 7px;
+            border-bottom: 1px solid #eee;
+        }
 
-			.totaux td {
-				padding: 6px;
-			}
+        .center { text-align: center; }
+        .right { text-align: right; }
 
-			.totaux tr.total-ttc td {
-				font-size: 13px;
-				font-weight: bold;
-				border-top: 2px solid #444;
-			}
+        .cheval-row td {
+            background: #f7f8fc;
+            font-weight: bold;
+            border-top: 2px solid #ddd;
+        }
 
-			.badge {
-				background: #eef3ff;
-				color: #2c4ed8;
-				padding: 2px 6px;
-				border-radius: 3px;
-				font-size: 10px;
-			}
+        .muted {
+            color: #777;
+            font-size: 10px;
+        }
 
-			.muted {
-				color: #777;
-			}
+        .totaux {
+            margin-top: 25px;
+            width: 45%;
+            float: right;
+            border-collapse: collapse;
+        }
 
-			.clearfix {
-				clear: both;
-			}
-		</style>
-	</head>
+        .totaux td {
+            padding: 6px;
+            font-size: 11px;
+        }
 
-	<body>
-		<!-- EN-TÊTE -->
-		<div class="header">
-			<h1>Facture</h1>
-			<h2>Période
-				{{ '%02d'|format(mois.mois) }}/{{ mois.annee }}</h2>
-			<p>
-				<strong>Facture n° :</strong>
-				{{ '%02d'|format(mois.mois) }}-{{ mois.annee }}-{{ facture.id }}<br/>
+        .totaux tr.total-ttc td {
+            font-size: 14px;
+            font-weight: bold;
+            border-top: 3px solid #2c4ed8;
+            padding-top: 8px;
+        }
 
-				<strong>Date :</strong>
-				{{ 'now'|date('d/m/Y') }}
-			</p>
-		</div>
+        .footer {
+            margin-top: 40px;
+            font-size: 9px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
 
-		<!-- INFOS ENTREPRISE ET CLIENT -->
-		<table class="infos">
-			<tr>
-				<td width="50%">
-					<div class="box">
-						<strong>Facturé à</strong><br/>
-						{{ user.prenom }}
-						{{ user.nom }}<br/>
-						<span class="muted">{{ user.email }}</span>
-						{{ user.rue }}
-						{{ user.ville }}
-						{{ user.cp }}
-					</div>
-				</td>
-				<td width="50%" class="right">
-					{% set entreprise = facture.entreprise %}
-					<div class="box">
-						<strong>{{ entreprise.nom }}</strong><br/>
-						{{ entreprise.rue }}<br/>
-						{{ entreprise.cp }}
-						{{ entreprise.ville }}<br/>
-						{{ entreprise.pays }}<br/>
-						<strong>SIRET:</strong>
-						{{ entreprise.siret }}<br/>
-						{% if entreprise.numTVA %}
-							<strong>TVA intracom:</strong>
-							{{ entreprise.numTVA }}<br/>
-						{% endif %}
-					</div>
-				</td>
-			</tr>
-		</table>
+<body>
 
-		<!-- TABLE PRODUITS -->
-		<table>
-			<thead>
-				<tr>
-					<th>Cheval</th>
-					<th>Produit</th>
-					<th class="center">Qté</th>
-					<th class="right">PU HT</th>
-					<th class="right">Montant HT</th>
-					<th class="center">TVA</th>
-					<th class="right">TVA €</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for cheval, lignes in lignesParCheval %}
-					{# Ligne titre cheval #}
-					<tr>
-						<td colspan="7" style="background:#f5f5f5; font-weight:bold;">{{ cheval }}
-							({{ lignes[0].pourcentage }}
-							%)</td>
-					</tr>
+<!-- EN-TÊTE -->
+<div class="header">
+    <div class="header-left">
+        <h1>Facture</h1>
+        <h2>Période {{ '%02d'|format(mois.mois) }}/{{ mois.annee }}</h2>
+    </div>
 
-					{# Produits du cheval #}
-					{% for ligne in lignes %}
-						<tr>
-							<td></td>
-							<td>{{ ligne.description }}</td>
-							<td class="center">{{ ligne.quantite }}</td>
-							<td class="right">{{ ligne.prixUnitaire|number_format(2, ',', ' ') }}
-								€</td>
-							<td class="right">{{ ligne.montantHT|number_format(2, ',', ' ') }}
-								€</td>
-							<td class="center">{{ ligne.tauxTVA }}
-								%</td>
-							<td class="right">{{ ligne.montantTVA|number_format(2, ',', ' ') }}
-								€</td>
-						</tr>
-					{% endfor %}
+    <div class="header-right">
+        <strong>Facture n°</strong><br/>
+        {{ '%02d'|format(mois.mois) }}-{{ mois.annee }}-{{ facture.id }}<br/><br/>
+        <strong>Date</strong><br/>
+        {{ 'now'|date('d/m/Y') }}
+    </div>
+    <div class="clearfix"></div>
+</div>
 
-					{# Ligne espace entre chevaux #}
-					<tr>
-						<td colspan="7" style="border:none;height:8px;"></td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+<!-- INFOS -->
+<table class="infos">
+    <tr>
+        <td width="50%">
+            <div class="box">
+                <div class="box-title">Facturé à</div>
+                <strong>{{ user.prenom }} {{ user.nom }}</strong><br/>
+                <span class="muted">{{ user.email }}</span><br/>
+                {{ user.rue }}<br/>
+                {{ user.cp }} {{ user.ville }}
+            </div>
+        </td>
+        <td width="50%">
+            {% set entreprise = facture.entreprise %}
+            <div class="box">
+                <div class="box-title">Émetteur</div>
+                <strong>{{ entreprise.nom }}</strong><br/>
+                {{ entreprise.rue }}<br/>
+                {{ entreprise.cp }} {{ entreprise.ville }}<br/>
+                {{ entreprise.pays }}<br/>
+                <span class="muted">
+                    SIRET : {{ entreprise.siret }}<br/>
+                    {% if entreprise.numTVA %}
+                        TVA : {{ entreprise.numTVA }}
+                    {% endif %}
+                </span>
+            </div>
+        </td>
+    </tr>
+</table>
 
-		<!-- TOTAUX -->
-		<table class="totaux">
-			<tr>
-				<td class="right">Total HT</td>
-				<td class="right">{{ totalHT|number_format(2, ',', ' ') }}
-					€</td>
-			</tr>
+<!-- LIGNES -->
+<table>
+    <thead>
+        <tr>
+            <th>Cheval</th>
+            <th>Produit</th>
+            <th class="center">Qté</th>
+            <th class="right">PU HT</th>
+            <th class="right">Montant HT</th>
+            <th class="center">TVA</th>
+            <th class="right">TVA €</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cheval, lignes in lignesParCheval %}
+            <tr class="cheval-row">
+                <td colspan="7">
+                    {{ cheval }} — {{ lignes[0].pourcentage }} %
+                </td>
+            </tr>
 
-			{% for taux, montant in totalTVA %}
-				<tr>
-					<td class="right">TVA
-						{{ taux }}
-						%</td>
-					<td class="right">{{ montant|number_format(2, ',', ' ') }}
-						€</td>
-				</tr>
-			{% endfor %}
+            {% for ligne in lignes %}
+                <tr>
+                    <td></td>
+                    <td>{{ ligne.description }}</td>
+                    <td class="center">{{ ligne.quantite }}</td>
+                    <td class="right">{{ ligne.prixUnitaire|number_format(2, ',', ' ') }} €</td>
+                    <td class="right">{{ ligne.montantHT|number_format(2, ',', ' ') }} €</td>
+                    <td class="center">{{ ligne.tauxTVA }} %</td>
+                    <td class="right">{{ ligne.montantTVA|number_format(2, ',', ' ') }} €</td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
 
-			<tr class="total-ttc">
-				<td class="right">Total TTC</td>
-				<td class="right">{{ totalTTC|number_format(2, ',', ' ') }}
-					€</td>
-			</tr>
-		</table>
+<!-- TOTAUX -->
+<table class="totaux">
+    <tr>
+        <td class="right">Total HT</td>
+        <td class="right">{{ totalHT|number_format(2, ',', ' ') }} €</td>
+    </tr>
 
-		<!-- MENTIONS LEGALES -->
-		<div class="box" style="margin-top:30px; font-size:10px;">
-			<p>
-				<strong>Conditions de paiement:</strong>
-				Paiement à 30 jours. Pénalités de retard: taux légal. Indemnité forfaitaire: 40 €.
-			</p>
-			<p>TVA non applicable, article 293 B du CGI (si applicable).</p>
-		</div>
-		<div class="clearfix"></div>
-	</body>
+    {% for taux, montant in totalTVA %}
+        <tr>
+            <td class="right">TVA {{ taux }} %</td>
+            <td class="right">{{ montant|number_format(2, ',', ' ') }} €</td>
+        </tr>
+    {% endfor %}
+
+    <tr class="total-ttc">
+        <td class="right">Total TTC</td>
+        <td class="right">{{ totalTTC|number_format(2, ',', ' ') }} €</td>
+    </tr>
+</table>
+
+<div class="clearfix"></div>
+
+<!-- FOOTER -->
+<div class="footer">
+    Conditions de paiement : 30 jours.  
+    Pénalités de retard : taux légal.  
+    Indemnité forfaitaire de recouvrement : 40 €.<br/>
+    TVA non applicable, art. 293B du CGI (si applicable).
+</div>
+
+</body>
 </html>

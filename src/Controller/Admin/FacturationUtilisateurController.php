@@ -4,15 +4,16 @@ namespace App\Controller\Admin;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Entity\MoisDeGestion;
 use App\Service\FactureCalculator;
 use App\Entity\FacturationUtilisateur;
 use App\Form\FacturationGenerationType;
-use App\Entity\MoisDeGestion;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\MoisDeGestionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\DeplacementToChevalProduitService;
 use App\Repository\FacturationUtilisateurRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -140,7 +141,7 @@ class FacturationUtilisateurController extends AbstractController
     }
 
     #[Route('/generer-utilisateur', name: 'app_admin_facturation_generer_utilisateur')]
-    public function genererUtilisateur(Request $request, MoisDeGestionRepository $moisRepo): Response
+    public function genererUtilisateur(Request $request, MoisDeGestionRepository $moisRepo, DeplacementToChevalProduitService $deplacementService): Response
     {
         $form = $this->createForm(FacturationGenerationType::class);
         $form->handleRequest($request);
@@ -148,6 +149,7 @@ class FacturationUtilisateurController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var MoisDeGestion $mois */
             $mois = $form->get('moisDeGestion')->getData();
+            $deplacementService->genererPourMois($mois);
             $entreprise = $form->get('entreprise')->getData();
             if (!$mois) return $this->redirectToRoute('app_admin_facturation_utilisateur');
 
