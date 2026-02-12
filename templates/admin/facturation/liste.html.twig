@@ -1,171 +1,172 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-	BackOffice | Facturation Utilisateurs
+    BackOffice | Facturation Utilisateurs
 {% endblock %}
 
 {% block body %}
-	<section class="section is-title-bar">
-		<div class="level">
-			<div class="level-left">
-				<div class="level-item">
-					<ul>
-						<li>Admin</li>
-						<li>Facturation</li>
-					</ul>
-				</div>
-			</div>
-			<div class="level-right">
-				<a href="{{ path('app_admin_facturation_generer_utilisateur') }}" class="button is-small is-primary">
-					<span>Générer des factures</span>
-					<span class="icon">
-						<i class="mdi mdi-plus"></i>
-					</span>
-				</a>
-			</div>
-		</div>
-	</section>
+<section class="section">
+    <div class="level mb-5">
+        <div class="level-left">
+            <h1 class="title is-4">Facturation Utilisateurs</h1>
+        </div>
+        <div class="level-right">
+            <a href="{{ path('app_admin_facturation_generer_utilisateur') }}" class="button is-primary">
+                <span class="icon"><i class="mdi mdi-plus"></i></span>
+                <span>Générer des factures</span>
+            </a>
+        </div>
+    </div>
 
-	<section class="section is-main-section">
-		{% for label, messages in app.flashes(['success', 'danger']) %}
-			{% for message in messages %}
-				<div class="notification is-{{ label }}">
-					<button class="delete"></button>
-					{{ message }}
-				</div>
-			{% endfor %}
-		{% endfor %}
+    {% for label, messages in app.flashes(['success', 'danger']) %}
+        {% for message in messages %}
+            <div class="notification is-{{ label }}">
+                <button class="delete"></button>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
 
-		<div class="card has-table">
-			<header class="card-header">
-				<p class="card-header-title">
-					<span class="icon">
-						<i class="mdi mdi-file-document-box-multiple-outline"></i>
-					</span>
-					{{ factures|length }}
-					factures utilisateurs
-				</p>
-				<a href="#" class="card-header-icon">
-					<span class="icon">
-						<i class="mdi mdi-reload"></i>
-					</span>
-				</a>
-			</header>
+    {% set currentEntreprise = null %}
+    {% set currentMonth = null %}
 
-			<div class="card-content">
-				<div class="b-table has-pagination">
-					<div class="table-wrapper has-mobile-cards">
-						<table class="table is-fullwidth is-hoverable is-striped">
-							<thead>
-								<tr>
-									<th>Utilisateur</th>
-									<th>Mois / Année</th>
-									<th>Total (TTC)</th>
-									<th>Actions</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% set currentEntreprise = null %}
-								{% set currentMonth = null %}
+    {% for facture in factures %}
+        {% set entrepriseNom = facture.entreprise.nom %}
+        {% set monthYear = ('%02d'|format(facture.moisDeGestion.mois)) ~ '/' ~ facture.moisDeGestion.annee %}
 
-								{% for facture in factures %}
-									{% set entreprise = facture.entreprise.nom %}
-									{% set monthYear = ('%02d'|format(facture.moisDeGestion.mois)) ~ '/' ~ facture.moisDeGestion.annee %}
+        {# Nouvelle entreprise ? Ouvrir card #}
+        {% if currentEntreprise != entrepriseNom %}
+            {% if currentEntreprise is not null %}
+                </div> {# fermeture card précédente #}
+            {% endif %}
+            <div class="card mb-5">
+                <header class="card-header has-background-light">
+                    <p class="card-header-title has-text-weight-bold">
+                        Entreprise : {{ entrepriseNom }}
+                    </p>
+                </header>
+                <div class="card-content">
+            {% set currentEntreprise = entrepriseNom %}
+            {% set currentMonth = null %}
+        {% endif %}
 
-									{# 🏢 Séparateur ENTREPRISE #}
-									{% if entreprise != currentEntreprise %}
-										<tr class="has-background-link-light">
-											<td colspan="4">
-												<strong class="has-text-link-dark">
-													Entreprise facturante :
-													<span class="tag is-link">{{ entreprise }}</span>
-												</strong>
-											</td>
-										</tr>
+        {# Nouveau mois ? Header mois #}
+        {% if currentMonth != monthYear %}
+            <div class="month-header has-background-light p-3 mb-3">
+                <strong>Mois :</strong> <span class="tag is-primary">{{ monthYear }}</span>
+            </div>
+            {% set currentMonth = monthYear %}
+        {% endif %}
 
-										{% set currentEntreprise = entreprise %}
-										{% set currentMonth = null %}
-									{% endif %}
+        <div class="box mb-3">
+            <div class="columns is-vcentered is-mobile">
+                <div class="column is-3">
+                    <strong>Utilisateur :</strong>
+                    {{ facture.utilisateur.nom }} {{ facture.utilisateur.prenom }}
+                </div>
+                <div class="column is-2">
+                    <strong>Total (TTC) :</strong>
+                    <span class="tag is-success">{{ totauxTtc[facture.id]|number_format(2, ',', ' ') }} €</span>
+                </div>
+                <div class="column is-3 has-text-right">
+                    <a href="{{ path('app_admin_facturation_pdf_utilisateur', { id: facture.id }) }}" class="button is-info" title="PDF">
+                        <span class="icon"><i class="mdi mdi-file-pdf-box"></i></span>
+                    </a>
+                    <button class="button is-danger jb-modal" data-target="modal-delete-{{ facture.id }}" title="Supprimer">
+                        <span class="icon"><i class="mdi mdi-trash-can"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-									{# 📅 Séparateur MOIS #}
-									{% if monthYear != currentMonth %}
-										<tr class="has-background-primary-light">
-											<td colspan="4">
-												<strong class="has-text-primary-dark">
-													Mois :
-													<span class="tag is-primary">{{ monthYear }}</span>
-												</strong>
-											</td>
-										</tr>
+        {# Modal suppression #}
+        <div id="modal-delete-{{ facture.id }}" class="modal">
+            <div class="modal-background jb-modal-close"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Confirmer la suppression</p>
+                    <button class="delete jb-modal-close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p>Voulez-vous vraiment supprimer cette facture ?</p>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button jb-modal-close">Annuler</button>
+                    <a href="{{ path('app_admin_facturation_delete_utilisateur', { id: facture.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
+                </footer>
+            </div>
+        </div>
 
-										{% set currentMonth = monthYear %}
-									{% endif %}
+    {% endfor %}
 
-									{# 🧾 Ligne facture #}
-									<tr class="is-hoverable">
-										<td data-label="Utilisateur">
-											<span class="tag is-info">
-												{{ facture.utilisateur.nom }}
-												{{ facture.utilisateur.prenom }}
-											</span>
-										</td>
+    {% if currentEntreprise is not null %}
+        </div> {# fermeture dernière card #}
+    {% endif %}
 
-										<td data-label="Mois / Année">
-											<span class="tag is-light">{{ monthYear }}</span>
-										</td>
+</section>
+{% endblock %}
 
-										<td data-label="Total (€)">
-											<span class="tag is-success has-text-weight-bold">
-												{{ totauxTtc[facture.id]|number_format(2, ',', ' ') }}
-												€
 
-											</span>
-										</td>
+{% block stylesheets %}
+  <style>
+	/* GENERAL STYLES */
+	body {
+	  background-color: #f3f4f6;
+	  color: #111827;
+	  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	}
+	
+	.container {
+	  max-width: 1200px;
+	  margin: 0 auto;
+	}
+	
+	/* PAGE HEADER */
+	.page-header {
+	  border-bottom: 1px solid #e5e7eb;
+	}
 
-										<td class="is-actions-cell">
-											<div class="buttons is-right">
-												<a href="{{ path('app_admin_facturation_pdf_utilisateur', { id: facture.id }) }}" class="button is-warning" title="PDF">
-													<span class="icon">
-														<i class="mdi mdi-file-pdf-box"></i>
-													</span>
-												</a>
+	/* CARD STYLES */
+	.card {
+	  border-radius: 12px;
+	  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}	
 
-												<button class="button is-danger jb-modal" data-target="modal-delete-{{ facture.id }}" title="Supprimer">
-													<span class="icon">
-														<i class="mdi mdi-trash-can"></i>
-													</span>
-												</button>
-											</div>
-										</td>
-									</tr>
+	.card-header {
+	  background-color: #f9fafb;
+	  border-bottom: 1px solid #e5e7eb;
+	}
 
-									{# 🗑 Modal suppression #}
-									<div id="modal-delete-{{ facture.id }}" class="modal">
-										<div class="modal-background jb-modal-close"></div>
-										<div class="modal-card">
-											<header class="modal-card-head">
-												<p class="modal-card-title">Confirmer la suppression</p>
-												<button class="delete jb-modal-close"></button>
-											</header>
-											<section class="modal-card-body">
-												<p>Voulez-vous vraiment supprimer cette facture ?</p>
-											</section>
-											<footer class="modal-card-foot">
-												<button class="button jb-modal-close">Annuler</button>
-												<a href="{{ path('app_admin_facturation_delete_utilisateur', { id: facture.id }) }}" class="button is-danger jb-modal-close">
-													Supprimer
-												</a>
-											</footer>
-										</div>
-									</div>
-
-								{% endfor %}
-							</tbody>
-
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
+	.card-header-title {
+	  font-size: 1.25rem;
+	  color: #1f2937;
+	}
+	.card-content {
+	  padding: 1.5rem;
+	}
+	.box {
+	  border-radius: 8px;
+	  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	}
+	.tag {
+	  font-size: 0.9rem;
+	  padding: 0.25em 0.75em;
+	}
+	.tag.is-success {
+	  background-color: #d1fae5;
+	  color: #065f46;
+	}
+	.tag.is-warning {
+	  background-color: #fef3c7;
+	  color: #92400e;
+	}
+	.button.is-info {
+	  background-color: #bfdbfe;
+	  color: #1e40af;
+	}
+	.button.is-danger {
+	  background-color: #fecaca;
+	  color: #991b1b;
+	}
+  </style>
 {% endblock %}

@@ -52,11 +52,7 @@
                   <th>Rue</th>
                   <th>Ville</th>
                   <th>Code postal</th>
-                  <th>Pays</th>
                   <th>Roles</th>
-                  <th>Entreprises</th>
-                  <th>Chevaux</th>
-                  <th>Enregistré le</th>
 
                   <th></th>
                 </tr>
@@ -70,7 +66,6 @@
                     <td data-label="Description">{{ item.rue }}</td>
                     <td data-label="Description">{{ item.ville }}</td>
                     <td data-label="Description">{{ item.cp }}</td>
-                    <td data-label="Description">{{ item.pays }}</td>
                     <td data-label="Roles">
                       {% for role in item.roles %}
                         {% if role == 'ROLE_ADMIN' %}
@@ -86,31 +81,10 @@
                         {% endif %}
                       {% endfor %}
                     </td>
-                    <td>
-                      {% for entreprise in item.entreprise %}
-                        <span class="tag is-info">{{ entreprise.nom }}</span>{% if not loop.last %}{% endif %}
-                      {% else %}
-                        Aucune
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% set chevaux = [] %}
-                      {% for cp in item.chevalProprietaires %}
-                        {% set chevaux = chevaux|merge([cp.cheval]) %}
-                      {% endfor %}
-                      {% if chevaux is not empty %}
-                        {% for cheval in chevaux %}
-                          <span class="tag is-info">{{ cheval.nom }}</span>{% if not loop.last %}, {% endif %}
-                        {% endfor %}
-                      {% else %}
-                        Aucun
-                      {% endif %}
-                    </td>
-                    <td data-label="Enregistré le">
-                      <small class="has-text-grey is-abbr-like" title="{{ item.createdAt|date('d M Y') }}">{{ item.createdAt|date('d M Y') }}</small>
-                    </td>
+
                     <td class="is-actions-cell">
                       <div class="buttons is-right">
+                        <a href="{{ path('app_admin_user_show', { id: item.id }) }}" class="button is-small is-info" type="button"><span class="icon"><i class="mdi mdi-eye"></i></span></a>
                         <a href="{{ path('app_admin_user_update', { id: item.id }) }}" class="button is-small is-primary" type="button"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
                         <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
                       </div>

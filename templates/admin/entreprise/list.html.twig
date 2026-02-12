@@ -51,10 +51,6 @@
                   <th>Ville</th>
                   <th>Code postal</th>
                   <th>Pays</th>
-                  <th>Siren</th>
-                  <th>Siret</th>
-                  <th>Téléphone</th>
-                  <th>Utilisateurs</th>
 
                   <th></th>
                 </tr>
@@ -67,18 +63,9 @@
                     <td data-label="Description">{{ item.ville }}</td>
                     <td data-label="Description">{{ item.cp }}</td>
                     <td data-label="Description">{{ item.pays }}</td>
-                    <td data-label="Description">{{ item.siren }}</td>
-                    <td data-label="Description">{{ item.siret }}</td>
-                    <td data-label="Description">{{ item.telephone }}</td>
-                    <td data-label="Utilisateurs">
-                      {% for user in item.users %}
-                        <span class="tag is-info">{{ user.prenom }} {{ user.nom }}</span>
-                      {% else %}
-                        Aucun
-                      {% endfor %}
-                    </td>
                     <td class="is-actions-cell">
                       <div class="buttons is-right">
+                        <a href="{{ path('app_admin_entreprise_show', { id: item.id }) }}" class="button is-small is-info" type="button"><span class="icon"><i class="mdi mdi-eye"></i></span></a>
                         <a href="{{ path('app_admin_entreprise_update', { id: item.id }) }}" class="button is-small is-primary" type="button"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
                         <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
                       </div>

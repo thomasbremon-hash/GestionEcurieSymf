@@ -75,4 +75,13 @@ final class EntrepriseController extends AbstractController
         $this->addFlash('success', "L'entreprise " . $entreprise->getNom() . " a bien été supprimée !");
         return $this->redirectToRoute('app_admin_entreprises');
     }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/show/{id}', name: 'app_admin_entreprise_show', methods: ['GET'])]
+    public function show(Entreprise $entreprise): Response
+    {
+        return $this->render('admin/entreprise/show.html.twig', [
+            'entreprise' => $entreprise,
+        ]);
+    }
 }

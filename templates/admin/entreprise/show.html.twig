@@ -1,0 +1,197 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  {{ entreprise.nom }} | Admin
+{% endblock %}
+
+{% block body %}
+  <style>
+    body {
+      background-color: #f5f5f7;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    /* HEADER */
+    .page-header {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 2.5rem 3rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+    
+    .page-header h1 {
+      font-size: 2rem;
+      color: #1f2937;
+    }
+    
+    .page-header .badge {
+      font-size: 0.85rem;
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+    
+    /* KPI */
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+      transition: 0.25s;
+      text-align: center;
+    }
+    
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+    }
+    
+    .kpi-title {
+      font-size: 0.9rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .kpi-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #111827;
+    }
+    
+    /* INFO CARDS */
+    .info-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+    
+    .info-card h4 {
+      color: #1f2937;
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .info-label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .info-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    /* USER CARDS */
+    .user-card {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 1.2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      transition: all 0.2s ease;
+    }
+    
+    .user-card:hover {
+      background: #f3f4f6;
+      transform: translateY(-2px);
+    }
+  </style>
+
+  <div class="container py-5">
+    {# ================= HEADER ================= #}
+    <div class="page-header mb-5 d-flex justify-content-between align-items-start flex-wrap">
+      <div>
+        <h1>{{ entreprise.nom }}</h1>
+        <div class="d-flex gap-2 mt-2 flex-wrap">
+          <span class="badge">ID #{{ entreprise.id }}</span>
+          <span class="badge">{{ entreprise.users|length }} utilisateurs</span>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-3 mt-md-0">
+        <a href="{{ path('app_admin_entreprise_update', { id: entreprise.id }) }}" class="btn btn-primary rounded-pill px-4 fw-semibold">Modifier</a>
+        <a href="{{ path('app_admin_entreprises') }}" class="btn btn-outline-secondary rounded-pill px-4">Retour</a>
+      </div>
+    </div>
+
+    {# ================= KPI ================= #}
+    <div class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <i class="bi bi-people-fill me-1"></i> Utilisateurs
+          </div>
+          <div class="kpi-value">{{ entreprise.users|length }}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <i class="bi bi-heart-fill me-1"></i> Chevaux
+          </div>
+          <div class="kpi-value">{{ entreprise.cheval|length }}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="kpi-card">
+          <div class="kpi-title">
+            <i class="bi bi-receipt-cutoff me-1"></i> Facturations
+          </div>
+          <div class="kpi-value">{{ entreprise.facturationEntreprises|length }}</div>
+        </div>
+      </div>
+    </div>
+
+    {# ================= INFORMATIONS ================= #}
+    <div class="info-card">
+      <h4><i class="bi bi-info-circle me-2"></i> Informations générales</h4>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="info-label">Adresse</div>
+          <div class="info-value">
+            {{ entreprise.adresseComplete }}<br />{{ entreprise.pays }}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="info-label">Téléphone</div>
+          <div class="info-value">{{ entreprise.telephone ? : 'Non renseigné' }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="info-label">SIREN</div>
+          <div class="info-value">{{ entreprise.siren ? : 'Non renseigné' }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="info-label">SIRET</div>
+          <div class="info-value">{{ entreprise.siret ? : 'Non renseigné' }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="info-label">Numéro TVA</div>
+          <div class="info-value">{{ entreprise.numTVA ? : 'Non renseigné' }}</div>
+        </div>
+      </div>
+    </div>
+
+    {# ================= UTILISATEURS ================= #}
+    <div class="info-card">
+      <h4><i class="bi bi-people me-2"></i> Utilisateurs affiliés</h4>
+      {% if (entreprise.users|length) > 0 %}
+        <div class="row g-3">
+          {% for user in entreprise.users %}
+            <div class="col-md-6 col-lg-4">
+              <div class="user-card">
+                <div class="fw-semibold">{{ user.email }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-muted">Aucun utilisateur affilié.</div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
