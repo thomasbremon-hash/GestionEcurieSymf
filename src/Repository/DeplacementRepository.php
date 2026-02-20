@@ -41,20 +41,15 @@ class DeplacementRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-    public function findByMois(MoisDeGestion $mois): array
+    public function findByMois(\App\Entity\MoisDeGestion $mois)
     {
-        $start = new \DateTimeImmutable(sprintf(
-            '%04d-%02d-01 00:00:00',
-            $mois->getAnnee(),
-            $mois->getMois()
-        ));
-
-        $end = $start->modify('last day of this month 23:59:59');
+        $debutMois = new \DateTime(sprintf('%d-%02d-01', $mois->getAnnee(), $mois->getMois()));
+        $finMois = (clone $debutMois)->modify('last day of this month')->setTime(23, 59, 59);
 
         return $this->createQueryBuilder('d')
-            ->andWhere('d.date BETWEEN :start AND :end')
-            ->setParameter('start', $start)
-            ->setParameter('end', $end)
+            ->where('d.date BETWEEN :debut AND :fin')
+            ->setParameter('debut', $debutMois)
+            ->setParameter('fin', $finMois)
             ->getQuery()
             ->getResult();
     }

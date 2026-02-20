@@ -83,17 +83,29 @@
             </li>
 
             <li>
-              <a href="{{ path('app_admin_mois_gestion') }}" class="has-icon">
-                <span class="icon"><span class="mdi mdi-finance"></span></span>
-                <span class="menu-item-label">Relevés</span>
+              <a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
+                <span class="is-flex is-align-items-center">
+                  <span class="icon"><i class="mdi mdi-finance"></i></span>
+                  <span class="menu-item-label">Gestion financière</span>
+                </span>
+                <span class="icon arrow"><i class="mdi mdi-chevron-down"></i></span>
               </a>
-            </li>
 
-            <li>
-              <a href="{{ path('app_admin_facturation_utilisateur') }}" class="has-icon">
-                <span class="icon"><span class="mdi mdi-finance"></span></span>
-                <span class="menu-item-label">Facturation</span>
-              </a>
+              <ul class="submenu" style="display: none;">
+                <li>
+                  <a href="{{ path('app_admin_mois_gestion') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-calendar-month"></i></span>
+                    <span>Relevés</span>
+                  </a>
+                </li>
+
+                <li>
+                  <a href="{{ path('app_admin_facturation_utilisateur') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-file-document-outline"></i></span>
+                    <span>Facturation</span>
+                  </a>
+                </li>
+              </ul>
             </li>
 
             <li>
@@ -127,27 +139,10 @@
             </li>
 
             <li>
-              <a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
-                <span class="is-flex is-align-items-center">
-                  <span class="icon"><i class="mdi mdi-map-marker-outline"></i></span>
-                  <span class="menu-item-label">Structure & Distance</span>
-                </span>
-                <span class="icon arrow"><i class="mdi mdi-chevron-down"></i></span>
+              <a href="{{ path('app_admin_structures') }}" class="is-flex is-align-items-center">
+                <span class="icon"><i class="mdi mdi-office-building"></i></span>
+                <span>Structure</span>
               </a>
-              <ul class="submenu" style="display: none;">
-                <li>
-                  <a href="{{ path('app_admin_structures') }}" class="is-flex is-align-items-center">
-                    <span class="icon"><i class="mdi mdi-office-building"></i></span>
-                    <span>Structure</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="{{ path('app_admin_distances') }}" class="is-flex is-align-items-center">
-                    <span class="icon"><i class="mdi mdi-map-marker-distance"></i></span>
-                    <span>Distances</span>
-                  </a>
-                </li>
-              </ul>
             </li>
 
             <li>
@@ -158,34 +153,10 @@
             </li>
 
             <li>
-              <a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
-                <span class="is-flex is-align-items-center">
-                  <span class="icon"><i class="mdi mdi-bank-transfer"></i></span>
-                  <span class="menu-item-label">Produits & Taxes</span>
-                </span>
-                <span class="icon arrow"><i class="mdi mdi-chevron-down"></i></span>
+              <a href="{{ path('app_admin_produits') }}" class="is-flex is-align-items-center">
+                <span class="icon"><i class="mdi mdi-barcode-scan"></i></span>
+                <span>Produits</span>
               </a>
-              <ul class="submenu" style="display: none;">
-                <li>
-                  <a href="{{ path('app_admin_produit_entreprise') }}" class="is-flex is-align-items-center">
-                    <span class="icon"><i class="mdi mdi-calculator-variant"></i></span>
-                    <span>Produits | Entreprises</span>
-                  </a>
-                </li>
-
-                <li>
-                  <a href="{{ path('app_admin_produits') }}" class="is-flex is-align-items-center">
-                    <span class="icon"><i class="mdi mdi-barcode-scan"></i></span>
-                    <span>Produits</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="{{ path('app_admin_taxes') }}" class="is-flex is-align-items-center">
-                    <span class="icon"><i class="mdi mdi-cash"></i></span>
-                    <span>Taxes</span>
-                  </a>
-                </li>
-              </ul>
             </li>
 
             <li>

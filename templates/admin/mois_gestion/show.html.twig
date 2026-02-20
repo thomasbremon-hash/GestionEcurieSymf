@@ -27,6 +27,7 @@
   <section class="section is-main-section">
     <div class="columns is-multiline">
       {% set total_mois = 0 %}
+
       {% for cheval in chevaux %}
         <div class="column is-half">
           <div class="card">
@@ -46,17 +47,38 @@
                   </thead>
                   <tbody>
                     {% set total_cheval = 0 %}
+                    {% set deplacements_affiches = [] %}
+
                     {% for cp in moisDeGestion.chevalProduits %}
-                      {% if cp.cheval.id == cheval.id %}
-                        {% set total_produit = cp.quantite * cp.prixUnitaire %}
-                        {% set total_cheval = total_cheval + total_produit %}
-                        {% set total_mois = total_mois + total_produit %}
-                        <tr>
-                          <td>{{ cp.produit.nom }}</td>
-                          <td>{{ cp.quantite }}</td>
-                          <td>{{ cp.prixUnitaire|number_format(2, ',', ' ') }} €</td>
-                          <td>{{ total_produit|number_format(2, ',', ' ') }} €</td>
-                        </tr>
+                      {% if cp.cheval.id == cheval.id and cp.quantite > 0 %}
+                        {% set afficher = true %}
+
+                        {# Gestion des déplacements uniques #}
+                        {% if cp.produit.nom == 'Déplacement' %}
+                          {% set key = cp.commentaire %}
+                          {% if key in deplacements_affiches %}
+                            {% set afficher = false %}
+                          {% else %}
+                            {% set deplacements_affiches = deplacements_affiches|merge([key]) %}
+                          {% endif %}
+                        {% endif %}
+
+                        {% if afficher %}
+                          {% set total_produit = cp.quantite * cp.prixUnitaire %}
+                          {% set total_cheval = total_cheval + total_produit %}
+                          <tr>
+                            <td>
+                              {% if cp.produit.nom == 'Déplacement' %}
+                                {{ cp.commentaire ? : cp.produit.nom }}
+                              {% else %}
+                                {{ cp.produit.nom }}
+                              {% endif %}
+                            </td>
+                            <td>{{ cp.quantite }}</td>
+                            <td>{{ cp.prixUnitaire|number_format(2, ',', ' ') }} €</td>
+                            <td>{{ total_produit|number_format(2, ',', ' ') }} €</td>
+                          </tr>
+                        {% endif %}
                       {% endif %}
                     {% endfor %}
                   </tbody>
@@ -71,18 +93,19 @@
             </div>
           </div>
         </div>
+        {% set total_mois = total_mois + total_cheval %}
       {% endfor %}
     </div>
 
     {# Total général du mois #}
     <div class="notification" style="
-    text-align: center;
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-top: 20px;
-    background-color: #ffffff;  /* gris clair */
-    color: #333;                 /* texte sombre */
-    border-left: 5px solid #3273dc; /* accent bleu */
-">Total du mois : {{ total_mois|number_format(2, ',', ' ') }} €</div>
+      text-align: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 20px;
+      background-color: #ffffff;
+      color: #333;
+      border-left: 5px solid #3273dc;
+    ">Total du mois : {{ total_mois|number_format(2, ',', ' ') }} €</div>
   </section>
 {% endblock %}

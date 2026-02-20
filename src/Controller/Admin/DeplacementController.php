@@ -28,10 +28,16 @@ final class DeplacementController extends AbstractController
     #[Route('/liste', name: 'app_admin_deplacements')]
     public function index(DeplacementRepository $deplacementRepository): Response
     {
+        $deplacements = $deplacementRepository->createQueryBuilder('d')
+            ->orderBy('d.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+
         return $this->render('admin/deplacement/liste.html.twig', [
-            'deplacements' => $deplacementRepository->findAll(),
+            'deplacements' => $deplacements,
         ]);
     }
+
 
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_deplacement_new')]
@@ -61,7 +67,7 @@ final class DeplacementController extends AbstractController
             $em->persist($deplacement);
             $em->flush();
 
-            $this->addFlash('success', $isEdit ? 'deplacement modifiée !' : 'deplacement créée !');
+            $this->addFlash('success', $isEdit ? 'Déplacement modifié !' : 'Déplacement créé !');
 
             return $this->redirectToRoute('app_admin_deplacements');
         }
@@ -81,14 +87,6 @@ final class DeplacementController extends AbstractController
             return $this->redirectToRoute('app_admin_deplacements');
         }
 
-        // Vérification si une structure est associé
-        if ($deplacement->getStructure() !== null) {
-            $this->addFlash(
-                'danger',
-                "Impossible de supprimer le deplacement « " . $deplacement->getNom() . " » car il est associé à une structure."
-            );
-            return $this->redirectToRoute('app_admin_deplacements');
-        }
 
         $this->em->remove($deplacement);
         $this->em->flush();

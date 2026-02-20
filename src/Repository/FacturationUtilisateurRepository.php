@@ -40,4 +40,20 @@ class FacturationUtilisateurRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function getNextNumeroFacture(): string
+    {
+        $year = date('Y');
+
+        $qb = $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->where('f.numFacture LIKE :year')
+            ->setParameter('year', "FACT-$year-%");
+
+        $count = $qb->getQuery()->getSingleScalarResult();
+
+        $next = $count + 1;
+
+        return sprintf('FACT-%s-%04d', $year, $next);
+    }
 }

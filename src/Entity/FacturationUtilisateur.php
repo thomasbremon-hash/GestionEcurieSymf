@@ -25,6 +25,13 @@ class FacturationUtilisateur
     #[ORM\ManyToOne(inversedBy: 'ManyToOne')]
     private ?Entreprise $entreprise = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $numFacture = null;
+
+
+    #[ORM\Column(length: 255)]
+    private ?string $statut = "impayee";
+
     public function getId(): ?int
     {
         return $this->id;
@@ -74,6 +81,30 @@ class FacturationUtilisateur
     public function setEntreprise(?Entreprise $entreprise): static
     {
         $this->entreprise = $entreprise;
+
+        return $this;
+    }
+
+    public function getNumFacture(): ?string
+    {
+        return $this->numFacture;
+    }
+
+    public function setNumFacture(string $numFacture): static
+    {
+        $this->numFacture = $numFacture;
+
+        return $this;
+    }
+
+    public function getStatut(): ?string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): static
+    {
+        $this->statut = $statut;
 
         return $this;
     }

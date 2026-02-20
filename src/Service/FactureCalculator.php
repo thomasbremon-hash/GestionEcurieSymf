@@ -13,6 +13,7 @@ class FactureCalculator
         $totalHT = 0;
         $totalTVA = [];
         $totalTTC = 0;
+        $seen = []; // Pour éviter les doublons
 
         foreach ($user->getChevalProprietaires() as $cp) {
             $cheval = $cp->getCheval();
@@ -23,16 +24,29 @@ class FactureCalculator
                     continue;
                 }
 
+                // clé unique pour éviter doublons
+                $key = $conso->getId() . '-' . $cp->getPourcentage();
+                if (in_array($key, $seen)) {
+                    continue;
+                }
+                $seen[] = $key;
+
                 $prixProrata = $conso->getPrixUnitaire() * $pourcentage;
                 $montantHT = $prixProrata * $conso->getQuantite();
                 $montantTVA = $montantHT * ($conso->getProduit()->getTauxTVA() / 100);
                 $montantTTC = $montantHT + $montantTVA;
 
+                // 🔹 Si c'est un déplacement, on prend le commentaire comme description
+                $description = $conso->getProduit()->getNom();
+                if ($conso->getProduit()->getNom() === 'Déplacement' && $conso->getCommentaire()) {
+                    $description = $conso->getCommentaire();
+                }
+
                 $lignes[] = [
                     'cheval' => $cheval->getNom(),
                     'pourcentage' => $cp->getPourcentage(),
                     'code' => $conso->getProduit()->getNom(),
-                    'description' => $conso->getProduit()->getDescription(),
+                    'description' => $description,
                     'quantite' => $conso->getQuantite(),
                     'prixBase' => $conso->getPrixUnitaire(),
                     'prixUnitaire' => $prixProrata,

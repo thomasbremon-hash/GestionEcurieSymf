@@ -36,6 +36,23 @@ class DeplacementToChevalProduitService
             $kmParCheval = $deplacement->getDistance() / count($chevaux);
 
             foreach ($chevaux as $cheval) {
+
+                // 🔹 Vérifier si le ChevalProduit existe déjà
+                $existing = $this->em->getRepository(ChevalProduit::class)->findOneBy([
+                    'cheval' => $cheval,
+                    'produit' => $produitKm,
+                    'moisDeGestion' => $mois,
+                    'commentaire' => sprintf(
+                        'Déplacement "%s" du %s',
+                        $deplacement->getNom(),
+                        $deplacement->getDate()?->format('d/m/Y')
+                    )
+                ]);
+
+                if ($existing) {
+                    continue; // Déjà généré → on skip
+                }
+
                 $cp = new ChevalProduit();
                 $cp->setCheval($cheval);
                 $cp->setProduit($produitKm);

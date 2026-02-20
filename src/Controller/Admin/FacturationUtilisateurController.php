@@ -90,42 +90,35 @@ class FacturationUtilisateurController extends AbstractController
         $data = $calculator->calculerFactureUtilisateur($user, $mois);
 
         $lignesParCheval = [];
-
         foreach ($data['lignes'] as $ligne) {
-
-            // ❌ On ignore les produits non consommés
             if ($ligne['quantite'] <= 0) {
                 continue;
             }
-
             $cheval = $ligne['cheval'];
-
             if (!isset($lignesParCheval[$cheval])) {
                 $lignesParCheval[$cheval] = [];
             }
-
             $lignesParCheval[$cheval][] = $ligne;
         }
 
-
-        $lignes = array_filter($data['lignes'], function ($ligne) {
-            return isset($ligne['quantite']) && $ligne['quantite'] > 0;
-        });
-
-
         $html = $this->renderView('admin/facturation/pdf.html.twig', [
-            'user'      => $user,
-            'mois'      => $mois,
+            'user'            => $user,
+            'mois'            => $mois,
             'lignesParCheval' => $lignesParCheval,
-            'totalHT'   => $data['totalHT'],
-            'totalTVA'  => $data['totalTVA'],
-            'totalTTC'  => $data['totalTTC'],
-            'facture'   => $facture,
+            'totalHT'         => $data['totalHT'],
+            'totalTVA'        => $data['totalTVA'],
+            'totalTTC'        => $data['totalTTC'],
+            'facture'         => $facture,
         ]);
 
 
+
         $options = new Options();
+
         $options->set('defaultFont', 'DejaVu Sans');
+
+        // ✅ autoriser Dompdf à accéder au dossier public
+        $options->set('chroot', $this->getParameter('kernel.project_dir') . '/public');
 
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
@@ -140,9 +133,28 @@ class FacturationUtilisateurController extends AbstractController
         ]);
     }
 
-    #[Route('/generer-utilisateur', name: 'app_admin_facturation_generer_utilisateur')]
-    public function genererUtilisateur(Request $request, MoisDeGestionRepository $moisRepo, DeplacementToChevalProduitService $deplacementService): Response
+    #[Route('/payer/{id}', name: 'app_admin_facturation_payer')]
+    public function payer(FacturationUtilisateur $facture): Response
     {
+        $facture->setStatut('payee');
+
+        $this->em->flush();
+
+        $this->addFlash('success', 'Facture marquée comme payée.');
+
+        return $this->redirectToRoute('app_admin_facturation_utilisateur');
+    }
+
+
+
+
+    #[Route('/generer-utilisateur', name: 'app_admin_facturation_generer_utilisateur')]
+    public function genererUtilisateur(
+        Request $request,
+        MoisDeGestionRepository $moisRepo,
+        DeplacementToChevalProduitService $deplacementService,
+        FacturationUtilisateurRepository $factureRepo
+    ): Response {
         $form = $this->createForm(FacturationGenerationType::class);
         $form->handleRequest($request);
 
@@ -161,12 +173,34 @@ class FacturationUtilisateurController extends AbstractController
                 }
             }
 
+            // 🔹 Récupérer le dernier numéro global
+            $dernierFacture = $factureRepo->createQueryBuilder('f')
+                ->select('f.numFacture')
+                ->orderBy('f.id', 'DESC')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+
+            $dernierNumero = 0;
+            if ($dernierFacture && isset($dernierFacture['numFacture'])) {
+                // Extraire le compteur XXXX du format MM-YYYY-XXXX
+                preg_match('/\d{4}$/', $dernierFacture['numFacture'], $matches);
+                if (!empty($matches[0])) {
+                    $dernierNumero = (int)$matches[0];
+                }
+            }
+
+            $compteur = $dernierNumero;
+
             foreach ($proprietaires as $user) {
+                $compteur++;
+
                 $facture = new FacturationUtilisateur();
                 $facture->setUtilisateur($user);
                 $facture->setMoisDeGestion($mois);
                 $facture->setEntreprise($entreprise);
 
+                // Calcul du total
                 $total = 0;
                 foreach ($mois->getChevalProduits() as $cp) {
                     foreach ($cp->getCheval()->getChevalProprietaires() as $cprop) {
@@ -176,6 +210,18 @@ class FacturationUtilisateurController extends AbstractController
                     }
                 }
                 $facture->setTotal($total);
+
+                // 🔹 Numéro de facture global auto-incrémenté
+                $numFacture = sprintf(
+                    '%02d-%d-%04d',
+                    $mois->getMois(),
+                    $mois->getAnnee(),
+                    $compteur
+                );
+                $facture->setNumFacture($numFacture);
+
+                // Statut par défaut
+                $facture->setStatut('impayee');
 
                 $this->em->persist($facture);
             }
@@ -187,6 +233,9 @@ class FacturationUtilisateurController extends AbstractController
 
         return $this->render('admin/facturation/facturation.form.html.twig', ['form' => $form]);
     }
+
+
+
 
 
 
