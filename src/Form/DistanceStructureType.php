@@ -19,31 +19,39 @@ class DistanceStructureType extends AbstractType
     {
         $builder
 
-            // STRUCTURE
-            ->add('structure', EntityType::class, [
-                'class' => Structure::class,
-                'choice_label' => 'nom', // plus lisible que l'id
-                'label' => 'Structure',
-                'placeholder' => 'Sélectionner une structure',
-                'attr' => [
-                    'class' => 'select'
-                ],
+            ->add('entreprise', EntityType::class, [
+                'class' => Entreprise::class,
+                'choice_label' => 'nom',
+                'label' => 'Entreprise',
+                'placeholder' => 'Sélectionner une entreprise',
                 'constraints' => [
-                    new NotBlank(['message' => 'La structure est obligatoire'])
+                    new NotBlank()
                 ]
             ])
 
-            // ENTREPRISE
-            ->add('entreprise', EntityType::class, [
-                'class' => Entreprise::class,
-                'choice_label' => 'nom', // adapte si nécessaire
-                'label' => 'Entreprise',
-                'placeholder' => 'Sélectionner une entreprise',
+            ->add('structure', EntityType::class, [
+                'class' => Structure::class,
+                'choice_label' => 'nom',
+                'label' => 'Structure',
+                'placeholder' => 'Sélectionner une structure',
+                'constraints' => [
+                    new NotBlank()
+                ]
+            ])
+
+            ->add('distance', IntegerType::class, [
+                'label' => 'Distance (km)',
                 'attr' => [
-                    'class' => 'select'
+                    'class' => 'input',
+                    'placeholder' => 'Ex : 52'
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'L’entreprise est obligatoire'])
+                    new NotBlank([
+                        'message' => 'La distance est obligatoire'
+                    ]),
+                    new Positive([
+                        'message' => 'La distance doit être positive'
+                    ])
                 ]
             ])
         ;

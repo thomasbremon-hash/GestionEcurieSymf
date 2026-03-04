@@ -39,11 +39,18 @@ class Structure
     #[ORM\OneToMany(targetEntity: DistanceStructure::class, mappedBy: 'structure')]
     private Collection $structureDistance;
 
+    /**
+     * @var Collection<int, DistanceStructure>
+     */
+    #[ORM\OneToMany(targetEntity: DistanceStructure::class, mappedBy: 'structure')]
+    private Collection $distanceStructures;
+
 
     public function __construct()
     {
         $this->deplacements = new ArrayCollection();
         $this->structureDistance = new ArrayCollection();
+        $this->distanceStructures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -167,5 +174,35 @@ class Structure
             $this->getCp(),
             $this->getVille()
         ));
+    }
+
+    /**
+     * @return Collection<int, DistanceStructure>
+     */
+    public function getDistanceStructures(): Collection
+    {
+        return $this->distanceStructures;
+    }
+
+    public function addDistanceStructure(DistanceStructure $distanceStructure): static
+    {
+        if (!$this->distanceStructures->contains($distanceStructure)) {
+            $this->distanceStructures->add($distanceStructure);
+            $distanceStructure->setStructure($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDistanceStructure(DistanceStructure $distanceStructure): static
+    {
+        if ($this->distanceStructures->removeElement($distanceStructure)) {
+            // set the owning side to null (unless already changed)
+            if ($distanceStructure->getStructure() === $this) {
+                $distanceStructure->setStructure(null);
+            }
+        }
+
+        return $this;
     }
 }

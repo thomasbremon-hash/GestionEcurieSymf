@@ -4,14 +4,14 @@ namespace App\Controller\Admin;
 
 use App\Entity\Deplacement;
 use App\Form\DeplacementType;
-use App\Service\DistanceCalculator;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DeplacementRepository;
+use App\Repository\DistanceStructureRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/deplacement')]
@@ -42,7 +42,7 @@ final class DeplacementController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_deplacement_new')]
     #[Route('/edit/{id}', name: 'app_admin_deplacement_update')]
-    public function form(Request $request, EntityManagerInterface $em, ?Deplacement $deplacement, DistanceCalculator $distanceCalculator): Response
+    public function form(Request $request, EntityManagerInterface $em, ?Deplacement $deplacement, DistanceStructureRepository $distanceRepo): Response
     {
         $isEdit = true;
         if (!$deplacement) {
@@ -57,12 +57,19 @@ final class DeplacementController extends AbstractController
             $entreprise = $deplacement->getEntreprise();
             $structure = $deplacement->getStructure();
 
-            $distanceKm = $distanceCalculator->calculate(
-                $entreprise->getAdresseComplete(),
-                $structure->getAdresseComplete()
-            );
+            $distance = $distanceRepo->findDistance($entreprise, $structure);
 
-            $deplacement->setDistance($distanceKm);
+            if ($distance === null) {
+
+                $this->addFlash(
+                    'danger',
+                    'Distance non définie pour cette entreprise et structure'
+                );
+
+                return $this->redirectToRoute('app_admin_deplacement_new');
+            }
+
+            $deplacement->setDistance($distance);
 
             $em->persist($deplacement);
             $em->flush();

@@ -13,28 +13,28 @@ class DistanceStructure
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $distance = null;
+    #[ORM\ManyToOne(inversedBy: 'distanceStructures')]
+    private ?Entreprise $entreprise = null;
 
-    #[ORM\ManyToOne(inversedBy: 'structureDistance')]
+    #[ORM\ManyToOne(inversedBy: 'distanceStructures')]
     private ?Structure $structure = null;
 
-    #[ORM\ManyToOne(inversedBy: 'distanceEntreprise')]
-    private ?Entreprise $entreprise = null;
+    #[ORM\Column]
+    private ?int $distance = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDistance(): ?float
+    public function getEntreprise(): ?Entreprise
     {
-        return $this->distance;
+        return $this->entreprise;
     }
 
-    public function setDistance(?float $distance): static
+    public function setEntreprise(?Entreprise $entreprise): static
     {
-        $this->distance = $distance;
+        $this->entreprise = $entreprise;
 
         return $this;
     }
@@ -51,14 +51,14 @@ class DistanceStructure
         return $this;
     }
 
-    public function getEntreprise(): ?Entreprise
+    public function getDistance(): ?int
     {
-        return $this->entreprise;
+        return $this->distance;
     }
 
-    public function setEntreprise(?Entreprise $entreprise): static
+    public function setDistance(int $distance): static
     {
-        $this->entreprise = $entreprise;
+        $this->distance = $distance;
 
         return $this;
     }

@@ -84,6 +84,12 @@ class Entreprise
     #[ORM\OneToMany(targetEntity: FacturationUtilisateur::class, mappedBy: 'entreprise')]
     private Collection $ManyToOne;
 
+    /**
+     * @var Collection<int, DistanceStructure>
+     */
+    #[ORM\OneToMany(targetEntity: DistanceStructure::class, mappedBy: 'entreprise')]
+    private Collection $distanceStructures;
+
 
     public function __construct()
     {
@@ -94,6 +100,7 @@ class Entreprise
         $this->deplacement = new ArrayCollection();
         $this->facturationEntreprises = new ArrayCollection();
         $this->ManyToOne = new ArrayCollection();
+        $this->distanceStructures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -420,6 +427,36 @@ class Entreprise
             // set the owning side to null (unless already changed)
             if ($manyToOne->getEntreprise() === $this) {
                 $manyToOne->setEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DistanceStructure>
+     */
+    public function getDistanceStructures(): Collection
+    {
+        return $this->distanceStructures;
+    }
+
+    public function addDistanceStructure(DistanceStructure $distanceStructure): static
+    {
+        if (!$this->distanceStructures->contains($distanceStructure)) {
+            $this->distanceStructures->add($distanceStructure);
+            $distanceStructure->setEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDistanceStructure(DistanceStructure $distanceStructure): static
+    {
+        if ($this->distanceStructures->removeElement($distanceStructure)) {
+            // set the owning side to null (unless already changed)
+            if ($distanceStructure->getEntreprise() === $this) {
+                $distanceStructure->setEntreprise(null);
             }
         }
 

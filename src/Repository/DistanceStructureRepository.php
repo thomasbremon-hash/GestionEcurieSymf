@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\DistanceStructure;
+use App\Entity\Entreprise;
+use App\Entity\Structure;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +42,18 @@ class DistanceStructureRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+
+    public function findDistance(Entreprise $entreprise, Structure $structure): ?int
+    {
+        $result = $this->createQueryBuilder('d')
+            ->andWhere('d.entreprise = :entreprise')
+            ->andWhere('d.structure = :structure')
+            ->setParameter('entreprise', $entreprise)
+            ->setParameter('structure', $structure)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $result?->getDistance();
+    }
 }

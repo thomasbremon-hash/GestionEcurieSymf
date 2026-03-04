@@ -146,10 +146,29 @@
             </li>
 
             <li>
-              <a href="{{ path('app_admin_deplacements') }}" class="{% if currentPath == 'app_admin_deplacements' %}{% endif %} has-icon">
-                <span class="icon"><span class="mdi mdi-car"></span></span>
-                <span class="menu-item-label">Déplacement</span>
+              <a href="#" class="toggle-menu has-icon is-flex is-align-items-center" style="justify-content: space-between;">
+                <span class="is-flex is-align-items-center">
+                  <span class="icon"><i class="mdi mdi-car"></i></span>
+                  <span class="menu-item-label">Distance & Déplacements</span>
+                </span>
+                <span class="icon arrow"><i class="mdi mdi-chevron-down"></i></span>
               </a>
+
+              <ul class="submenu" style="display: none;">
+                <li>
+                  <a href="{{ path('app_admin_deplacements') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-car"></i></span>
+                    <span>Déplacements</span>
+                  </a>
+                </li>
+
+                <li>
+                  <a href="{{ path('app_admin_distances') }}" class="is-flex is-align-items-center">
+                    <span class="icon"><i class="mdi mdi-map-marker-distance"></i></span>
+                    <span>Distances</span>
+                  </a>
+                </li>
+              </ul>
             </li>
 
             <li>
