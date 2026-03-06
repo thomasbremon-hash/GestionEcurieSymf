@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\ResetPasswordRequest;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -32,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      */
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
@@ -56,6 +57,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column]
+    private bool $isActive = false;
+
     /**
      * @var Collection<int, Entreprise>
      */
@@ -74,12 +78,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: FacturationUtilisateur::class, mappedBy: 'utilisateur')]
     private Collection $facturationUtilisateurs;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ResetPasswordRequest::class, cascade: ['remove'])]
+    private Collection $resetPasswordRequests;
+
 
     public function __construct()
     {
         $this->entreprise = new ArrayCollection();
         $this->chevalProprietaires = new ArrayCollection();
         $this->facturationUtilisateurs = new ArrayCollection();
+        $this->resetPasswordRequests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -247,6 +255,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Entreprise>
      */
@@ -325,6 +345,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($facturationUtilisateur->getUtilisateur() === $this) {
                 $facturationUtilisateur->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ResetPasswordRequest>
+     */
+    public function getResetPasswordRequests(): Collection
+    {
+        return $this->resetPasswordRequests;
+    }
+
+    public function addResetPasswordRequest(ResetPasswordRequest $request): static
+    {
+        if (!$this->resetPasswordRequests->contains($request)) {
+            $this->resetPasswordRequests->add($request);
+            $request->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResetPasswordRequest(ResetPasswordRequest $request): static
+    {
+        if ($this->resetPasswordRequests->removeElement($request)) {
+            // set the owning side to null (unless already changed)
+            if ($request->getUser() === $this) {
+                $request->setUser(null);
             }
         }
 

@@ -67,14 +67,6 @@
               <p class="control is-expanded">{{ form_widget(formUser.email) }}</p>
               {{ form_errors(formUser.email) }}
             </div>
-
-            {% if userId is null %}
-              <div class="field">
-                {{ form_label(formUser.password) }}
-                <p class="control is-expanded">{{ form_widget(formUser.password) }}</p>
-                {{ form_errors(formUser.password) }}
-              </div>
-            {% endif %}
           </div>
         </div>
 

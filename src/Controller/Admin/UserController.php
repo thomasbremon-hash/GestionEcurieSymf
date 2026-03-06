@@ -3,17 +3,20 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
-use App\Entity\Cheval;
-use App\Form\UserType;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/user')]
@@ -38,7 +41,7 @@ final class UserController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_user_new')]
     #[Route('/update/{id}', name: 'app_admin_user_update')]
-    public function new(Request $request, UserPasswordHasherInterface $passwordHasher, ?User $user): Response
+    public function new(Request $request, ResetPasswordHelperInterface $resetPasswordHelper, MailerInterface $mailer, ?User $user): Response
     {
         $isEdit = $user !== null;
 
@@ -53,15 +56,33 @@ final class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // On hash seulement si le champ existe (donc en création)
-            if (!$isEdit) {
-                $plainPassword = $form->get('password')->getData();
-                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-                $user->setPassword($hashedPassword);
-            }
+            $user->setIsActive(false);
 
             $this->em->persist($user);
             $this->em->flush();
+
+            if (!$isEdit) {
+
+                $resetToken = $resetPasswordHelper->generateResetToken($user);
+
+                $resetUrl = $this->generateUrl(
+                    'app_reset_password',
+                    ['token' => $resetToken->getToken()],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+
+                $email = (new TemplatedEmail())
+                    ->from('no-reply@gestionecurie.fr')
+                    ->to($user->getEmail())
+                    ->subject('Création de votre compte')
+                    ->htmlTemplate('reset_password/welcome.html.twig')
+                    ->context([
+                        'user' => $user,
+                        'resetUrl' => $resetUrl,
+                    ]);
+
+                $mailer->send($email);
+            }
 
             $txt = $isEdit ? 'modifié' : 'enregistré';
             $this->addFlash('success', "L'utilisateur a été $txt avec succès !");
@@ -91,11 +112,8 @@ final class UserController extends AbstractController
     #[Route('/delete/{id}', name: 'app_admin_user_delete')]
     public function adminCategoryRemove(?User $user)
     {
-        if (!$user->getEntreprise()->isEmpty()) {
 
-            $this->addFlash('danger', "Impossible de supprimer l'utilisateur " . $user->getPrenom() . " " . $user->getPrenom() . " car il est affilié à une entreprise !");
-            return $this->redirectToRoute('app_admin_users');
-        }
+
         $this->em->remove($user);
         $this->em->flush();
         $this->addFlash('success', "L'utilisateur " . $user->getPrenom() . " " . $user->getPrenom() . " a bien été supprimée !");

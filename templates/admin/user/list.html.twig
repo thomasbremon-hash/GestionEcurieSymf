@@ -53,7 +53,7 @@
                   <th>Ville</th>
                   <th>Code postal</th>
                   <th>Roles</th>
-
+                  <th>Statut</th> {# Nouvelle colonne #}
                   <th></th>
                 </tr>
               </thead>
@@ -82,6 +82,15 @@
                       {% endfor %}
                     </td>
 
+                    {# Nouvelle colonne statut #}
+                    <td data-label="Statut">
+                      {% if item.isActive %}
+                        <span class="tag is-success">Actif</span>
+                      {% else %}
+                        <span class="tag is-warning">Invitation envoyée</span>
+                      {% endif %}
+                    </td>
+
                     <td class="is-actions-cell">
                       <div class="buttons is-right">
                         <a href="{{ path('app_admin_user_show', { id: item.id }) }}" class="button is-small is-info" type="button"><span class="icon"><i class="mdi mdi-eye"></i></span></a>
@@ -90,6 +99,7 @@
                       </div>
                     </td>
                   </tr>
+
                   <div id="sample-modal-{{ item.id }}" class="modal">
                     <div class="modal-background jb-modal-close"></div>
                     <div class="modal-card">
