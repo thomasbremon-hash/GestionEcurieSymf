@@ -60,9 +60,7 @@ class ChevalType extends AbstractType
                     'Étalon' => 'Étalon',
                 ],
                 'placeholder' => 'Sélectionner un sexe',
-                'attr' => [
-                    'class' => 'select'
-                ],
+
                 'constraints' => [
                     new NotBlank(['message' => 'Le sexe est obligatoire']),
                 ]

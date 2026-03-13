@@ -1,9 +1,228 @@
 {% extends 'layouts/base.html.twig' %}
 
 {% block title %}
-
+  Comptabilité — {{ app.user.prenom }} {{ app.user.nom }}
 {% endblock %}
 
 {% block body %}
+  {% set moisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'] %}
 
+  <div class="compta-page">
+    {# ════════════════════════════
+     HERO
+  ════════════════════════════ #}
+    <div class="compta-hero">
+      <div class="compta-hero-grid"></div>
+      <div class="container">
+        <div class="compta-hero-inner">
+          <div>
+            <div class="compta-hero-eyebrow">
+              <i class="mdi mdi-calculator-variant-outline"></i> Comptabilité
+            </div>
+            <h1 class="compta-hero-title">Mes factures</h1>
+            <p class="compta-hero-sub">Historique complet et téléchargement de vos documents.</p>
+          </div>
+          <div class="compta-hero-meta">
+            <span><i class="mdi mdi-account-outline"></i> {{ app.user.prenom }} {{ app.user.nom }}</span>
+            <span><i class="mdi mdi-calendar-outline"></i> {{ 'now'|date('d/m/Y') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container compta-body">
+      {# ════════════════════════════
+       KPIs
+    ════════════════════════════ #}
+      <div class="compta-kpis">
+        <div class="compta-kpi compta-kpi--total">
+          <div class="compta-kpi-icon">
+            <i class="mdi mdi-receipt-text-outline"></i>
+          </div>
+          <div>
+            <div class="compta-kpi-label">Total facturé TTC</div>
+            <div class="compta-kpi-value">{{ totalGeneral|number_format(2, ',', ' ') }} €</div>
+          </div>
+        </div>
+
+        <div class="compta-kpi compta-kpi--paye">
+          <div class="compta-kpi-icon">
+            <i class="mdi mdi-check-circle-outline"></i>
+          </div>
+          <div>
+            <div class="compta-kpi-label">Réglé ({{ nbPaye }} facture{{ nbPaye > 1 ? 's' : '' }})</div>
+            <div class="compta-kpi-value">{{ totalPaye|number_format(2, ',', ' ') }} €</div>
+          </div>
+        </div>
+
+        <div class="compta-kpi compta-kpi--impaye {% if totalImpaye > 0 %}{% endif %}">
+          <div class="compta-kpi-icon">
+            <i class="mdi mdi-clock-alert-outline"></i>
+          </div>
+          <div>
+            <div class="compta-kpi-label">En attente ({{ nbImpaye }} facture{{ nbImpaye > 1 ? 's' : '' }})</div>
+            <div class="compta-kpi-value">{{ totalImpaye|number_format(2, ',', ' ') }} €</div>
+          </div>
+        </div>
+
+        <div class="compta-kpi compta-kpi--count">
+          <div class="compta-kpi-icon">
+            <i class="mdi mdi-file-document-multiple-outline"></i>
+          </div>
+          <div>
+            <div class="compta-kpi-label">Total documents</div>
+            <div class="compta-kpi-value">{{ factures|length }}</div>
+          </div>
+        </div>
+      </div>
+
+      {# ════════════════════════════
+       ALERTE IMPAYÉES
+    ════════════════════════════ #}
+      {% if totalImpaye > 0 %}
+        <div class="compta-alert-banner">
+          <div class="compta-alert-icon">
+            <i class="mdi mdi-alert-circle-outline"></i>
+          </div>
+          <div>
+            <div class="compta-alert-title">{{ nbImpaye }} facture{{ nbImpaye > 1 ? 's' : '' }} en attente de règlement</div>
+            <div class="compta-alert-sub">Montant total dû : {{ totalImpaye|number_format(2, ',', ' ') }} €. Merci de contacter l'écurie pour régulariser.</div>
+          </div>
+        </div>
+      {% endif %}
+
+      {# ════════════════════════════
+       FACTURES
+    ════════════════════════════ #}
+      {% if (factures|length) > 0 %}
+        <div class="compta-toolbar">
+          <div class="compta-tabs" id="compta-tabs">
+            <button class="compta-tab active" data-filter="all">
+              <i class="mdi mdi-format-list-bulleted"></i> Toutes
+              <span class="compta-tab-count">{{ factures|length }}</span>
+            </button>
+            <button class="compta-tab" data-filter="impayee">
+              <i class="mdi mdi-clock-outline"></i> En attente
+              <span class="compta-tab-count">{{ nbImpaye }}</span>
+            </button>
+            <button class="compta-tab" data-filter="payee">
+              <i class="mdi mdi-check-circle-outline"></i> Réglées
+              <span class="compta-tab-count">{{ nbPaye }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="compta-factures">
+          {% for annee, facturesAnnee in facturesParAnnee %}
+            <div class="compta-annee-block" data-annee="{{ annee }}">
+              <div class="compta-annee-header">
+                <div class="compta-annee-title">
+                  <i class="mdi mdi-calendar-blank-outline"></i> {{ annee }}
+                </div>
+                <div class="compta-annee-stats">
+                  {% set totalAnnee = 0 %}
+                  {% for f in facturesAnnee %}
+                    {% set totalAnnee = totalAnnee + totauxTtc[f.id] %}
+                  {% endfor %}
+                  <span class="compta-annee-total">{{ totalAnnee|number_format(2, ',', ' ') }} €</span>
+                  <span class="compta-annee-count">{{ facturesAnnee|length }} facture{{ (facturesAnnee|length) > 1 ? 's' : '' }}</span>
+                </div>
+              </div>
+
+              <div class="compta-table-wrap">
+                <table class="compta-table">
+                  <thead>
+                    <tr>
+                      <th>N° Facture</th>
+                      <th>Période</th>
+                      <th>Entreprise</th>
+                      <th>Montant TTC</th>
+                      <th>Statut</th>
+                      <th>PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for facture in facturesAnnee %}
+                      {% set isPaid = facture.statut != 'impayee' %}
+                      <tr class="compta-row" data-statut="{{ facture.statut }}">
+                        <td>
+                          <span class="compta-num">{{ facture.numFacture }}</span>
+                        </td>
+
+                        <td>
+                          {% if facture.moisDeGestion %}
+                            <span class="compta-mois">{{ moisNoms[facture.moisDeGestion.mois - 1] }} {{ facture.moisDeGestion.annee }}</span>
+                          {% else %}
+                            —
+                          {% endif %}
+                        </td>
+
+                        <td>
+                          {% if facture.entreprise %}
+                            <span class="compta-entreprise"><i class="mdi mdi-domain"></i> {{ facture.entreprise.nom }}</span>
+                          {% else %}
+                            —
+                          {% endif %}
+                        </td>
+
+                        <td>
+                          {# Utilise le vrai totalTTC calculé par FactureCalculator #}
+                          <span class="compta-montant">{{ totauxTtc[facture.id]|number_format(2, ',', ' ') }} €</span>
+                        </td>
+
+                        <td>
+                          <span class="compta-statut-pill {{ isPaid ? 'paid' : 'unpaid' }}">
+                            <i class="mdi mdi-{{ isPaid ? 'check-circle' : 'clock-outline' }}"></i>
+                            {{ isPaid ? 'Réglé' : 'En attente' }}
+                          </span>
+                        </td>
+
+                        <td>
+                          <a href="{{ path('app_comptabilite_facture_pdf', { id: facture.id }) }}" class="compta-pdf-btn" title="Télécharger {{ facture.numFacture }}">
+                            <i class="mdi mdi-file-pdf-box"></i>
+                            <span>PDF</span>
+                          </a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="compta-empty">
+          <i class="mdi mdi-receipt-text-outline"></i>
+          <div class="compta-empty-title">Aucune facture disponible</div>
+          <div class="compta-empty-sub">Vos factures apparaîtront ici dès leur émission.</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+    const tabs = document.querySelectorAll('.compta-tab')
+    const rows = document.querySelectorAll('.compta-row')
+    
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) => t.classList.remove('active'))
+        tab.classList.add('active')
+    
+        const filter = tab.dataset.filter
+        rows.forEach((row) => {
+          row.style.display = filter === 'all' || row.dataset.statut === filter ? '' : 'none'
+        })
+    
+        // Masquer blocs année vides
+        document.querySelectorAll('.compta-annee-block').forEach((block) => {
+          const hasVisible = [...block.querySelectorAll('.compta-row')].some((r) => r.style.display !== 'none')
+          block.style.display = hasVisible ? '' : 'none'
+        })
+      })
+    })
+  </script>
 {% endblock %}

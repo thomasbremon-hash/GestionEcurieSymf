@@ -22,9 +22,7 @@ class ParticipationType extends AbstractType
                 'class' => Cheval::class,
                 'choice_label' => 'nom',
                 'placeholder' => 'Sélectionner le cheval',
-                'attr' => [
-                    'class' => 'select',
-                ],
+
                 'label' => 'Cheval',
             ])
 
@@ -35,9 +33,7 @@ class ParticipationType extends AbstractType
                     return $course->getNom() . ' / ' . $course->getLieu();
                 },
                 'placeholder' => 'Sélectionner la course',
-                'attr' => [
-                    'class' => 'select',
-                ],
+
                 'label' => 'Course',
             ])
 

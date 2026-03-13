@@ -13,6 +13,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_GESTIONNAIRE')]
+#[IsGranted('ROLE_COMPTABILITE')]
+#[IsGranted('ROLE_CLIENT')]
 #[Route('/admin/cheval')]
 final class ChevalController extends AbstractController
 {
@@ -24,6 +27,9 @@ final class ChevalController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_GESTIONNAIRE')]
+    #[IsGranted('ROLE_COMPTABILITE')]
+    #[IsGranted('ROLE_CLIENT')]
     #[Route('/liste', name: 'app_admin_chevaux')]
     public function index(ChevalRepository $chevalRepository): Response
     {

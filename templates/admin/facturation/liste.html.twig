@@ -1,331 +1,260 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-    BackOffice | Facturation Utilisateurs
+  BackOffice | Facturation utilisateurs
 {% endblock %}
 
 {% block body %}
-<section class="section">
+  <div class="admin-wrapper--wide">
 
-    <div class="level mb-5">
-
-        <div class="level-left">
-            <h1 class="title is-4">Facturation Utilisateurs</h1>
+    {# ── Flash ── #}
+    {% for label, messages in app.flashes(['success', 'danger']) %}
+      {% for message in messages %}
+        <div class="flash {{ label }}">
+          <span><i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i> {{ message }}</span>
+          <button class="flash-close" onclick="this.parentElement.remove()"><i class="mdi mdi-close"></i></button>
         </div>
+      {% endfor %}
+    {% endfor %}
 
-        <div class="level-right">
-
-            <a href="{{ path('app_admin_facturation_generer_utilisateur') }}" class="button is-primary">
-
-                <span class="icon">
-                    <i class="mdi mdi-plus"></i>
-                </span>
-
-                <span>Générer des factures</span>
-
-            </a>
-
-        </div>
-
+    {# ── Page top ── #}
+    <div class="page-top">
+      <div>
+        <div class="page-eyebrow">Admin › Gestion financière</div>
+        <h1 class="page-title">Facturation <span class="subtitle">{{ factures|length }} facture{{ factures|length > 1 ? 's' }}</span></h1>
+      </div>
+      <a href="{{ path('app_admin_facturation_generer_utilisateur') }}" class="btn-primary-custom">
+        <i class="mdi mdi-plus"></i> Générer des factures
+      </a>
     </div>
 
-
-    {% for label, messages in app.flashes(['success', 'danger']) %}
-
-        {% for message in messages %}
-
-            <div class="notification is-{{ label }}">
-
-                <button class="delete"></button>
-
-                {{ message }}
-
-            </div>
-
-        {% endfor %}
-
-    {% endfor %}
-
-
-
+    {# ── Groupement par entreprise puis par mois ── #}
     {% set currentEntreprise = null %}
     {% set currentMonth = null %}
-
-
+    {% set isFirstEntreprise = true %}
 
     {% for facture in factures %}
+      {% set entrepriseNom = facture.entreprise.nom %}
+      {% set monthYear = ('%02d'|format(facture.moisDeGestion.mois)) ~ '/' ~ facture.moisDeGestion.annee %}
 
-        {% set entrepriseNom = facture.entreprise.nom %}
-        {% set monthYear = ('%02d'|format(facture.moisDeGestion.mois)) ~ '/' ~ facture.moisDeGestion.annee %}
+      {# ── Nouveau bloc entreprise ── #}
+      {% if currentEntreprise != entrepriseNom %}
 
+        {# Fermer la table + card précédente #}
+        {% if currentEntreprise is not null %}
+              </tbody>
+            </table>
+            <div class="table-footer">
+              <div class="pagination-info"></div>
+            </div>
+          </div>{# fin table-card #}
+        </div>{# fin entreprise-block #}
+        {% endif %}
 
+        {# Ouvrir nouvelle section entreprise #}
+        <div class="entreprise-block">
+          <div class="entreprise-block-header">
+            <div class="user-avatar" style="width:40px;height:40px;font-size:0.9rem;background:var(--accent);border-radius:var(--radius-sm);">
+              {{ entrepriseNom|slice(0,1)|upper }}
+            </div>
+            <div>
+              <div class="entreprise-block-name">{{ entrepriseNom }}</div>
+              <div class="entreprise-block-sub">
+                {% set nb = 0 %}
+                {% for f in factures %}{% if f.entreprise.nom == entrepriseNom %}{% set nb = nb + 1 %}{% endif %}{% endfor %}
+                {{ nb }} facture{{ nb > 1 ? 's' }}
+              </div>
+            </div>
+          </div>
 
-        {# Nouvelle entreprise #}
+          <div class="table-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mois</th>
+                  <th>Client</th>
+                  <th>N° Facture</th>
+                  <th>Total TTC</th>
+                  <th>Statut</th>
+                  <th>Email</th>
+                  <th style="text-align:right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+        {% set currentEntreprise = entrepriseNom %}
+        {% set currentMonth = null %}
+      {% endif %}
 
-        {% if currentEntreprise != entrepriseNom %}
+      {# ── Séparateur de mois ── #}
+      {% if currentMonth != monthYear %}
+        <tr class="month-separator-row">
+          <td colspan="7">
+            <span class="month-separator-label">
+              <i class="mdi mdi-calendar-month"></i>
+              {{ monthYear }}
+            </span>
+          </td>
+        </tr>
+        {% set currentMonth = monthYear %}
+      {% endif %}
 
-            {% if currentEntreprise is not null %}
-                </div>
+      {# ── Ligne facture ── #}
+      <tr>
+
+        {# Mois #}
+        <td>
+          <span class="tag-neutral tag" style="font-size:0.75rem;">{{ monthYear }}</span>
+        </td>
+
+        {# Client #}
+        <td>
+          <div class="user-cell">
+            <div class="user-avatar" style="width:34px;height:34px;font-size:0.75rem;">
+              {{ facture.utilisateur.nom|slice(0,1)|upper }}{{ facture.utilisateur.prenom|slice(0,1)|upper }}
+            </div>
+            <div>
+              <div class="user-name">{{ facture.utilisateur.nom }} {{ facture.utilisateur.prenom }}</div>
+            </div>
+          </div>
+        </td>
+
+        {# N° Facture #}
+        <td>
+          <span class="invoice-num">{{ facture.numFacture }}</span>
+        </td>
+
+        {# Total TTC #}
+        <td>
+          <span class="amount-cell">{{ totauxTtc[facture.id]|number_format(2, ',', ' ') }} €</span>
+        </td>
+
+        {# Statut #}
+        <td>
+          {% if facture.statut == 'payee' %}
+            <span class="pill pill-active"><i class="mdi mdi-check-circle"></i> Payée</span>
+          {% elseif facture.statut == 'impayee' %}
+            <span class="pill pill-admin"><i class="mdi mdi-alert-circle"></i> Impayée</span>
+          {% else %}
+            <span class="pill pill-pending"><i class="mdi mdi-clock-outline"></i> En attente</span>
+          {% endif %}
+        </td>
+
+        {# Email #}
+        <td>
+          {% if facture.mailEnvoye %}
+            <span class="pill pill-active"><i class="mdi mdi-email-check"></i> Envoyé</span>
+          {% else %}
+            <span class="pill pill-pending"><i class="mdi mdi-email-outline"></i> Non envoyé</span>
+          {% endif %}
+        </td>
+
+        {# Actions #}
+        <td>
+          <div class="action-btns">
+            <a href="{{ path('app_admin_facturation_pdf_utilisateur', { id: facture.id }) }}"
+               class="action-btn" style="color:var(--red);border-color:rgba(185,28,28,0.3);background:var(--red-light);"
+               title="Télécharger PDF">
+              <i class="mdi mdi-file-pdf-box"></i>
+            </a>
+            {% if facture.statut != 'payee' %}
+              <a href="{{ path('app_admin_facturation_payer', { id: facture.id }) }}"
+                 class="action-btn" style="color:var(--green);border-color:rgba(61,107,82,0.3);background:var(--green-light);"
+                 title="Marquer payée">
+                <i class="mdi mdi-cash-plus"></i>
+              </a>
             {% endif %}
-
-            <div class="card mb-5">
-
-                <header class="card-header has-background-light">
-
-                    <p class="card-header-title has-text-weight-bold">
-
-                        Entreprise : {{ entrepriseNom }}
-
-                    </p>
-
-                </header>
-
-                <div class="card-content">
-
-            {% set currentEntreprise = entrepriseNom %}
-            {% set currentMonth = null %}
-
-        {% endif %}
-
-
-        {# Nouveau mois #}
-
-        {% if currentMonth != monthYear %}
-
-            <div class="month-header has-background-light p-3 mb-3">
-
-                <strong>Mois :</strong>
-
-                <span class="tag is-primary">
-
-                    {{ monthYear }}
-
-                </span>
-
-            </div>
-
-            {% set currentMonth = monthYear %}
-
-        {% endif %}
-
-
-        <div class="box mb-3">
-
-            <div class="columns is-vcentered is-mobile">
-
-
-
-                {# CLIENT #}
-
-                <div class="column is-2">
-
-                    <strong>Client :</strong><br>
-
-                    {{ facture.utilisateur.nom }} {{ facture.utilisateur.prenom }}
-
-                </div>
-    {# NUMERO FACTURE #}
-
-                <div class="column is-2">
-
-                    <strong>N° :</strong><br>
-
-                    <span class="tag is-dark">
-
-                        {{ facture.numFacture }}
-
-                    </span>
-
-                </div>
-
-
-
-                {# TOTAL #}
-
-                <div class="column is-2">
-
-                    <strong>Total :</strong><br>
-
-                    <span class="tag is-success">
-
-                        {{ totauxTtc[facture.id]|number_format(2, ',', ' ') }} €
-
-                    </span>
-
-                </div>
-
-
-
-                {# STATUT #}
-
-                <div class="column is-2">
-
-                    <strong>Statut :</strong><br>
-
-
-                    {% if facture.statut == 'payee' %}
-
-                        <span class="tag is-success">
-                            Payée
-                        </span>
-
-
-                    {% elseif facture.statut == 'impayee' %}
-
-                        <span class="tag is-danger">
-                            Impayée
-                        </span>
-
-
-                    {% else %}
-
-                        <span class="tag is-warning">
-                            En attente
-                        </span>
-
-                    {% endif %}
-
-
-                </div>
-
-
-
-                {# ACTIONS #}
-
-                <div class="column is-4 has-text-right">
-
-
-
-                    {# PDF #}
-
-                    <a href="{{ path('app_admin_facturation_pdf_utilisateur', { id: facture.id }) }}"
-
-                       class="button is-info"
-
-                       title="PDF">
-
-                        <span class="icon">
-                            <i class="mdi mdi-file-pdf-box"></i>
-                        </span>
-
-                    </a>
-
-
-
-                    {# MARQUER PAYE #}
-
-                    {% if facture.statut != 'payee' %}
-
-                        <a href="{{ path('app_admin_facturation_payer', { id: facture.id }) }}"
-
-                           class="button is-success"
-
-                           title="Marquer payée">
-
-                            <span class="icon">
-                                <i class="mdi mdi-cash-plus"></i>
-                            </span>
-
-                        </a>
-
-                    {% endif %}
-
-
-
-                    {# SUPPRIMER #}
-
-                    <button class="button is-danger jb-modal"
-
-                            data-target="modal-delete-{{ facture.id }}"
-
-                            title="Supprimer">
-
-                        <span class="icon">
-                            <i class="mdi mdi-trash-can"></i>
-                        </span>
-
-                    </button>
-
-
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        {# MODAL DELETE #}
-
-        <div id="modal-delete-{{ facture.id }}" class="modal">
-
-            <div class="modal-background jb-modal-close"></div>
-
-            <div class="modal-card">
-
-                <header class="modal-card-head">
-
-                    <p class="modal-card-title">
-
-                        Confirmer la suppression
-
-                    </p>
-
-                    <button class="delete jb-modal-close"></button>
-
-                </header>
-
-
-                <section class="modal-card-body">
-
-                    <p>
-
-                        Voulez-vous vraiment supprimer la facture
-
-                        <strong>{{ facture.numFacture }}</strong> ?
-
-                    </p>
-
-                </section>
-
-
-                <footer class="modal-card-foot">
-
-                    <button class="button jb-modal-close">
-
-                        Annuler
-
-                    </button>
-
-
-                    <a href="{{ path('app_admin_facturation_delete_utilisateur', { id: facture.id }) }}"
-
-                       class="button is-danger jb-modal-close">
-
-                        Supprimer
-
-                    </a>
-
-
-                </footer>
-
-            </div>
-
-        </div>
-
-
+            {% if not facture.mailEnvoye %}
+              <a href="{{ path('app_admin_facturation_envoyer_mail', { id: facture.id }) }}"
+                 class="action-btn" style="color:var(--gold);border-color:rgba(160,124,48,0.3);background:var(--gold-light);"
+                 title="Envoyer le mail">
+                <i class="mdi mdi-email-send"></i>
+              </a>
+            {% endif %}
+            <button class="action-btn del"
+                    onclick="openModal('modal-{{ facture.id }}')"
+                    title="Supprimer">
+              <i class="mdi mdi-trash-can"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
 
     {% endfor %}
 
-
-
+    {# Fermer la dernière table + card #}
     {% if currentEntreprise is not null %}
+              </tbody>
+            </table>
+            <div class="table-footer">
+              <div class="pagination-info"></div>
+            </div>
+          </div>
         </div>
     {% endif %}
 
+  </div>{# fin admin-wrapper #}
 
+  {# ── Modals suppression ── #}
+  {% for facture in factures %}
+    <div class="modal-overlay" id="modal-{{ facture.id }}">
+      <div class="modal-box">
+        <div class="modal-icon"><i class="mdi mdi-trash-can-outline"></i></div>
+        <div class="modal-title">Supprimer la facture ?</div>
+        <div class="modal-text">
+          Vous êtes sur le point de supprimer la facture <strong>{{ facture.numFacture }}</strong>.<br>
+          Cette action est irréversible.
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="closeModal('modal-{{ facture.id }}')">Annuler</button>
+          <a href="{{ path('app_admin_facturation_delete_utilisateur', { id: facture.id }) }}" class="btn-danger">
+            <i class="mdi mdi-trash-can"></i> Supprimer
+          </a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 
-</section>
+  <script>
+    function openModal(id)  { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+    });
+  </script>
 
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const buttons = document.querySelectorAll('.send-mail-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', function () {
+      const factureId = this.dataset.id;
+      this.disabled = true;
+      this.innerHTML = '<i class="mdi mdi-loading mdi-spin"></i>';
+
+      fetch('{{ path("app_admin_facturation_envoyer_mail", {"id": "FACTURE_ID"}) }}'.replace('FACTURE_ID', factureId), {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          this.outerHTML = '<span class="pill pill-active"><i class="mdi mdi-email-check"></i> Envoyé</span>';
+        } else {
+          alert(data.message);
+          this.disabled = false;
+          this.innerHTML = '<i class="mdi mdi-email-send"></i>';
+        }
+      })
+      .catch(() => {
+        alert('Erreur lors de l\'envoi du mail');
+        this.disabled = false;
+        this.innerHTML = '<i class="mdi mdi-email-send"></i>';
+      });
+    });
+  });
+});
+</script>
 {% endblock %}

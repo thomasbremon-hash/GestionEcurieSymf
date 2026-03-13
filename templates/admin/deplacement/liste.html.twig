@@ -5,162 +5,188 @@
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Déplacements</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_deplacement_new') }}" class="button is-small is-primary">
-          <span>Ajouter</span>
-          <span class="icon"><i class="mdi mdi-plus"></i></span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section is-main-section">
+  <div class="admin-wrapper--wide">
+    {# ── Flash ── #}
     {% for label, messages in app.flashes(['success', 'danger']) %}
       {% for message in messages %}
-        <div class="notification is-{{ label }}">
-          <button class="delete"></button>
-          {{ message }}
+        <div class="flash {{ label }}">
+          <span><i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i> {{ message }}</span>
+          <button class="flash-close" onclick="this.parentElement.remove()"><i class="mdi mdi-close"></i></button>
         </div>
       {% endfor %}
     {% endfor %}
 
-    <div class="card has-table">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><i class="mdi mdi-map-marker-distance"></i></span>
-          {{ deplacements|length }} déplacements
-        </p>
-      </header>
+    {# ── Page top ── #}
+    <div class="page-top">
+      <div>
+        <div class="page-eyebrow">Admin › Gestion</div>
+        <h1 class="page-title">Déplacements <span class="subtitle">{{ deplacements|length }} au total</span></h1>
+      </div>
+      <a href="{{ path('app_admin_deplacement_new') }}" class="btn-primary-custom"><i class="mdi mdi-plus"></i> Ajouter un déplacement</a>
+    </div>
 
-      <div class="card-content">
-        <div class="table-wrapper">
-          <table class="table is-fullwidth is-striped is-hoverable">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Date</th>
-                <th>Chevaux</th>
-                <th>Structure</th>
-                <th>Entreprise</th>
-                <th>Distance</th>
-                <th></th>
+    {# ── Table card ── #}
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-card-header-left">
+          <div class="table-card-title">
+            <i class="mdi mdi-map-marker-distance" style="color:var(--blue)"></i>
+            Liste des déplacements
+            <span class="count-badge">{{ deplacements|length }}</span>
+          </div>
+          <div class="per-page-wrap">
+            Afficher<select id="per-page-select">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>par page
+          </div>
+        </div>
+        <div class="search-wrap">
+          <i class="mdi mdi-magnify search-icon"></i>
+          <input type="text" id="search-input" placeholder="Rechercher…" />
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Date</th>
+            <th>Chevaux</th>
+            <th>Structure</th>
+            <th>Entreprise</th>
+            <th>Distance</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="deplacement-tbody">
+          {% set moisActuel = null %}
+
+          {% for deplacement in deplacements %}
+            {% set moisDeplacement = deplacement.date|date('Y-m') %}
+
+            {# ── Séparateur de mois ── #}
+            {% if moisActuel != moisDeplacement %}
+              <tr class="month-separator-row" data-separator="true">
+                <td colspan="7">
+                  <span class="month-separator-label">
+                    <i class="mdi mdi-calendar-month-outline"></i>
+                    {{ deplacement.date|format_datetime(locale='fr', pattern='MMMM yyyy')|capitalize }}
+                  </span>
+                </td>
               </tr>
-            </thead>
+              {% set moisActuel = moisDeplacement %}
+            {% endif %}
 
-            <tbody>
-              {% set moisActuel = null %}
-
-              {% for deplacement in deplacements %}
-                {% set moisDeplacement = deplacement.date|date('Y-m') %}
-
-                {% if moisActuel != moisDeplacement %}
-                  <tr>
-                    <td colspan="7" style="
-                                background:#f0f0f0;
-                                font-weight:bold;
-                                font-size:16px;
-                                ">{{ deplacement.date|format_datetime(locale='fr', pattern='MMMM yyyy')|capitalize }}</td>
-                  </tr>
-
-                  {% set moisActuel = moisDeplacement %}
-                {% endif %}
-
-                <tr>
-                  <td>{{ deplacement.nom }}</td>
-
-                  <td>{{ deplacement.date|date('d/m/Y') }}</td>
-
-                  <td>
-                    {% if (deplacement.chevaux|length) > 0 %}
-                      {% for cheval in deplacement.chevaux %}
-                        <span class="tag is-info">{{ cheval.nom }}</span>
-                      {% endfor %}
-                    {% else %}
-                      <span class="tag is-light">Aucun</span>
-                    {% endif %}
-                  </td>
-
-                  <td>
-                    <span class="tag is-warning">{{ deplacement.structure.nom ?? 'N/A' }}</span>
-                  </td>
-
-                  <td>
-                    <span class="tag is-primary">{{ deplacement.entreprise.nom ?? 'N/A' }}</span>
-                  </td>
-
-                  <td>
-                    {% if deplacement.distance %}
-                      <span class="tag is-success">{{ deplacement.distance|number_format(2, ',', ' ') }} km</span>
-                    {% else %}
-                      <span class="tag is-light">N/A</span>
-                    {% endif %}
-                  </td>
-
-                  <td class="is-actions-cell">
-                    <div class="buttons is-right">
-                      <a href="{{ path('app_admin_deplacement_update', { id: deplacement.id }) }}" class="button is-small is-primary"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
-
-                      {# Bouton suppression #}
-                      <button class="button is-small is-danger jb-modal" data-target="modal-delete-{{ deplacement.id }}"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
-                    </div>
-                  </td>
-
-                  {# Modal suppression #}
-                  <div id="modal-delete-{{ deplacement.id }}" class="modal">
-                    <div class="modal-background jb-modal-close"></div>
-
-                    <div class="modal-card">
-                      <header class="modal-card-head">
-                        <p class="modal-card-title">Confirmer la suppression</p>
-                        <button class="delete jb-modal-close"></button>
-                      </header>
-
-                      <section class="modal-card-body">
-                        <p>
-                          Voulez-vous vraiment supprimer le déplacement
-                          <strong>{{ deplacement.nom }}</strong> du
-                          <strong>{{ deplacement.date|date('d/m/Y') }}</strong> ?
-                        </p>
-                      </section>
-
-                      <footer class="modal-card-foot">
-                        <button class="button jb-modal-close">Annuler</button>
-                        <a href="{{ path('app_admin_deplacement_delete', { id: deplacement.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
-                      </footer>
-                    </div>
-                  </div>
-                </tr>
-
-                {# MODAL DELETE #}
-
-                <div id="modal-{{ deplacement.id }}" class="modal">
-                  <div class="modal-background jb-modal-close"></div>
-
-                  <div class="modal-card">
-                    <header class="modal-card-head">
-                      <p class="modal-card-title">Confirmer</p>
-                    </header>
-
-                    <footer class="modal-card-foot">
-                      <a href="{{ path('app_admin_deplacement_delete', { id: deplacement.id }) }}" class="button is-danger">Supprimer</a>
-                    </footer>
-                  </div>
+            <tr data-index="{{ loop.index0 }}" data-month="{{ moisDeplacement }}">
+              {# Nom #}
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:var(--blue);">{{ deplacement.nom|slice(0, 1)|upper }}</div>
+                  <div class="user-name">{{ deplacement.nom }}</div>
                 </div>
-              {% endfor %}
-            </tbody>
-          </table>
+              </td>
+
+              {# Date #}
+              <td>
+                <span style="font-size:0.88rem;color:var(--ink-soft);">{{ deplacement.date|date('d/m/Y') }}</span>
+              </td>
+
+              {# Chevaux #}
+              <td>
+                {% if (deplacement.chevaux|length) > 0 %}
+                  <div style="display:flex;flex-wrap:wrap;gap:0.35rem;">
+                    {% for cheval in deplacement.chevaux %}
+                      <span class="pill tag-green">{{ cheval.nom }}</span>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <span style="color:var(--ink-muted);font-size:0.85rem;font-style:italic;">Aucun</span>
+                {% endif %}
+              </td>
+
+              {# Structure #}
+              <td>
+                {% if deplacement.structure is not null %}
+                  <span class="pill" style="background:var(--gold-light);color:var(--gold);border:1px solid rgba(160,124,48,.2);">
+                    <i class="mdi mdi-office-building-outline"></i>
+                    {{ deplacement.structure.nom }}
+                  </span>
+                {% else %}
+                  <span style="color:var(--ink-muted);font-size:0.85rem;">N/A</span>
+                {% endif %}
+              </td>
+
+              {# Entreprise #}
+              <td>
+                {% if deplacement.entreprise is not null %}
+                  <span class="pill pill-user">
+                    <i class="mdi mdi-domain"></i>
+                    {{ deplacement.entreprise.nom }}
+                  </span>
+                {% else %}
+                  <span style="color:var(--ink-muted);font-size:0.85rem;">N/A</span>
+                {% endif %}
+              </td>
+
+              {# Distance #}
+              <td>
+                {% if deplacement.distance %}
+                  <span class="pill tag-accent" style="font-family:'Sora',sans-serif;font-weight:700;">
+                    <i class="mdi mdi-map-marker-distance"></i>
+                    {{ deplacement.distance|number_format(2, ',', ' ') }} km
+                  </span>
+                {% else %}
+                  <span style="color:var(--ink-muted);font-size:0.85rem;">N/A</span>
+                {% endif %}
+              </td>
+
+              {# Actions #}
+              <td>
+                <div class="action-btns">
+                  <a href="{{ path('app_admin_deplacement_update', { id: deplacement.id }) }}" class="action-btn edit" title="Modifier"><i class="mdi mdi-pencil"></i></a>
+                  <button class="action-btn del" onclick="openModal('modal-{{ deplacement.id }}')" title="Supprimer"><i class="mdi mdi-trash-can"></i></button>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr class="empty-row">
+              <td colspan="7">
+                <i class="mdi mdi-map-marker-off-outline" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>
+                Aucun déplacement trouvé.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        <div class="pagination-info" id="pagination-info">—</div>
+        <div class="pagination-controls" id="pagination-controls"></div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Modals suppression ── #}
+  {% for deplacement in deplacements %}
+    <div class="modal-overlay" id="modal-{{ deplacement.id }}">
+      <div class="modal-box">
+        <div class="modal-icon">
+          <i class="mdi mdi-trash-can-outline"></i>
+        </div>
+        <div class="modal-title">Supprimer ce déplacement ?</div>
+        <div class="modal-text">
+          Vous êtes sur le point de supprimer <strong>{{ deplacement.nom }}</strong>
+          du <strong>{{ deplacement.date|date('d/m/Y') }}</strong>.<br />
+          Cette action est irréversible.
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="closeModal('modal-{{ deplacement.id }}')">Annuler</button>
+          <a href="{{ path('app_admin_deplacement_delete', { id: deplacement.id }) }}" class="btn-danger"><i class="mdi mdi-trash-can"></i> Supprimer</a>
         </div>
       </div>
     </div>
-  </section>
+  {% endfor %}
 {% endblock %}

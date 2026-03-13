@@ -21,7 +21,6 @@ class ChevalProprietaireType extends AbstractType
                 'class' => User::class,
                 'choice_label' => fn(User $u) => $u->getPrenom() . ' ' . $u->getNom(),
                 'placeholder' => 'Sélectionner un propriétaire',
-                'attr' => ['class' => 'select'],
                 'label' => 'Propriétaire',
                 // PAS de multiple ici
             ])

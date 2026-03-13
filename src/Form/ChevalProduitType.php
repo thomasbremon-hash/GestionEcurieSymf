@@ -20,12 +20,13 @@ class ChevalProduitType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('quantite', NumberType::class, [
-                'scale' => 2,
-                'constraints' => [
-                    new GreaterThanOrEqual(0),
+            ->add('quantite', IntegerType::class, [
+                'attr' => [
+                    'min' => 0,
+                    'placeholder' => '0', // affiche 0 en gris sans le pré-remplir
                 ],
-                'label' => false,
+                'data' => null, // pas de valeur par défaut
+                'required' => false,
             ]);
     }
 

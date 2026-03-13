@@ -1,97 +1,282 @@
 {% extends 'layouts/base.admin.html.twig' %}
+
 {% block title %}
-  BackOffice | Liste entreprise
+  BackOffice | Liste des courses
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Courses</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_course_new') }}" class="button is-small is-primary">
-          <span>Ajouter</span>
-          <span class="icon"><i class="mdi mdi-plus"></i></span>
-        </a>
-      </div>
-    </div>
-  </section>
-  <section class="section is-main-section">
+  <div class="admin-wrapper--wide">
+    {# ── Flash ── #}
     {% for label, messages in app.flashes(['success', 'danger']) %}
       {% for message in messages %}
-        <div class="notification is-{{ label }}">
-          <button class="delete"></button>
-          {{ message }}
+        <div class="flash {{ label }}">
+          <span><i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i> {{ message }}</span>
+          <button class="flash-close" onclick="this.parentElement.remove()"><i class="mdi mdi-close"></i></button>
         </div>
       {% endfor %}
     {% endfor %}
 
-    <div class="card has-table">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-shopping-outline"></span></span>
-          {{ courses|length }} courses
-        </p>
-        <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
-      </header>
-      <div class="card-content">
-        <div class="b-table has-pagination">
-          <div class="table-wrapper has-mobile-cards">
-            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth" id="table">
-              <thead>
-                <tr>
-                  <th>Nom</th>
-                  <th>Lieu</th>
-                  <th>Date de la course</th>
-                  <th>Distance</th>
-                  <th>Type</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in courses %}
-                  <tr>
-                    <td data-label="Description">{{ item.nom }}</td>
-                    <td data-label="Description">{{ item.lieu }}</td>
-                    <td data-label="Description">{{ item.dateCourse ? item.dateCourse|date('d/m/Y') : 'N/A' }}</td>
-                    <td data-label="Description">{{ item.distance }}m</td>
-                    <td data-label="Description">{{ item.type }}</td>
-                    <td class="is-actions-cell">
-                      <div class="buttons is-right">
-                        <a href="{{ path('app_admin_course_update', { id: item.id }) }}" class="button is-small is-primary" type="button"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
-                        <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <div id="sample-modal-{{ item.id }}" class="modal">
-                    <div class="modal-background jb-modal-close"></div>
-                    <div class="modal-card">
-                      <header class="modal-card-head">
-                        <p class="modal-card-title">Confirmer la suppression</p>
-                        <button class="delete jb-modal-close" aria-label="close"></button>
-                      </header>
-                      <section class="modal-card-body">
-                        <p>Voulez-vous vraiment supprimer la course ?</p>
-                      </section>
-                      <footer class="modal-card-foot">
-                        <button class="button jb-modal-close">Annuler</button>
-                        <a href="{{ path('app_admin_course_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
-                      </footer>
-                    </div>
-                    <button class="modal-close is-large jb-modal-close" aria-label="close"></button>
-                  </div>
-                {% endfor %}
-              </tbody>
-            </table>
+    {# ── Page top ── #}
+    <div class="page-top">
+      <div>
+        <div class="page-eyebrow">Admin › Gestion</div>
+        <h1 class="page-title">Courses <span class="subtitle">{{ courses|length }} au total</span></h1>
+      </div>
+      <a href="{{ path('app_admin_course_new') }}" class="btn-primary-custom"><i class="mdi mdi-plus"></i> Ajouter une course</a>
+    </div>
+
+    {# ── Table card ── #}
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-card-header-left">
+          <div class="table-card-title">
+            <i class="mdi mdi-flag-checkered" style="color:var(--accent)"></i>
+            Liste des courses
+            <span class="count-badge">{{ courses|length }}</span>
           </div>
+          <div class="per-page-wrap">
+            Afficher<select id="per-page-select">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>par page
+          </div>
+        </div>
+        <div class="search-wrap">
+          <i class="mdi mdi-magnify search-icon"></i>
+          <input type="text" id="search-input" placeholder="Rechercher…" />
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Lieu</th>
+            <th>Date</th>
+            <th>Distance</th>
+            <th>Type</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="course-tbody">
+          {% for item in courses %}
+            <tr data-index="{{ loop.index0 }}">
+              {# Nom #}
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:var(--gold);border-radius:var(--radius-sm);">
+                    <i class="mdi mdi-flag-checkered" style="font-size:1rem;"></i>
+                  </div>
+                  <div class="user-name">{{ item.nom }}</div>
+                </div>
+              </td>
+
+              {# Lieu #}
+              <td>
+                <span style="font-size:0.88rem;color:var(--ink-soft);">
+                  <i class="mdi mdi-map-marker-outline" style="font-size:0.85rem;"></i>
+                  {{ item.lieu ? : '—' }}
+                </span>
+              </td>
+
+              {# Date #}
+              <td>
+                <span style="font-size:0.88rem;color:var(--ink-soft);">{{ item.dateCourse ? item.dateCourse|date('d/m/Y') : '—' }}</span>
+              </td>
+
+              {# Distance #}
+              <td>
+                {% if item.distance %}
+                  <span class="count-inline">
+                    <i class="mdi mdi-ruler" style="color:var(--blue);font-size:0.9rem;"></i>
+                    {{ item.distance }} m
+                  </span>
+                {% else %}
+                  <span style="color:var(--ink-muted);font-size:0.85rem;">—</span>
+                {% endif %}
+              </td>
+
+              {# Type #}
+              <td>
+                {% if item.type %}
+                  <span class="pill tag-neutral" style="text-transform:capitalize;">{{ item.type }}</span>
+                {% else %}
+                  <span style="color:var(--ink-muted);font-size:0.85rem;">—</span>
+                {% endif %}
+              </td>
+
+              {# Actions #}
+              <td>
+                <div class="action-btns">
+                  <a href="{{ path('app_admin_course_update', { id: item.id }) }}" class="action-btn edit" title="Modifier"><i class="mdi mdi-pencil"></i></a>
+                  <button class="action-btn del" onclick="openModal('modal-{{ item.id }}')" title="Supprimer"><i class="mdi mdi-trash-can"></i></button>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr class="empty-row">
+              <td colspan="6">
+                <i class="mdi mdi-flag-remove" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>
+                Aucune course trouvée.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        <div class="pagination-info" id="pagination-info">—</div>
+        <div class="pagination-controls" id="pagination-controls"></div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Modals ── #}
+  {% for item in courses %}
+    <div class="modal-overlay" id="modal-{{ item.id }}">
+      <div class="modal-box">
+        <div class="modal-icon">
+          <i class="mdi mdi-trash-can-outline"></i>
+        </div>
+        <div class="modal-title">Supprimer cette course ?</div>
+        <div class="modal-text">
+          Vous êtes sur le point de supprimer <strong>{{ item.nom }}</strong>.<br />
+          Cette action est irréversible.
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
+          <a href="{{ path('app_admin_course_delete', { id: item.id }) }}" class="btn-danger"><i class="mdi mdi-trash-can"></i> Supprimer</a>
         </div>
       </div>
     </div>
-  </section>
+  {% endfor %}
+
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.add('open')
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open')
+    }
+    document.querySelectorAll('.modal-overlay').forEach((o) => {
+      o.addEventListener('click', (e) => {
+        if (e.target === o) o.classList.remove('open')
+      })
+    })
+    
+    const tbody = document.getElementById('course-tbody')
+    const infoEl = document.getElementById('pagination-info')
+    const ctrlEl = document.getElementById('pagination-controls')
+    const perPageSel = document.getElementById('per-page-select')
+    const searchEl = document.getElementById('search-input')
+    
+    let page = 1
+    let perPg = parseInt(perPageSel.value)
+    let query = ''
+    
+    function allRows() {
+      return [...tbody.querySelectorAll('tr[data-index]')]
+    }
+    function filteredRows() {
+      return allRows().filter((r) => query === '' || r.textContent.toLowerCase().includes(query))
+    }
+    
+    function render() {
+      const rows = filteredRows()
+      const total = rows.length
+      const pages = Math.max(1, Math.ceil(total / perPg))
+      if (page > pages) page = pages
+    
+      const start = (page - 1) * perPg
+      const end = start + perPg
+    
+      allRows().forEach((r) => r.classList.add('page-hidden'))
+      rows.forEach((r, i) => {
+        if (i >= start && i < end) r.classList.remove('page-hidden')
+      })
+    
+      const from = total ? start + 1 : 0
+      const to = Math.min(end, total)
+      infoEl.innerHTML = `Affichage de <strong>${from}–${to}</strong> sur <strong>${total}</strong> course${total > 1 ? 's' : ''}`
+    
+      ctrlEl.innerHTML = ''
+    
+      const mkBtn = (content, onClick, disabled = false, active = false, isDots = false) => {
+        if (isDots) {
+          const s = document.createElement('span')
+          s.className = 'page-dots'
+          s.textContent = '…'
+          return s
+        }
+        const b = document.createElement('button')
+        b.className = 'page-btn' + (active ? ' active' : '')
+        b.innerHTML = content
+        if (disabled) b.setAttribute('disabled', true)
+        else b.addEventListener('click', onClick)
+        return b
+      }
+    
+      ctrlEl.appendChild(
+        mkBtn(
+          '<i class="mdi mdi-chevron-left"></i>',
+          () => {
+            page--
+            render()
+          },
+          page === 1
+        )
+      )
+      const delta = 2
+      let last = null
+      for (let p = 1; p <= pages; p++) {
+        const show = p === 1 || p === pages || (p >= page - delta && p <= page + delta)
+        if (!show) {
+          if (last !== null && last !== -1) {
+            ctrlEl.appendChild(mkBtn('', null, false, false, true))
+            last = -1
+          }
+          continue
+        }
+        ctrlEl.appendChild(
+          mkBtn(
+            p,
+            (function (pg) {
+              return () => {
+                page = pg
+                render()
+              }
+            })(p),
+            false,
+            p === page
+          )
+        )
+        last = p
+      }
+      ctrlEl.appendChild(
+        mkBtn(
+          '<i class="mdi mdi-chevron-right"></i>',
+          () => {
+            page++
+            render()
+          },
+          page === pages
+        )
+      )
+    }
+    
+    searchEl.addEventListener('input', () => {
+      query = searchEl.value.toLowerCase()
+      page = 1
+      render()
+    })
+    perPageSel.addEventListener('change', () => {
+      perPg = parseInt(perPageSel.value)
+      page = 1
+      render()
+    })
+    
+    render()
+  </script>
 {% endblock %}

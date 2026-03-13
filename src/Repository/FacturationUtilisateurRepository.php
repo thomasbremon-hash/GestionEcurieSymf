@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\FacturationUtilisateur;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -55,5 +56,46 @@ class FacturationUtilisateurRepository extends ServiceEntityRepository
         $next = $count + 1;
 
         return sprintf('FACT-%s-%04d', $year, $next);
+    }
+
+    /**
+     * Retourne le chiffre d'affaires total (somme de toutes les factures)
+     *
+     * @return float
+     */
+    public function sumTotalCA(): float
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->select('SUM(f.total) as totalCA');
+
+        $result = $qb->getQuery()->getSingleScalarResult();
+
+        return $result ? (float)$result : 0.0;
+    }
+
+    public function findByUtilisateur(User $user): array
+    {
+        return $this->createQueryBuilder('f')
+            ->join('f.moisDeGestion', 'mg')
+            ->where('f.utilisateur = :user')
+            ->setParameter('user', $user)
+            ->orderBy('mg.annee', 'DESC')
+            ->addOrderBy('mg.mois', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findImpayeesByUtilisateur(User $user): array
+    {
+        return $this->createQueryBuilder('f')
+            ->join('f.moisDeGestion', 'mg')
+            ->where('f.utilisateur = :user')
+            ->andWhere('f.statut = :statut')
+            ->setParameter('user', $user)
+            ->setParameter('statut', 'impayee')
+            ->orderBy('mg.annee', 'DESC')
+            ->addOrderBy('mg.mois', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 }

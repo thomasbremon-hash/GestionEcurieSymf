@@ -5,218 +5,186 @@
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>BackOffice</li>
-            <li>Chevaux</li>
-          </ul>
-        </div>
+  <div class="form-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_chevaux') }}">Chevaux</a>
+      <span class="sep">›</span>
+      <span class="current">{{ chevalId is not null ? 'Modifier' : 'Ajouter' }}</span>
+    </div>
+
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Chevaux</div>
+        <h1 class="page-title">{{ chevalId is not null ? 'Modifier le cheval' : 'Ajouter un cheval' }}</h1>
       </div>
     </div>
-  </section>
 
-  <section class="section is-main-section">
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-horse"></span></span>
-          {{ chevalId is not null ? 'Modifier' : 'Ajouter' }} un cheval
-        </p>
-      </header>
-      <div class="card-content">
-        {{ form_start(formCheval) }}
+    {# ── Form card ── #}
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="section-icon" style="background:var(--green-light);color:var(--green);">
+          <i class="mdi mdi-chess-knight"></i>
+        </div>
+        <h2 class="form-card-title">{{ chevalId is not null ? 'Modifier les informations' : 'Nouveau cheval' }}</h2>
+      </div>
 
-        {# Nom / Race / Sexe #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Nom / Race / Sexe</label>
+      {{ form_start(formCheval, { attr: { novalidate: 'novalidate' } }) }}
+
+      <div class="form-body">
+        {# ── Identité ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-horseshoe"></i> Identité
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-2" style="margin-bottom:1.25rem;">
+            <div class="form-field">
               {{ form_label(formCheval.nom) }}
-              <p class="control is-expanded">{{ form_widget(formCheval.nom) }}</p>
-              {{ form_errors(formCheval.nom) }}
+              {{ form_widget(formCheval.nom) }}
+              <div class="field-error">{{ form_errors(formCheval.nom) }}</div>
             </div>
-
-            <div class="field">
+            <div class="form-field">
               {{ form_label(formCheval.race) }}
-              <p class="control is-expanded">{{ form_widget(formCheval.race) }}</p>
-              {{ form_errors(formCheval.race) }}
+              {{ form_widget(formCheval.race) }}
+              <div class="field-error">{{ form_errors(formCheval.race) }}</div>
             </div>
-
-            <div class="field">
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
               {{ form_label(formCheval.sexe) }}
-              <p class="control is-expanded">
-                <div class="select is-fullwidth">{{ form_widget(formCheval.sexe) }}</div>
-              </p>
-              {{ form_errors(formCheval.sexe) }}
+              {{ form_widget(formCheval.sexe) }}
+              <div class="field-error">{{ form_errors(formCheval.sexe) }}</div>
+            </div>
+            <div class="form-field">
+              {{ form_label(formCheval.dateNaissance) }}
+              {{ form_widget(formCheval.dateNaissance) }}
+              <div class="field-error">{{ form_errors(formCheval.dateNaissance) }}</div>
             </div>
           </div>
         </div>
 
-        {# Date de naissance #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Date de naissance</label>
+        {# ── Propriétaires ── #}
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-account-multiple-outline"></i> Propriétaires
           </div>
-          <div class="field-body">
-            <div class="field">{{ form_widget(formCheval.dateNaissance) }}
-              {{ form_errors(formCheval.dateNaissance) }}</div>
+
+          <div id="chevalProprietaires-error" class="proprietaire-error-msg" style="display:none;">
+            <i class="mdi mdi-alert-circle"></i> Le total des pourcentages ne peut pas dépasser 100 %
           </div>
-        </div>
 
-        {# Propriétaires (CollectionType) #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Propriétaires</label>
-          </div>
-          <div class="field-body">
-            <div id="chevalProprietaires-error" style="color: red; margin-bottom: 10px; display: none;">Impossible de supprimer la dernière ligne !</div>
-            <div id="chevalProprietaires-wrapper">
-              {% for cp in formCheval.chevalProprietaires %}
-                <div class="field is-grouped is-grouped-multiline collection-item">
-                  {# Sélecteur utilisateur #}
-                  <div class="control is-expanded">
-                    {{ form_label(cp.proprietaire, 'Propriétaire') }}
-                    <div class="select is-fullwidth">{{ form_widget(cp.proprietaire) }}</div>
-                    {{ form_errors(cp.proprietaire) }}
-                  </div>
-
-                  {# Pourcentage #}
-                  <div class="control is-narrow">
-                    {{ form_label(cp.pourcentage, 'Pourcentage') }}
-                    <div class="control">{{ form_widget(cp.pourcentage) }}</div>
-                    <p class="help is-danger pourcentage-error" style="display:none;">Total des pourcentages ne peut pas dépasser 100%</p>
-                    {{ form_errors(cp.pourcentage) }}
-                  </div>
-
-                  {# Bouton supprimer ligne #}
-                  <div class="control is-narrow" style="align-self: flex-end;">
-                    <button title="Cliquez pour ajouter un propriétaire" type="button" class="button is-primary jb-add-collection mdi mdi-plus"></button>
-                    <button title="Cliquez pour supprimer cette ligne" type="button" class="button is-danger jb-remove-collection mdi mdi-delete-sweep"></button>
-                  </div>
+          <div id="chevalProprietaires-wrapper">
+            {% for cp in formCheval.chevalProprietaires %}
+              <div class="proprietaire-row collection-item">
+                <div class="form-field" style="flex:1 1 220px;">
+                  {{ form_label(cp.proprietaire, 'Propriétaire') }}
+                  {{ form_widget(cp.proprietaire) }}
+                  <div class="field-error">{{ form_errors(cp.proprietaire) }}</div>
                 </div>
-              {% endfor %}
-            </div>
-            {{ form_errors(formCheval.chevalProprietaires) }}
-          </div>
-        </div>
 
-        {# Bouton ajouter une ligne #}
-        <div class="field"></div>
+                <div class="form-field" style="flex:0 0 130px;">
+                  {{ form_label(cp.pourcentage, 'Pourcentage (%)') }}
+                  {{ form_widget(cp.pourcentage) }}
+                  <div class="field-error pourcentage-error" style="display:none;">Dépasse 100 %</div>
+                  <div class="field-error">{{ form_errors(cp.pourcentage) }}</div>
+                </div>
 
-        <hr />
-
-        {# Bouton de soumission #}
-        <div class="field is-horizontal">
-          <div class="field-label"></div>
-          <div class="field-body">
-            <div class="field is-grouped">
-              <div class="control">
-                <button type="submit" class="button is-primary">{{ chevalId is not null ? 'Modifier' : 'Ajouter' }}</button>
+                <div class="proprietaire-row-actions">
+                  <button type="button" class="action-btn edit jb-add-collection" title="Ajouter une ligne"><i class="mdi mdi-plus"></i></button>
+                  <button type="button" class="action-btn del jb-remove-collection" title="Supprimer cette ligne"><i class="mdi mdi-delete-sweep"></i></button>
+                </div>
               </div>
-            </div>
+            {% endfor %}
           </div>
-        </div>
 
-        {{ form_end(formCheval) }}
+          <div class="field-error" style="margin-top:.5rem;">{{ form_errors(formCheval.chevalProprietaires) }}</div>
+        </div>
       </div>
+
+      {# ── Footer ── #}
+      <div class="form-footer">
+        <a href="{{ path('app_admin_chevaux') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+        <button type="submit" class="btn-primary-custom" id="submit-btn">
+          <i class="mdi mdi-{{ chevalId is not null ? 'content-save' : 'horse' }}"></i>
+          {{ chevalId is not null ? 'Enregistrer les modifications' : 'Créer le cheval' }}
+        </button>
+      </div>
+
+      {{ form_end(formCheval) }}
     </div>
-  </section>
+  </div>
 
   <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const wrapper = document.getElementById('chevalProprietaires-wrapper');
-  const submitBtn = document.querySelector('button[type="submit"]');
-
-  // Mettre à jour les indexes des inputs/selects
-  function updateIndexes() {
-    wrapper.querySelectorAll('.collection-item').forEach((el, idx) => {
-      el.querySelectorAll('select, input').forEach(input => {
-        const name = input.getAttribute('name');
-        if(name){
-          input.setAttribute('name', name.replace(/\[\d+\]/, '[' + idx + ']'));
-        }
-      });
-    });
-  }
-
-  // Calculer le total et gérer l'erreur si > 100
-  function updateTotal() {
-    let total = 0;
-    wrapper.querySelectorAll('.collection-item').forEach(item => {
-      const input = item.querySelector('input[type="number"]');
-      if(input){
-        total += parseFloat(input.value) || 0;
+    document.addEventListener('DOMContentLoaded', () => {
+      const wrapper = document.getElementById('chevalProprietaires-wrapper')
+      const submitBtn = document.getElementById('submit-btn')
+      const errorMsg = document.getElementById('chevalProprietaires-error')
+    
+      function updateIndexes() {
+        wrapper.querySelectorAll('.collection-item').forEach((el, idx) => {
+          el.querySelectorAll('select, input').forEach((input) => {
+            const name = input.getAttribute('name')
+            if (name) input.setAttribute('name', name.replace(/\[\d+\]/, '[' + idx + ']'))
+          })
+        })
       }
-    });
-
-    if(total > 100){
-      submitBtn.disabled = true;
-      wrapper.querySelectorAll('.pourcentage-error').forEach(p => p.style.display = 'block');
-    } else {
-      submitBtn.disabled = false;
-      wrapper.querySelectorAll('.pourcentage-error').forEach(p => p.style.display = 'none');
-    }
-  }
-
-  // Mettre à jour l'état des boutons "Supprimer"
-  function updateRemoveButtons() {
-    const allItems = wrapper.querySelectorAll('.collection-item');
-    const removeBtns = wrapper.querySelectorAll('.jb-remove-collection');
-
-    if(allItems.length <= 1){
-      removeBtns.forEach(btn => btn.disabled = true);
-    } else {
-      removeBtns.forEach(btn => btn.disabled = false);
-    }
-  }
-
-  // Event delegation pour les clics sur Ajouter et Supprimer
-  wrapper.addEventListener('click', e => {
-    const target = e.target;
-
-    // Supprimer une ligne
-    if(target.classList.contains('jb-remove-collection')){
-      target.closest('.collection-item').remove();
-      updateIndexes();
-      updateTotal();
-      updateRemoveButtons();
-    }
-
-    // Ajouter une ligne
-    if(target.classList.contains('jb-add-collection')){
-      const prototype = wrapper.querySelector('.collection-item');
-      if(!prototype) return;
-
-      const clone = prototype.cloneNode(true);
-
-      // Vider les inputs et réinitialiser selects
-      clone.querySelectorAll('input, select').forEach(input => {
-        if(input.tagName === 'INPUT') input.value = '';
-        if(input.tagName === 'SELECT') input.selectedIndex = 0;
-      });
-
-      wrapper.appendChild(clone);
-      updateIndexes();
-      updateTotal();
-      updateRemoveButtons();
-    }
-  });
-
-  // Mettre à jour le total si on modifie les inputs
-  wrapper.addEventListener('input', e => {
-    if(e.target.tagName === 'INPUT' && e.target.type === 'number'){
-      updateTotal();
-    }
-  });
-
-  // Initial check
-  updateTotal();
-  updateRemoveButtons();
-});
-</script>
+    
+      function updateTotal() {
+        let total = 0
+        wrapper.querySelectorAll('.collection-item').forEach((item) => {
+          const input = item.querySelector('input[type="number"]')
+          if (input) total += parseFloat(input.value) || 0
+        })
+        if (total > 100) {
+          submitBtn.disabled = true
+          errorMsg.style.display = 'flex'
+          wrapper.querySelectorAll('.pourcentage-error').forEach((p) => (p.style.display = 'block'))
+        } else {
+          submitBtn.disabled = false
+          errorMsg.style.display = 'none'
+          wrapper.querySelectorAll('.pourcentage-error').forEach((p) => (p.style.display = 'none'))
+        }
+      }
+    
+      function updateRemoveButtons() {
+        const allItems = wrapper.querySelectorAll('.collection-item')
+        const removeBtns = wrapper.querySelectorAll('.jb-remove-collection')
+        removeBtns.forEach((btn) => (btn.disabled = allItems.length <= 1))
+      }
+    
+      wrapper.addEventListener('click', (e) => {
+        const target = e.target.closest('button')
+        if (!target) return
+    
+        if (target.classList.contains('jb-remove-collection')) {
+          target.closest('.collection-item').remove()
+          updateIndexes()
+          updateTotal()
+          updateRemoveButtons()
+        }
+    
+        if (target.classList.contains('jb-add-collection')) {
+          const prototype = wrapper.querySelector('.collection-item')
+          if (!prototype) return
+          const clone = prototype.cloneNode(true)
+          clone.querySelectorAll('input, select').forEach((input) => {
+            if (input.tagName === 'INPUT') input.value = ''
+            if (input.tagName === 'SELECT') input.selectedIndex = 0
+          })
+          wrapper.appendChild(clone)
+          updateIndexes()
+          updateTotal()
+          updateRemoveButtons()
+        }
+      })
+    
+      wrapper.addEventListener('input', (e) => {
+        if (e.target.tagName === 'INPUT' && e.target.type === 'number') updateTotal()
+      })
+    
+      updateTotal()
+      updateRemoveButtons()
+    })
+  </script>
 {% endblock %}

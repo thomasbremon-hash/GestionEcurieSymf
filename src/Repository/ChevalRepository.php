@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Cheval;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +41,23 @@ class ChevalRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Retourne les chevaux de l'utilisateur avec son pourcentage de détention.
+     * Résultat : array of ['cheval' => Cheval, 'pourcentage' => float]
+     *
+     * Adapte 'uc.user' et 'uc.pourcentage' selon ta table de liaison.
+     * Si tu as une entité UserCheval avec propriétés $user, $cheval, $pourcentage :
+     */
+    public function findByUserWithPourcentage(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c AS cheval, cp.pourcentage')
+            ->join('c.chevalProprietaires', 'cp')
+            ->where('cp.proprietaire = :user')
+            ->setParameter('user', $user)
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

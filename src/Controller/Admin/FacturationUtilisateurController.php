@@ -2,21 +2,24 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\FacturationUtilisateur;
+use App\Entity\MoisDeGestion;
+use App\Form\FacturationGenerationType;
+use App\Repository\FacturationUtilisateurRepository;
+use App\Repository\MoisDeGestionRepository;
+use App\Service\DeplacementToChevalProduitService;
+use App\Service\FactureCalculator;
+use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use App\Entity\MoisDeGestion;
-use App\Service\FactureCalculator;
-use App\Entity\FacturationUtilisateur;
-use App\Form\FacturationGenerationType;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\MoisDeGestionRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Service\DeplacementToChevalProduitService;
-use App\Repository\FacturationUtilisateurRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/facturation')]
@@ -232,6 +235,74 @@ class FacturationUtilisateurController extends AbstractController
         }
 
         return $this->render('admin/facturation/facturation.form.html.twig', ['form' => $form]);
+    }
+
+    #[Route('/envoyer-mail/{id}', name: 'app_admin_facturation_envoyer_mail')]
+    public function envoyerMail(
+        FacturationUtilisateur $facture,
+        MailerInterface $mailer,
+        FactureCalculator $calculator
+    ): Response {
+        if ($facture->isMailEnvoye()) {
+            $this->addFlash('danger', 'Le mail a déjà été envoyé.');
+            return $this->redirectToRoute('app_admin_facturation_utilisateur');
+        }
+
+        $user = $facture->getUtilisateur();
+        $mois = $facture->getMoisDeGestion();
+
+        $data = $calculator->calculerFactureUtilisateur($user, $mois);
+
+        $lignesParCheval = [];
+        foreach ($data['lignes'] as $ligne) {
+            if ($ligne['quantite'] <= 0) continue;
+            $cheval = $ligne['cheval'];
+            $lignesParCheval[$cheval][] = $ligne;
+        }
+
+        $html = $this->renderView('admin/facturation/pdf.html.twig', [
+            'user' => $user,
+            'mois' => $mois,
+            'lignesParCheval' => $lignesParCheval,
+            'totalHT' => $data['totalHT'],
+            'totalTVA' => $data['totalTVA'],
+            'totalTTC' => $data['totalTTC'],
+            'facture' => $facture,
+        ]);
+
+        $options = new \Dompdf\Options();
+        $options->set('defaultFont', 'DejaVu Sans');
+        $options->set('chroot', $this->getParameter('kernel.project_dir') . '/public');
+
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $pdfContent = $dompdf->output();
+
+        try {
+            $email = (new \Symfony\Component\Mime\Email())
+                ->from('facturation@monentreprise.com')
+                ->to($user->getEmail())
+                ->subject('Votre facture ' . $facture->getNumFacture())
+                ->html($this->renderView('admin/facturation/mail.html.twig', [
+                    'facture' => $facture,
+                    'total' => $facture->getTotal(),
+                    'facturePdfUrl' => $this->generateUrl('app_admin_facturation_pdf_utilisateur', ['id' => $facture->getId()])
+                ]))
+                ->attach($pdfContent, $facture->getNumFacture() . '.pdf', 'application/pdf');
+
+            $mailer->send($email);
+
+            $facture->setMailEnvoye(true);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Mail envoyé avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Erreur lors de l’envoi du mail : ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_admin_facturation_utilisateur');
     }
 
 

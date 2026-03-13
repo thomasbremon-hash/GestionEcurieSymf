@@ -4,8 +4,10 @@ namespace App\Repository;
 
 use App\Entity\Deplacement;
 use App\Entity\MoisDeGestion;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Deplacement>
@@ -50,6 +52,41 @@ class DeplacementRepository extends ServiceEntityRepository
             ->where('d.date BETWEEN :debut AND :fin')
             ->setParameter('debut', $debutMois)
             ->setParameter('fin', $finMois)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Récupère tous les déplacements du mois en cours
+     *
+     * @return Deplacement[]
+     */
+    public function findByCurrentMonth(): array
+    {
+        $firstDay = new DateTime('first day of this month');
+        $lastDay = new DateTime('last day of this month');
+
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.date >= :start AND d.date <= :end')
+            ->setParameter('start', $firstDay->format('Y-m-d'))
+            ->setParameter('end', $lastDay->format('Y-m-d'))
+            ->orderBy('d.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * N derniers déplacements pour les chevaux de l'utilisateur.
+     */
+    public function findRecentByUser(User $user, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('d')
+            ->join('d.chevaux', 'c')
+            ->join('c.chevalProprietaires', 'cp')
+            ->where('cp.proprietaire = :user')
+            ->setParameter('user', $user)
+            ->orderBy('d.date', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }

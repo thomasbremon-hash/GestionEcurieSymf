@@ -86,9 +86,6 @@ class CourseType extends AbstractType
                     'Obstacle' => 'Obstacle'
                 ],
                 'placeholder' => 'Sélectionner un type',
-                'attr' => [
-                    'class' => 'select'
-                ],
                 'constraints' => [
                     new NotBlank(['message' => 'Le type est obligatoire']),
                 ]

@@ -1,177 +1,147 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Ajouter un utilisateur
+  BackOffice | {{ userId is not null ? 'Modifier' : 'Ajouter' }} un utilisateur
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>BackOffice</li>
-            <li>Utilisateurs</li>
-          </ul>
-        </div>
+  <div class="form-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_users') }}">Utilisateurs</a>
+      <span class="sep">›</span>
+      <span class="current">{{ userId is not null ? 'Modifier' : 'Ajouter' }}</span>
+    </div>
+
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Utilisateurs</div>
+        <h1 class="page-title">{{ userId is not null ? "Modifier l'utilisateur" : 'Ajouter un utilisateur' }}</h1>
       </div>
     </div>
-  </section>
 
-  <section class="section is-main-section">
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-account-plus"></span></span>
-          {% if userId is not null %}
-            Modifier
-          {% else %}
-            Ajouter
-          {% endif %}un utilisateur
-        </p>
-      </header>
-      <div class="card-content">
-        {{ form_start(formUser) }}
+    {# ── Form card ── #}
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="section-icon">
+          <i class="mdi mdi-{{ userId is not null ? 'account-edit' : 'account-plus' }}"></i>
+        </div>
+        <h2 class="form-card-title">{{ userId is not null ? 'Modifier les informations' : 'Nouveau compte utilisateur' }}</h2>
+      </div>
 
-        {# Ligne Prénom / Nom #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Prénom / Nom</label>
+      {{ form_start(formUser, { attr: { novalidate: 'novalidate' } }) }}
+
+      <div class="form-body">
+        {# ── Identité ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-account-outline"></i> Identité
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-2">
+            <div class="form-field">
               {{ form_label(formUser.prenom) }}
-              <p class="control is-expanded">{{ form_widget(formUser.prenom) }}</p>
-              {{ form_errors(formUser.prenom) }}
+              {{ form_widget(formUser.prenom) }}
+              <div class="field-error">{{ form_errors(formUser.prenom) }}</div>
             </div>
-            <div class="field">
+            <div class="form-field">
               {{ form_label(formUser.nom) }}
-              <p class="control is-expanded">{{ form_widget(formUser.nom) }}</p>
-              {{ form_errors(formUser.nom) }}
+              {{ form_widget(formUser.nom) }}
+              <div class="field-error">{{ form_errors(formUser.nom) }}</div>
             </div>
           </div>
         </div>
 
-        {# Ligne Email / Mot de passe #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            {% if userId is null %}
-              <label class="label">Email / Mot de passe</label>
-            {% else %}
-              <label class="label">Email</label>
-            {% endif %}
+        {# ── Connexion ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-lock-outline"></i> Connexion
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-1">
+            <div class="form-field">
               {{ form_label(formUser.email) }}
-              <p class="control is-expanded">{{ form_widget(formUser.email) }}</p>
-              {{ form_errors(formUser.email) }}
+              {{ form_widget(formUser.email) }}
+              <div class="field-error">{{ form_errors(formUser.email) }}</div>
             </div>
           </div>
         </div>
 
-        {# Ligne Rue / Ville #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Rue / Ville</label>
+        {# ── Adresse ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-map-marker-outline"></i> Adresse
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-1" style="margin-bottom:1.25rem;">
+            <div class="form-field">
               {{ form_label(formUser.rue) }}
-              <p class="control is-expanded">{{ form_widget(formUser.rue) }}</p>
-              {{ form_errors(formUser.rue) }}
+              {{ form_widget(formUser.rue) }}
+              <div class="field-error">{{ form_errors(formUser.rue) }}</div>
             </div>
-            <div class="field">
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
               {{ form_label(formUser.ville) }}
-              <p class="control is-expanded">{{ form_widget(formUser.ville) }}</p>
-              {{ form_errors(formUser.ville) }}
+              {{ form_widget(formUser.ville) }}
+              <div class="field-error">{{ form_errors(formUser.ville) }}</div>
             </div>
-          </div>
-        </div>
-
-        {# Ligne Code postal / Pays #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Code postal / Pays</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
+            <div class="form-field">
               {{ form_label(formUser.cp) }}
-              <p class="control is-expanded">{{ form_widget(formUser.cp) }}</p>
-              {{ form_errors(formUser.cp) }}
+              {{ form_widget(formUser.cp) }}
+              <div class="field-error">{{ form_errors(formUser.cp) }}</div>
             </div>
-            <div class="field">
+          </div>
+          <div class="fields-row cols-1" style="margin-top:1.25rem;">
+            <div class="form-field">
               {{ form_label(formUser.pays) }}
-              <p class="control is-expanded">{{ form_widget(formUser.pays) }}</p>
-              {{ form_errors(formUser.pays) }}
+              {{ form_widget(formUser.pays) }}
+              <div class="field-error">{{ form_errors(formUser.pays) }}</div>
             </div>
           </div>
         </div>
 
-        {# Ligne Rôles #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Rôles</label>
+        {# ── Rôles ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-shield-account-outline"></i> Rôles
           </div>
-          <div class="field-body">
-            <div class="field mt-2">
-              {% for choice in formUser.roles %}
-                <label class="checkbox">
-                  {{ form_widget(choice) }}
-                  {{ choice.vars.label }}
-                </label>
-              {% endfor %}
-
-              {{ form_errors(formUser.roles) }}
-            </div>
+          <div class="checkbox-grid">
+            {% for choice in formUser.roles %}
+              <label class="checkbox-item">
+                {{ form_widget(choice) }}
+                <span>{{ choice.vars.label }}</span>
+              </label>
+            {% endfor %}
           </div>
+          <div class="field-error" style="margin-top:.5rem;">{{ form_errors(formUser.roles) }}</div>
         </div>
 
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Entreprises</label>
+        {# ── Entreprises ── #}
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-domain"></i> Entreprises affiliées
           </div>
-          <div class="field-body">
-            <div class="field is-grouped is-grouped-multiline">
-              {% for entreprise in formUser.entreprise %}
-                <div class="control">
-                  <label class="checkbox">
-                    {{ form_widget(entreprise) }}
-                    {{ entreprise.vars.label }}
-                  </label>
-                </div>
-              {% endfor %}
-            </div>
-            {{ form_errors(formUser.entreprise) }}
+          <div class="checkbox-grid">
+            {% for entreprise in formUser.entreprise %}
+              <label class="checkbox-item">
+                {{ form_widget(entreprise) }}
+                <span>{{ entreprise.vars.label }}</span>
+              </label>
+            {% endfor %}
           </div>
+          <div class="field-error" style="margin-top:.5rem;">{{ form_errors(formUser.entreprise) }}</div>
         </div>
-
-        <hr />
-
-        {# Bouton de soumission #}
-        <div class="field is-horizontal">
-          <div class="field-label">
-            {# Vide pour alignement #}
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <div class="field is-grouped">
-                <div class="control">
-                  <button type="submit" class="button is-primary">
-                    {% if userId is not null %}
-                      Modifier
-                    {% else %}
-                      Ajouter
-                    {% endif %}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {{ form_end(formUser) }}
       </div>
+
+      {# ── Footer ── #}
+      <div class="form-footer">
+        <a href="{{ path('app_admin_users') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+        <button type="submit" class="btn-primary-custom">
+          <i class="mdi mdi-{{ userId is not null ? 'content-save' : 'account-plus' }}"></i>
+          {{ userId is not null ? 'Enregistrer les modifications' : "Créer l'utilisateur" }}
+        </button>
+      </div>
+
+      {{ form_end(formUser) }}
     </div>
-  </section>
+  </div>
 {% endblock %}

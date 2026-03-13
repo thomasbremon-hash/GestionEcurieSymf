@@ -1,64 +1,64 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-	BackOffice | Générer factures utilisateurs
+  BackOffice | Générer des factures utilisateurs
 {% endblock %}
 
 {% block body %}
-	<section class="section is-title-bar">
-		<div class="level">
-			<div class="level-left">
-				<ul>
-					<li>Admin</li>
-					<li>Facturation</li>
-					<li>Utilisateurs</li>
-					<li>Génération</li>
-				</ul>
-			</div>
-		</div>
-	</section>
+  <div class="form-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_facturation_utilisateur') }}">Facturation</a>
+      <span class="sep">›</span>
+      <span class="current">Générer</span>
+    </div>
 
-	<section class="section is-main-section">
-		<div class="card">
-			<header class="card-header">
-				<p class="card-header-title">
-					<span class="icon">
-						<i class="mdi mdi-account-cash"></i>
-					</span>
-					Générer les factures utilisateurs
-				</p>
-			</header>
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Gestion financière</div>
+        <h1 class="page-title">Générer des factures</h1>
+      </div>
+    </div>
 
-			<div class="card-content">
-				{{ form_start(form) }}
+    {# ── Form card ── #}
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="section-icon">
+          <i class="mdi mdi-account-cash"></i>
+        </div>
+        <h2 class="form-card-title">Paramètres de génération</h2>
+      </div>
 
-				<div class="field">
-					{{ form_label(form.moisDeGestion) }}
-					<div class="control">
-						<div class="select">
-							{{ form_widget(form.moisDeGestion) }}
-						</div>
-					</div>
-					{{ form_errors(form.moisDeGestion) }}
-				</div>
+      {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
 
-				<div class="field">
-					{{ form_label(form.entreprise) }}
-					<div class="control">
-						<div class="select">
-							{{ form_widget(form.entreprise) }}
-						</div>
-					</div>
-					{{ form_errors(form.entreprise) }}
-				</div>
+      <div class="form-body">
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-tune"></i> Sélection
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
+              {{ form_label(form.moisDeGestion) }}
+              {{ form_widget(form.moisDeGestion) }}
+              <div class="field-error">{{ form_errors(form.moisDeGestion) }}</div>
+            </div>
 
+            <div class="form-field">
+              {{ form_label(form.entreprise) }}
+              {{ form_widget(form.entreprise) }}
+              <div class="field-error">{{ form_errors(form.entreprise) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-				<div class="field">
-					<button class="button is-primary">Générer les factures</button>
-				</div>
+      <div class="form-footer">
+        <a href="{{ path('app_admin_facturation_utilisateur') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+        <button type="submit" class="btn-primary-custom"><i class="mdi mdi-file-document-multiple"></i> Générer les factures</button>
+      </div>
 
-				{{ form_end(form) }}
-			</div>
-		</div>
-	</section>
+      {{ form_end(form) }}
+    </div>
+  </div>
 {% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Participation;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +41,21 @@ class ParticipationRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * N dernières participations aux courses pour les chevaux de l'utilisateur.
+     */
+    public function findRecentByUser(User $user, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.cheval', 'c')
+            ->join('c.chevalProprietaires', 'cp')
+            ->join('p.course', 'co')
+            ->where('cp.proprietaire = :user')
+            ->setParameter('user', $user)
+            ->orderBy('co.dateCourse', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

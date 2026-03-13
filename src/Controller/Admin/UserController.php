@@ -72,7 +72,7 @@ final class UserController extends AbstractController
                 );
 
                 $email = (new TemplatedEmail())
-                    ->from('no-reply@gestionecurie.fr')
+                    ->from('thomas.bremon@logicielpourtous.com')
                     ->to($user->getEmail())
                     ->subject('Création de votre compte')
                     ->htmlTemplate('reset_password/welcome.html.twig')

@@ -1,9 +1,303 @@
 {% extends 'layouts/base.html.twig' %}
 
 {% block title %}
-  Accueil
+  Gestion Écurie — Accueil
 {% endblock %}
 
 {% block body %}
+  {# ════════════════════════════════════════════════
+   1. HERO
+════════════════════════════════════════════════ #}
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-watermark">ÉCURIE</div>
 
+    <div class="hero-inner">
+      {# Texte gauche #}
+      <div class="anim-fade-up">
+        <div class="hero-eyebrow">
+          <i class="mdi mdi-horse"></i>
+          Plateforme de gestion équestre
+        </div>
+
+        <h1 class="hero-title">
+          La gestion de<br />
+          votre <span class="underline">écurie</span>,<br />
+          <span class="outline">digitalisée</span>
+        </h1>
+
+        <p class="hero-desc">Chevaux, propriétaires, courses, déplacements et facturation — centralisés dans un seul outil professionnel, accessible partout.</p>
+
+        <div class="hero-actions">
+          {% if app.user %}
+            {% if is_granted('ROLE_ADMIN') %}
+              <a href="{{ path('app_admin') }}" class="hero-btn hero-btn-primary"><i class="mdi mdi-view-dashboard-outline"></i> Mon tableau de bord</a>
+            {% else %}
+              <a href="{{ path('app_client') }}" class="hero-btn hero-btn-primary"><i class="mdi mdi-account-outline"></i> Mon espace</a>
+            {% endif %}
+            <a href="#services" class="hero-btn hero-btn-outline"><i class="mdi mdi-arrow-down"></i> Découvrir</a>
+          {% else %}
+            <a href="{{ path('app_login') }}" class="hero-btn hero-btn-primary"><i class="mdi mdi-login-variant"></i> Accéder à mon espace</a>
+            <a href="#services" class="hero-btn hero-btn-outline"><i class="mdi mdi-information-outline"></i> En savoir plus</a>
+          {% endif %}
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-value">
+              100<span class="hero-stat-suffix">%</span>
+            </div>
+            <div class="hero-stat-label">En ligne</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">
+              360<span class="hero-stat-suffix">°</span>
+            </div>
+            <div class="hero-stat-label">Suivi complet</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">
+              24<span class="hero-stat-suffix">/7</span>
+            </div>
+            <div class="hero-stat-label">Accessible</div>
+          </div>
+        </div>
+      </div>
+
+      {# Cartes droite #}
+      <div class="hero-cards anim-fade-up d2">
+        <div class="hero-card">
+          <div class="hero-card-icon green">
+            <i class="mdi mdi-horse"></i>
+          </div>
+          <div>
+            <div class="hero-card-title">Suivi des chevaux</div>
+            <div class="hero-card-desc">Fiches complètes, race, propriétaires et historique de courses.</div>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-icon gold">
+            <i class="mdi mdi-map-marker-distance"></i>
+          </div>
+          <div>
+            <div class="hero-card-title">Déplacements & courses</div>
+            <div class="hero-card-desc">Planification des sorties, structures et calcul kilométrique.</div>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-icon blue">
+            <i class="mdi mdi-receipt-text-outline"></i>
+          </div>
+          <div>
+            <div class="hero-card-title">Facturation mensuelle</div>
+            <div class="hero-card-desc">Mois de gestion, produits, TVA et répartition par propriétaire.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <i class="mdi mdi-chevron-double-down" style="font-size:1rem;"></i>
+      Défiler
+    </div>
+  </section>
+
+  {# ════════════════════════════════════════════════
+   2. SERVICES
+════════════════════════════════════════════════ #}
+  <section class="section-services" id="services">
+    <div class="container">
+      <div class="section-head centered reveal">
+        <span class="s-eyebrow">Fonctionnalités</span>
+        <h2 class="s-title">Tout ce dont vous avez besoin</h2>
+        <p class="s-desc">Une plateforme pensée pour les professionnels de l'équitation, de la gestion quotidienne à la comptabilité.</p>
+      </div>
+
+      <div class="services-grid">
+        <div class="svc-card green reveal">
+          <div class="svc-icon green">
+            <i class="mdi mdi-horse"></i>
+          </div>
+          <div class="svc-title">Gestion des chevaux</div>
+          <div class="svc-desc">Fiches détaillées par cheval : race, sexe, date de naissance et historique complet de participations aux courses.</div>
+        </div>
+
+        <div class="svc-card blue reveal d1">
+          <div class="svc-icon blue">
+            <i class="mdi mdi-account-multiple-outline"></i>
+          </div>
+          <div class="svc-title">Propriétaires & parts</div>
+          <div class="svc-desc">Plusieurs propriétaires par cheval avec leurs pourcentages de détention. Répartition automatique des frais mensuels.</div>
+        </div>
+
+        <div class="svc-card gold reveal d2">
+          <div class="svc-icon gold">
+            <i class="mdi mdi-trophy-outline"></i>
+          </div>
+          <div class="svc-title">Suivi des courses</div>
+          <div class="svc-desc">Enregistrement des participations avec position finale et distance. Historique consultable par cheval et par saison.</div>
+        </div>
+
+        <div class="svc-card dark reveal">
+          <div class="svc-icon dark">
+            <i class="mdi mdi-truck-outline"></i>
+          </div>
+          <div class="svc-title">Déplacements</div>
+          <div class="svc-desc">Planification et suivi de tous les déplacements par entreprise et structure. Calcul automatique des distances.</div>
+        </div>
+
+        <div class="svc-card purple reveal d1">
+          <div class="svc-icon purple">
+            <i class="mdi mdi-calculator-variant-outline"></i>
+          </div>
+          <div class="svc-title">Facturation mensuelle</div>
+          <div class="svc-desc">Générez vos mois de gestion avec produits, quantités et TVA. Factures exportables par client et par entreprise.</div>
+        </div>
+
+        <div class="svc-card red reveal d2">
+          <div class="svc-icon red">
+            <i class="mdi mdi-shield-account-outline"></i>
+          </div>
+          <div class="svc-title">Gestion des accès</div>
+          <div class="svc-desc">Rôles distincts pour administrateurs, gestionnaires, comptables et clients. Chaque profil accède à son espace dédié.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ════════════════════════════════════════════════
+   3. SECTION ÉCURIE
+════════════════════════════════════════════════ #}
+  <section class="section-ecurie" id="ecurie">
+    <div class="container">
+      <div class="ecurie-layout">
+        {# Mockup gauche #}
+        <div class="ecurie-mockup-wrap reveal">
+          <div class="ecurie-mockup">
+            <div class="mockup-topbar">
+              <div class="mockup-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="mockup-bar-title">Tableau de bord — Chevaux</div>
+            </div>
+            <div class="mockup-body">
+              <div class="mockup-row">
+                <div class="mockup-avatar" style="background:var(--green);">TB</div>
+                <div>
+                  <div class="mockup-info-name">Tornado Blue</div>
+                  <div class="mockup-info-sub">Pur-sang · 4 ans</div>
+                </div>
+                <span class="mockup-status green">Actif</span>
+              </div>
+              <div class="mockup-row">
+                <div class="mockup-avatar" style="background:var(--blue);">SM</div>
+                <div>
+                  <div class="mockup-info-name">Silver Moon</div>
+                  <div class="mockup-info-sub">Trotteur · 6 ans</div>
+                </div>
+                <span class="mockup-status blue">En course</span>
+              </div>
+              <div class="mockup-row">
+                <div class="mockup-avatar" style="background:var(--gold);">LS</div>
+                <div>
+                  <div class="mockup-info-name">Lady Storm</div>
+                  <div class="mockup-info-sub">AQPS · 3 ans</div>
+                </div>
+                <span class="mockup-status gold">Formation</span>
+              </div>
+              <div class="mockup-row">
+                <div class="mockup-avatar" style="background:var(--accent);">KP</div>
+                <div>
+                  <div class="mockup-info-name">King's Pride</div>
+                  <div class="mockup-info-sub">Pur-sang · 5 ans</div>
+                </div>
+                <span class="mockup-status green">Actif</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ecurie-float-badge">
+            <div class="float-badge-icon">
+              <i class="mdi mdi-horse-variant"></i>
+            </div>
+            <div>
+              <div class="float-badge-value">4</div>
+              <div class="float-badge-label">chevaux suivis</div>
+            </div>
+          </div>
+        </div>
+
+        {# Contenu droit #}
+        <div class="reveal d1">
+          <span class="s-eyebrow">Suivi individualisé</span>
+          <h2 class="s-title">Un dossier complet pour chaque cheval</h2>
+          <p class="s-desc">Chaque cheval dispose d'une fiche centralisée, accessible en temps réel par les personnes autorisées.</p>
+
+          <div class="ecurie-features">
+            <div class="ecurie-feat">
+              <div class="ecurie-feat-dot"></div>
+              <div>
+                <div class="ecurie-feat-title">Identité & informations</div>
+                <div class="ecurie-feat-desc">Race, sexe, date de naissance, propriétaires et pourcentages de détention.</div>
+              </div>
+            </div>
+            <div class="ecurie-feat">
+              <div class="ecurie-feat-dot"></div>
+              <div>
+                <div class="ecurie-feat-title">Historique de courses</div>
+                <div class="ecurie-feat-desc">Toutes les participations avec position, distance et structure d'arrivée.</div>
+              </div>
+            </div>
+            <div class="ecurie-feat">
+              <div class="ecurie-feat-dot"></div>
+              <div>
+                <div class="ecurie-feat-title">Gestion multi-propriétaires</div>
+                <div class="ecurie-feat-desc">Répartition des frais proportionnelle aux parts de chaque propriétaire.</div>
+              </div>
+            </div>
+            <div class="ecurie-feat">
+              <div class="ecurie-feat-dot"></div>
+              <div>
+                <div class="ecurie-feat-title">Suivi des déplacements</div>
+                <div class="ecurie-feat-desc">Tous les déplacements liés au cheval, par entreprise et par mois.</div>
+              </div>
+            </div>
+          </div>
+
+          {% if not app.user %}
+            <a href="{{ path('app_login') }}" class="btn btn-primary"><i class="mdi mdi-login-variant"></i> Se connecter pour accéder</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ════════════════════════════════════════════════
+   4. CTA FINAL
+════════════════════════════════════════════════ #}
+  <section class="section-cta">
+    <div class="container">
+      <div class="cta-inner reveal">
+        <div class="cta-eyebrow">
+          <i class="mdi mdi-horse" style="color:#a07c30;"></i>
+          Prêt à commencer ?
+        </div>
+        <h2 class="cta-title">Prenez le contrôle de votre écurie</h2>
+        <p class="cta-desc">Connectez-vous à votre espace et accédez à l'ensemble de vos outils de gestion en quelques clics.</p>
+        <div class="cta-actions">
+          {% if app.user %}
+            {% if is_granted('ROLE_ADMIN') %}
+              <a href="{{ path('app_admin') }}" class="hero-btn hero-btn-primary"><i class="mdi mdi-view-dashboard-outline"></i> Mon tableau de bord</a>
+            {% else %}
+              <a href="{{ path('app_client') }}" class="hero-btn hero-btn-primary"><i class="mdi mdi-account-outline"></i> Mon espace</a>
+            {% endif %}
+          {% else %}
+            <a href="{{ path('app_login') }}" class="hero-btn hero-btn-primary"><i class="mdi mdi-login-variant"></i> Se connecter</a>
+            <a href="#services" class="hero-btn hero-btn-outline"><i class="mdi mdi-arrow-up"></i> Retour en haut</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
 {% endblock %}

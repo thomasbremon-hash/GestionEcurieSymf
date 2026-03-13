@@ -1,9 +1,366 @@
 {% extends 'layouts/base.html.twig' %}
 
-{% block title %}
-
-{% endblock %}
+{% block title %}Mon espace — {{ app.user.prenom }} {{ app.user.nom }}{% endblock %}
 
 {% block body %}
+{% set moisNoms = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'] %}
 
+<div class="espace-page">
+
+  {# ════════════════════════════════════════
+     BANDEAU DE BIENVENUE
+  ════════════════════════════════════════ #}
+  <div class="espace-welcome">
+    <div class="espace-welcome-grid"></div>
+    <div class="container">
+      <div class="espace-welcome-inner">
+
+        <div class="espace-welcome-left anim-fade-up">
+          <div class="espace-avatar">
+            {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+          </div>
+          <div>
+            <div class="espace-welcome-eyebrow">Mon espace</div>
+            <div class="espace-welcome-name">Bonjour, {{ app.user.prenom }} !</div>
+            <div class="espace-welcome-sub">{{ app.user.email }}</div>
+          </div>
+        </div>
+
+        <div class="espace-welcome-stats anim-fade-up d1">
+          <div class="espace-welcome-stat">
+            <div class="espace-wstat-value">{{ chevaux|length }}</div>
+            <div class="espace-wstat-label">Cheval(aux)</div>
+          </div>
+          <div class="espace-welcome-stat">
+            <div class="espace-wstat-value">{{ factures|length }}</div>
+            <div class="espace-wstat-label">Factures</div>
+          </div>
+          <div class="espace-welcome-stat">
+            <div class="espace-wstat-value" {% if nbImpaye > 0 %}style="color:#ef4444"{% endif %}>
+              {{ nbImpaye }}
+            </div>
+            <div class="espace-wstat-label">Impayée(s)</div>
+          </div>
+          <div class="espace-welcome-stat">
+            <div class="espace-wstat-value">{{ totalGeneral|number_format(2, ',', ' ') }} €</div>
+            <div class="espace-wstat-label">Total TTC</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="espace-body">
+    <div class="container">
+
+      {# ════════════════════════════════════════
+         SECTION FACTURES (ex-comptabilité)
+      ════════════════════════════════════════ #}
+
+      {# KPIs #}
+      <div class="compta-kpis" style="margin-bottom:1.25rem;">
+
+        <div class="compta-kpi compta-kpi--total">
+          <div class="compta-kpi-icon"><i class="mdi mdi-receipt-text-outline"></i></div>
+          <div>
+            <div class="compta-kpi-label">Total facturé TTC</div>
+            <div class="compta-kpi-value">{{ totalGeneral|number_format(2, ',', ' ') }} €</div>
+          </div>
+        </div>
+
+        <div class="compta-kpi compta-kpi--paye">
+          <div class="compta-kpi-icon"><i class="mdi mdi-check-circle-outline"></i></div>
+          <div>
+            <div class="compta-kpi-label">Réglé ({{ nbPaye }} facture{{ nbPaye > 1 ? 's' : '' }})</div>
+            <div class="compta-kpi-value">{{ totalPaye|number_format(2, ',', ' ') }} €</div>
+          </div>
+        </div>
+
+        <div class="compta-kpi compta-kpi--impaye {% if totalImpaye > 0 %}compta-kpi--alert{% endif %}">
+          <div class="compta-kpi-icon"><i class="mdi mdi-clock-alert-outline"></i></div>
+          <div>
+            <div class="compta-kpi-label">En attente ({{ nbImpaye }} facture{{ nbImpaye > 1 ? 's' : '' }})</div>
+            <div class="compta-kpi-value">{{ totalImpaye|number_format(2, ',', ' ') }} €</div>
+          </div>
+        </div>
+
+        <div class="compta-kpi compta-kpi--count">
+          <div class="compta-kpi-icon"><i class="mdi mdi-file-document-multiple-outline"></i></div>
+          <div>
+            <div class="compta-kpi-label">Total documents</div>
+            <div class="compta-kpi-value">{{ factures|length }}</div>
+          </div>
+        </div>
+
+      </div>
+
+      {# Alerte impayées #}
+      {% if totalImpaye > 0 %}
+        <div class="compta-alert-banner" style="margin-bottom:1.25rem;">
+          <div class="compta-alert-icon"><i class="mdi mdi-alert-circle-outline"></i></div>
+          <div>
+            <div class="compta-alert-title">
+              {{ nbImpaye }} facture{{ nbImpaye > 1 ? 's' : '' }} en attente de règlement
+            </div>
+            <div class="compta-alert-sub">
+              Montant total dû : {{ totalImpaye|number_format(2, ',', ' ') }} €. Merci de contacter l'écurie pour régulariser.
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {# Tableau des factures #}
+      {% if factures|length > 0 %}
+
+        <div class="compta-toolbar" style="margin-bottom:1rem;">
+          <div class="compta-tabs">
+            <button class="compta-tab active" data-filter="all">
+              <i class="mdi mdi-format-list-bulleted"></i> Toutes
+              <span class="compta-tab-count">{{ factures|length }}</span>
+            </button>
+            <button class="compta-tab" data-filter="impayee">
+              <i class="mdi mdi-clock-outline"></i> En attente
+              <span class="compta-tab-count">{{ nbImpaye }}</span>
+            </button>
+            <button class="compta-tab" data-filter="payee">
+              <i class="mdi mdi-check-circle-outline"></i> Réglées
+              <span class="compta-tab-count">{{ nbPaye }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="compta-factures" style="margin-bottom:2.5rem;">
+          {% for annee, facturesAnnee in facturesParAnnee %}
+            <div class="compta-annee-block" data-annee="{{ annee }}">
+
+              <div class="compta-annee-header">
+                <div class="compta-annee-title">
+                  <i class="mdi mdi-calendar-blank-outline"></i> {{ annee }}
+                </div>
+                <div class="compta-annee-stats">
+                  {% set totalAnnee = 0 %}
+                  {% for f in facturesAnnee %}{% set totalAnnee = totalAnnee + totauxTtc[f.id] %}{% endfor %}
+                  <span class="compta-annee-total">{{ totalAnnee|number_format(2, ',', ' ') }} €</span>
+                  <span class="compta-annee-count">{{ facturesAnnee|length }} facture{{ facturesAnnee|length > 1 ? 's' : '' }}</span>
+                </div>
+              </div>
+
+              <div class="compta-table-wrap">
+                <table class="compta-table">
+                  <thead>
+                    <tr>
+                      <th>N° Facture</th>
+                      <th>Période</th>
+                      <th>Entreprise</th>
+                      <th>Montant TTC</th>
+                      <th>Statut</th>
+                      <th>PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for facture in facturesAnnee %}
+                      {% set isPaid = facture.statut != 'impayee' %}
+                      <tr class="compta-row" data-statut="{{ facture.statut }}">
+                        <td><span class="compta-num">{{ facture.numFacture }}</span></td>
+                        <td>
+                          {% if facture.moisDeGestion %}
+                            <span class="compta-mois">{{ moisNoms[facture.moisDeGestion.mois - 1] }} {{ facture.moisDeGestion.annee }}</span>
+                          {% else %}—{% endif %}
+                        </td>
+                        <td>
+                          {% if facture.entreprise %}
+                            <span class="compta-entreprise"><i class="mdi mdi-domain"></i> {{ facture.entreprise.nom }}</span>
+                          {% else %}—{% endif %}
+                        </td>
+                        <td>
+                          <span class="compta-montant">{{ totauxTtc[facture.id]|number_format(2, ',', ' ') }} €</span>
+                        </td>
+                        <td>
+                          <span class="compta-statut-pill {{ isPaid ? 'paid' : 'unpaid' }}">
+                            <i class="mdi mdi-{{ isPaid ? 'check-circle' : 'clock-outline' }}"></i>
+                            {{ isPaid ? 'Réglé' : 'En attente' }}
+                          </span>
+                        </td>
+                        <td>
+                          <a href="{{ path('app_client_facture_pdf', {id: facture.id}) }}" class="compta-pdf-btn" title="Télécharger {{ facture.numFacture }}">
+                            <i class="mdi mdi-file-pdf-box"></i> <span>PDF</span>
+                          </a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <div class="compta-empty" style="margin-bottom:2.5rem;">
+          <i class="mdi mdi-receipt-text-outline"></i>
+          <div class="compta-empty-title">Aucune facture disponible</div>
+          <div class="compta-empty-sub">Vos factures apparaîtront ici dès leur émission.</div>
+        </div>
+      {% endif %}
+
+      {# ════════════════════════════════════════
+         GRILLE INFOS : Chevaux | Déplacements | Compte
+      ════════════════════════════════════════ #}
+      <div class="espace-grid">
+
+        {# ── Mes chevaux ── #}
+        <div class="espace-card reveal">
+          <div class="espace-card-header">
+            <div class="espace-card-title"><i class="mdi mdi-horse"></i> Mes chevaux</div>
+            {% if chevaux|length > 0 %}
+              <span class="espace-card-badge">{{ chevaux|length }}</span>
+            {% endif %}
+          </div>
+          <div class="espace-card-body">
+            {% if chevaux|length > 0 %}
+              <div class="chevaux-list">
+                {% set colors = ['#1f2937','#3d6b52','#2d5fa6','#a07c30','#7c3d9e','#b91c1c'] %}
+                {% for item in chevaux %}
+                  <div class="cheval-row">
+                    <div class="cheval-monogram" style="background:{{ colors[loop.index0 % colors|length] }};">
+                      {{ item['cheval'].nom|first|upper }}{{ item['cheval'].nom|split(' ')|last|first|upper }}
+                    </div>
+                    <div>
+                      <div class="cheval-name">{{ item['cheval'].nom }}</div>
+                      <div class="cheval-meta">
+                        {{ item['cheval'].race ?? 'Race inconnue' }}
+                        {% if item['cheval'].dateNaissance %}· {{ 'now'|date('Y') - item['cheval'].dateNaissance|date('Y') }} ans{% endif %}
+                        {% if item['cheval'].sexe %}· {{ item['cheval'].sexe }}{% endif %}
+                      </div>
+                    </div>
+                    <span class="cheval-part">{{ item['pourcentage'] }}%</span>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="cheval-empty">
+                <i class="mdi mdi-horse-variant"></i>
+                Aucun cheval associé à votre compte.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {# ── Déplacements récents ── #}
+        <div class="espace-card reveal d1">
+          <div class="espace-card-header">
+            <div class="espace-card-title"><i class="mdi mdi-map-marker-distance"></i> Déplacements récents</div>
+          </div>
+          <div class="espace-card-body">
+            {% if deplacementsRecents|length > 0 %}
+              {% for dep in deplacementsRecents %}
+                <div class="deplacement-row">
+                  <div class="deplacement-icon"><i class="mdi mdi-truck-outline"></i></div>
+                  <div>
+                    <div class="deplacement-dest">
+                      {{ dep.nom }}{% if dep.structure %} · {{ dep.structure.nom }}{% endif %}
+                    </div>
+                    <div class="deplacement-meta">
+                      {% for cheval in dep.chevaux %}{{ cheval.nom }}{% if not loop.last %}, {% endif %}{% endfor %}
+                      {% if dep.date %} · {{ dep.date|date('d/m/Y') }}{% endif %}
+                    </div>
+                  </div>
+                  {% if dep.distance %}
+                    <span class="deplacement-km">{{ dep.distance }} km</span>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="espace-empty">
+                <i class="mdi mdi-map-marker-distance"></i>
+                Aucun déplacement enregistré.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {# ── Mon compte ── #}
+        <div class="espace-card espace-grid-wide reveal">
+          <div class="espace-card-header">
+            <div class="espace-card-title"><i class="mdi mdi-account-outline"></i> Mon compte</div>
+          </div>
+          <div class="espace-card-body">
+            <div style="display:flex;flex-direction:column;gap:0.85rem;">
+
+              {% set infoRow  = 'display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);' %}
+              {% set iconBox  = 'width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;' %}
+              {% set lblStyle = 'font-family:Sora,sans-serif;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);' %}
+              {% set valStyle = 'font-family:Sora,sans-serif;font-size:0.88rem;font-weight:700;color:var(--ink);' %}
+
+              <div style="{{ infoRow }}">
+                <div style="{{ iconBox }}background:var(--accent-light);color:var(--accent);"><i class="mdi mdi-account-outline"></i></div>
+                <div>
+                  <div style="{{ lblStyle }}">Nom complet</div>
+                  <div style="{{ valStyle }}">{{ app.user.prenom }} {{ app.user.nom }}</div>
+                </div>
+              </div>
+
+              <div style="{{ infoRow }}">
+                <div style="{{ iconBox }}background:var(--blue-light);color:var(--blue);"><i class="mdi mdi-email-outline"></i></div>
+                <div>
+                  <div style="{{ lblStyle }}">Adresse email</div>
+                  <div style="{{ valStyle }}">{{ app.user.email }}</div>
+                </div>
+              </div>
+
+              {% if app.user.rue %}
+                <div style="{{ infoRow }}">
+                  <div style="{{ iconBox }}background:var(--green-light);color:var(--green);"><i class="mdi mdi-map-marker-outline"></i></div>
+                  <div>
+                    <div style="{{ lblStyle }}">Adresse</div>
+                    <div style="{{ valStyle }}">{{ app.user.rue }}, {{ app.user.cp }} {{ app.user.ville }}</div>
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if app.user.entreprise|length > 0 %}
+                <div style="{{ infoRow }}">
+                  <div style="{{ iconBox }}background:var(--gold-light);color:var(--gold);"><i class="mdi mdi-domain"></i></div>
+                  <div>
+                    <div style="{{ lblStyle }}">Entreprise{{ app.user.entreprise|length > 1 ? 's' : '' }}</div>
+                    <div style="{{ valStyle }}">
+                      {% for e in app.user.entreprise %}{{ e.nom }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+
+            </div>
+          </div>
+        </div>
+
+      </div>{# fin espace-grid #}
+    </div>{# fin container #}
+  </div>{# fin espace-body #}
+
+</div>{# fin espace-page #}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const tabs = document.querySelectorAll('.compta-tab')
+const rows = document.querySelectorAll('.compta-row')
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'))
+    tab.classList.add('active')
+    const filter = tab.dataset.filter
+    rows.forEach(row => {
+      row.style.display = (filter === 'all' || row.dataset.statut === filter) ? '' : 'none'
+    })
+    document.querySelectorAll('.compta-annee-block').forEach(block => {
+      const hasVisible = [...block.querySelectorAll('.compta-row')].some(r => r.style.display !== 'none')
+      block.style.display = hasVisible ? '' : 'none'
+    })
+  })
+})
+</script>
 {% endblock %}

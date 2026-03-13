@@ -1,165 +1,229 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
   <head>
-    <!-- Basic -->
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <!-- Mobile Metas -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <!-- Site Metas -->
-    <meta name="keywords" content="" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <link rel="shortcut icon" href="{{ asset('/assets/css-famma/bootstrap.css') }}" type="" />
-    <title>Famms - Fashion HTML Template</title>
-    <!-- bootstrap core css -->
-    <link rel="stylesheet" type="text/css" href="{{ asset('/assets/css-famma/bootstrap.css') }}" />
-    <!-- font awesome style -->
-    <link href="{{ asset('/assets/css-famma/font-awesome.min.css') }}" rel="stylesheet" />
-    <!-- Custom styles for this template -->
-    <link href="{{ asset('/assets/css-famma/style.css') }}" rel="stylesheet" />
-    <!-- responsive style -->
-    <link href="{{ asset('/assets/css-famma/responsive.css') }}" rel="stylesheet" />
+    <meta name="description" content="Gestion écurie — L'outil digital conçu pour faciliter le quotidien des écuries." />
+    <title>
+      {% block title %}
+        Gestion Écurie
+      {% endblock %}
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/css/front.css') }}" />
+    {% block stylesheets %}
+
+    {% endblock %}
   </head>
 
   <body>
-    <!-- header section strats -->
-    <header class="header_section">
-      <div class="container">
-        <nav class="navbar navbar-expand-lg custom_nav-container">
-          <a class="navbar-brand" href="{{ path('app_home') }}"><img width="250" src="{{ asset('assets/images-famma/crop-logo.png') }}" alt="#" /></a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class=""></span></button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav">
-              <li class="nav-item active">
-                <a class="nav-link" href="{{ path('app_home') }}">
-                  Accueil
-                  <span class="sr-only">(current)</span>
-                </a>
+    {# ══════════════════════════════════════
+       NAVIGATION
+    ══════════════════════════════════════ #}
+    <nav class="site-nav" id="site-nav">
+      <div class="nav-inner">
+        <a href="{{ path('app_home') }}" class="nav-logo"><img src="{{ asset('assets/images-famma/logo-gestionecurie.png') }}" alt="Gestion Écurie" /></a>
+
+        <ul class="nav-links">
+          {# Accueil — toujours visible #}
+          <li>
+            <a href="{{ path('app_home') }}" class="{{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}"><i class="mdi mdi-home-outline"></i> Accueil</a>
+          </li>
+
+          {# Menus réservés aux utilisateurs connectés #}
+          {% if app.user %}
+            <li>
+              <a href="{{ path('app_client') }}" class="{{ app.request.attributes.get('_route') starts with 'app_client' ? 'active' : '' }}"><i class="mdi mdi-account-outline"></i> Mon espace</a>
+            </li>
+
+            {% if is_granted('ROLE_ADMIN') %}
+              <li>
+                <a href="{{ path('app_admin') }}" class="{{ app.request.attributes.get('_route') starts with 'app_admin' ? 'active' : '' }}"><i class="mdi mdi-shield-crown-outline"></i> BackOffice</a>
               </li>
+            {% endif %}
+          {% endif %}
+        </ul>
 
-              <li class="nav-item">
-                {% if is_granted('ROLE_ADMIN') %}
-                  <a class="nav-link" href="{{ path('app_admin') }}">Admin</a>
-                {% endif %}
-              </li>
+        {# Bouton connexion / déconnexion #}
+        {% if app.user %}
+          <a href="{{ path('app_logout') }}" class="nav-btn nav-btn-ghost"><i class="mdi mdi-logout-variant"></i> Déconnexion</a>
+        {% else %}
+          <a href="{{ path('app_login') }}" class="nav-btn"><i class="mdi mdi-login-variant"></i> Connexion</a>
+        {% endif %}
 
-              <li class="nav-item">
-                {% if is_granted('ROLE_GESTIONNAIRE') %}
-                  <a class="nav-link" href="{{ path('app_gestionnaire') }}">Gestionnaire</a>
-                {% endif %}
-              </li>
-
-              <li class="nav-item">
-                {% if is_granted('ROLE_CLIENT') %}
-                  <a class="nav-link" href="{{ path('app_client') }}">Client</a>
-                {% endif %}
-              </li>
-
-              <li class="nav-item">
-                {% if is_granted('ROLE_COMPTABILITE') %}
-                  <a class="nav-link" href="{{ path('app_comptabilite') }}">Comptabilité</a>
-                {% endif %}
-              </li>
-
-              {% if app.user %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
-                </li>
-              {% else %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
-                </li>
-              {% endif %}
-
-              {% if is_granted('ROLE_ADMIN') %}
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
-                    <span class="nav-label">BackOffice</span>
-                    <span class="caret"></span>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a href="{{ path('app_admin') }}">Dashboard</a>
-                    </li>
-                    <li>
-                      <a href="">Utilisateurs</a>
-                    </li>
-
-                    <li>
-                      <a href="">Entreprises</a>
-                    </li>
-                    <li>
-                      <a href="{{ path('app_admin_chevaux') }}">Chevaux</a>
-                    </li>
-                  </ul>
-                </li>
-              {% endif %}
-            </ul>
-          </div>
-        </nav>
+        <button class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></button>
       </div>
-    </header>
-    {% block body %}
+    </nav>
 
-    {% endblock %}
-    <!-- footer start -->
-    <footer class="footer_section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4 footer-col">
-            <div class="footer_contact">
-              <h4>Nous trouver..</h4>
-              <div class="contact_link_box">
-                <a href="">
-                  <i class="fa fa-map-marker" aria-hidden="true"></i>
-                  <span>Coordonnées</span>
-                </a>
-                <a href="">
-                  <i class="fa fa-phone" aria-hidden="true"></i>
-                  <span>02 23 45 78 89</span>
-                </a>
-                <a href="">
-                  <i class="fa fa-envelope" aria-hidden="true"></i>
-                  <span>nicolas@logicielpourtous.com</span>
-                </a>
-              </div>
+    {# Menu mobile #}
+    <div class="nav-mobile" id="nav-mobile">
+      <a href="{{ path('app_home') }}"><i class="mdi mdi-home-outline"></i> Accueil</a>
+
+      {% if app.user %}
+        <a href="{{ path('app_client') }}"><i class="mdi mdi-account-outline"></i> Mon espace</a>
+        <a href="{{ path('app_comptabilite') }}"><i class="mdi mdi-receipt-text-outline"></i> Mes factures</a>
+
+        {% if is_granted('ROLE_GESTIONNAIRE') %}
+          <a href="{{ path('app_gestionnaire') }}"><i class="mdi mdi-clipboard-list-outline"></i> Gestion</a>
+        {% endif %}
+
+        {% if is_granted('ROLE_ADMIN') %}
+          <hr />
+          <a href="{{ path('app_admin') }}"><i class="mdi mdi-view-dashboard-outline"></i> Dashboard admin</a>
+          <a href="{{ path('app_admin_users') }}"><i class="mdi mdi-account-group-outline"></i> Utilisateurs</a>
+          <a href="{{ path('app_admin_entreprises') }}"><i class="mdi mdi-domain"></i> Entreprises</a>
+          <a href="{{ path('app_admin_chevaux') }}"><i class="mdi mdi-horse"></i> Chevaux</a>
+        {% endif %}
+      {% endif %}
+
+      <hr />
+      {% if app.user %}
+        <a href="{{ path('app_logout') }}"><i class="mdi mdi-logout-variant"></i> Déconnexion</a>
+      {% else %}
+        <a href="{{ path('app_login') }}"><i class="mdi mdi-login-variant"></i> Connexion</a>
+      {% endif %}
+    </div>
+
+    {# ══════════════════════════════════════
+       FLASH MESSAGES
+    ══════════════════════════════════════ #}
+    {% set hasFlash = false %}
+    {% for type in ['success', 'danger', 'warning'] %}
+      {% if (app.flashes(type)|length) > 0 %}{% set hasFlash = true %}{% endif %}
+    {% endfor %}
+
+    {% if hasFlash %}
+      <div class="flash-container">
+        {% for type in ['success', 'danger', 'warning'] %}
+          {% for message in app.flashes(type) %}
+            <div class="flash {{ type }}">
+              <span>
+                <i class="mdi mdi-{{ type == 'success' ? 'check-circle' : type == 'danger' ? 'alert-circle' : 'alert' }}"></i>
+                {{ message }}
+              </span>
+              <button class="flash-close" aria-label="Fermer"><i class="mdi mdi-close"></i></button>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {# ══════════════════════════════════════
+       CONTENU PRINCIPAL
+    ══════════════════════════════════════ #}
+    <main class="site-main">
+      {% block body %}
+
+      {% endblock %}
+    </main>
+
+    {# ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ #}
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-name">Gestion Écurie</div>
+          <p class="footer-brand-desc">L'outil digital conçu pour faciliter le quotidien des écuries et offrir un suivi professionnel de vos chevaux et propriétaires.</p>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-btn" aria-label="Facebook"><i class="mdi mdi-facebook"></i></a>
+            <a href="#" class="footer-social-btn" aria-label="Instagram"><i class="mdi mdi-instagram"></i></a>
+            <a href="#" class="footer-social-btn" aria-label="LinkedIn"><i class="mdi mdi-linkedin"></i></a>
+            <a href="#" class="footer-social-btn" aria-label="Twitter"><i class="mdi mdi-twitter"></i></a>
+          </div>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Navigation</div>
+          <ul class="footer-links">
+            <li>
+              <a href="{{ path('app_home') }}"><i class="mdi mdi-chevron-right"></i> Accueil</a>
+            </li>
+            {% if app.user %}
+              <li>
+                <a href="{{ path('app_client') }}"><i class="mdi mdi-chevron-right"></i> Mon espace</a>
+              </li>
+              <li>
+                <a href="{{ path('app_comptabilite') }}"><i class="mdi mdi-chevron-right"></i> Mes factures</a>
+              </li>
+              {% if is_granted('ROLE_GESTIONNAIRE') %}
+                <li>
+                  <a href="{{ path('app_gestionnaire') }}"><i class="mdi mdi-chevron-right"></i> Gestion</a>
+                </li>
+              {% endif %}
+              {% if is_granted('ROLE_ADMIN') %}
+                <li>
+                  <a href="{{ path('app_admin') }}"><i class="mdi mdi-chevron-right"></i> BackOffice</a>
+                </li>
+              {% endif %}
+            {% endif %}
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Informations</div>
+          <ul class="footer-links">
+            <li>
+              <a href="#"><i class="mdi mdi-chevron-right"></i> Mentions légales</a>
+            </li>
+            <li>
+              <a href="#"><i class="mdi mdi-chevron-right"></i> Confidentialité</a>
+            </li>
+            <li>
+              <a href="#"><i class="mdi mdi-chevron-right"></i> CGU</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Contact</div>
+          <div class="footer-contact-item">
+            <div class="footer-contact-icon">
+              <i class="mdi mdi-map-marker-outline"></i>
+            </div>
+            <div>
+              <span class="footer-contact-label">Adresse</span>
+              <span class="footer-contact-text">À compléter</span>
             </div>
           </div>
-          <div class="col-md-4 footer-col">
-            <div class="footer_detail">
-              <a href="{{ path('app_home') }}" class="footer-logo">Gestion écurie</a>
-              <p>L’outil digital conçu pour faciliter le quotidien des écuries et offrir un suivi professionnel.</p>
-              <div class="footer_social">
-                <a href=""><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                <a href=""><i class="fa fa-twitter" aria-hidden="true"></i></a>
-                <a href=""><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-                <a href=""><i class="fa fa-instagram" aria-hidden="true"></i></a>
-                <a href=""><i class="fa fa-pinterest" aria-hidden="true"></i></a>
-              </div>
+          <div class="footer-contact-item">
+            <div class="footer-contact-icon">
+              <i class="mdi mdi-phone-outline"></i>
+            </div>
+            <div>
+              <span class="footer-contact-label">Téléphone</span>
+              <span class="footer-contact-text">02 23 45 78 89</span>
             </div>
           </div>
-          <div class="col-md-4 footer-col">
-            <div class="map_container">
-              <div class="map">
-                <div id="googleMap"></div>
-              </div>
+          <div class="footer-contact-item">
+            <div class="footer-contact-icon">
+              <i class="mdi mdi-email-outline"></i>
+            </div>
+            <div>
+              <span class="footer-contact-label">Email</span>
+              <span class="footer-contact-text">nicolas@logicielpourtous.com</span>
             </div>
           </div>
         </div>
       </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 Tous droits réservés — Logiciel pour tous</p>
+        <div class="footer-legal">
+          <a href="#">Mentions légales</a>
+          <a href="#">Confidentialité</a>
+        </div>
+      </div>
     </footer>
-    <!-- footer end -->
-    <div class="cpy_">
-      <p>© 2025 Tous droits réservés par Logiciel pour tous</p>
-    </div>
-    <!-- jQery -->
-    <script src="/assets/js-famma/jquery-3.4.1.min.js"></script>
-    <!-- popper js -->
-    <script src="/assets/js-famma/popper.min.js"></script>
-    <!-- bootstrap js -->
-    <script src="/assets/js-famma/bootstrap.js"></script>
-    <!-- custom js -->
-    <script src="/assets/js-famma/custom.js"></script>
+
+    <script src="{{ asset('assets/js/front.js') }}"></script>
+    {% block javascripts %}
+
+    {% endblock %}
   </body>
 </html>

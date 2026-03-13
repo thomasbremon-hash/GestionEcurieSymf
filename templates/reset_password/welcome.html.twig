@@ -5,51 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Création de votre compte</title>
     <style>
-      /* Mobile responsive */
       @media only screen and (max-width: 620px) {
         .wrapper {
           width: 100% !important;
-          padding: 20px !important;
+          padding: 12px !important;
         }
         .content {
-          padding: 20px !important;
+          padding: 24px 20px !important;
         }
         .btn {
           width: 100% !important;
-          padding: 12px 0 !important;
+          text-align: center !important;
+          display: block !important;
         }
       }
-      /* Remove underline from links in some clients */
       a {
         text-decoration: none;
       }
     </style>
   </head>
-  <body style="margin:0; padding:0; font-family:Arial,sans-serif; background-color:#f3f4f6;">
+  <body style="margin:0;padding:0;background:#f0ede8;font-family:'Helvetica Neue',Arial,sans-serif;">
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
-        <td align="center" style="padding: 30px 10px;">
-          <table class="wrapper" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden; max-width:600px; width:100%;">
+        <td align="center" style="padding:32px 12px;">
+          <table class="wrapper" width="580" cellpadding="0" cellspacing="0" style="max-width:580px;width:100%;border-radius:16px;overflow:hidden;
+                    box-shadow:0 4px 24px rgba(26,23,20,0.10);">
+            {# ── Barre top ── #}
             <tr>
-              <td style="background-color:#1f2937; color:#ffffff; text-align:center; padding:20px; font-size:24px; font-weight:bold;">Bienvenue sur Gestion Écurie</td>
+              <td style="background:#1f2937;height:4px;font-size:0;line-height:0;">&nbsp;</td>
             </tr>
-            <tr>
-              <td class="content" style="padding:30px; color:#111827; font-size:16px; line-height:1.5;">
-                <p>Bonjour {{ user.prenom }},</p>
-                <p>Votre compte vient d'être créé. Cliquez sur le bouton ci-dessous pour créer votre mot de passe :</p>
 
-                <p style="text-align:center; margin:30px 0;">
-                  <a href="{{ resetUrl }}" class="btn" style="background-color:#3b82f6; color:#ffffff; text-decoration:none; padding:12px 25px; border-radius:8px; font-weight:bold; display:inline-block;">Créer mon mot de passe</a>
+            {# ── Header ── #}
+            <tr>
+              <td style="background:#1f2937;padding:32px 36px 28px;">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;
+                        letter-spacing:0.12em;color:rgba(255,255,255,0.45);margin-bottom:6px;">Gestion Écurie</div>
+                <div style="font-size:22px;font-weight:800;color:#ffffff;
+                        letter-spacing:-0.03em;line-height:1.15;margin-bottom:6px;">Bienvenue, {{ user.prenom }} !</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.45);">Votre compte vient d'être créé avec succès.</div>
+              </td>
+            </tr>
+
+            {# ── Bandeau icône ── #}
+            <tr>
+              <td style="background:#f7f6f3;padding:20px 36px;border-bottom:1px solid #e8e5e0;">
+                <table cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="vertical-align:middle;padding-right:14px;">
+                      <div style="width:44px;height:44px;border-radius:12px;background:#e3e6ea;
+                              text-align:center;line-height:44px;font-size:22px;">🐴</div>
+                    </td>
+                    <td style="vertical-align:middle;">
+                      <div style="font-size:13px;font-weight:700;color:#1a1714;">Plateforme de gestion équestre</div>
+                      <div style="font-size:11px;color:#6b6560;margin-top:2px;">Chevaux · Facturation · Déplacements · Courses</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            {# ── Corps ── #}
+            <tr>
+              <td class="content" style="background:#ffffff;padding:32px 36px;
+                                     color:#1a1714;font-size:14px;line-height:1.75;">
+                <p style="margin:0 0 14px;">
+                  Bonjour <strong>{{ user.prenom }}</strong>,
                 </p>
 
-                <p>Si vous n'avez pas demandé ce compte, vous pouvez ignorer cet email.</p>
-                <p>
-                  Merci,<br />L’équipe Gestion Écurie
+                <p style="margin:0 0 20px;color:#6b6560;">
+                  Un compte a été créé pour vous sur la plateforme <strong style="color:#1a1714;">Gestion Écurie</strong>. Pour finaliser votre inscription, vous devez définir votre mot de passe en cliquant sur le bouton ci-dessous.
+                </p>
+
+                {# ── CTA ── #}
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+                  <tr>
+                    <td align="center">
+                      <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                        <tr>
+                          <td align="center" bgcolor="#1f2937" style="border-radius:8px;mso-padding-alt:0;">
+                            <a href="{{ resetUrl }}" class="btn" style="display:block;background:#1f2937;color:#ffffff;
+                                  font-size:13px;font-weight:700;letter-spacing:0.03em;
+                                  padding:13px 32px;border-radius:8px;
+                                  min-width:200px;text-align:center;">Créer mon mot de passe →</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                {# ── Lien de secours ── #}
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+                  <tr>
+                    <td style="background:#f7f6f3;border-radius:6px;padding:10px 14px;">
+                      <div style="font-size:10px;color:#a09b96;margin-bottom:3px;font-weight:700;
+                              text-transform:uppercase;letter-spacing:0.08em;">Lien alternatif</div>
+                      <div style="font-size:10px;color:#6b6560;word-break:break-all;">{{ resetUrl }}</div>
+                    </td>
+                  </tr>
+                </table>
+
+                <p style="margin:0 0 6px;color:#6b6560;font-size:12px;">
+                  Ce lien est valable <strong style="color:#1a1714;">24 heures</strong>. Si vous n'avez pas demandé la création de ce compte, vous pouvez ignorer cet email.
+                </p>
+
+                <p style="margin:20px 0 0;color:#6b6560;">
+                  Cordialement,<br />
+                  <strong style="color:#1a1714;">L'équipe Gestion Écurie</strong>
                 </p>
               </td>
             </tr>
+
+            {# ── Séparateur ── #}
             <tr>
-              <td style="background-color:#f9fafb; text-align:center; font-size:12px; color:#6b7280; padding:20px;">&copy; {{ 'now'|date('Y') }} Gestion Écurie. Tous droits réservés.</td>
+              <td style="background:#1f2937;height:2px;font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+
+            {# ── Footer ── #}
+            <tr>
+              <td style="background:#f7f6f3;padding:18px 36px;text-align:center;">
+                <div style="font-size:11px;color:#a09b96;line-height:1.7;">
+                  © {{ 'now'|date('Y') }} Gestion Écurie — Tous droits réservés<br />
+                  <span style="font-size:10px;">Vous recevez cet email car un compte vous a été attribué sur notre plateforme.</span>
+                </div>
+              </td>
             </tr>
           </table>
         </td>

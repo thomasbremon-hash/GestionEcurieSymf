@@ -32,6 +32,9 @@ class FacturationUtilisateur
     #[ORM\Column(length: 255)]
     private ?string $statut = "impayee";
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $mailEnvoye = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -106,6 +109,17 @@ class FacturationUtilisateur
     {
         $this->statut = $statut;
 
+        return $this;
+    }
+
+    public function isMailEnvoye(): bool
+    {
+        return $this->mailEnvoye;
+    }
+
+    public function setMailEnvoye(bool $mailEnvoye): self
+    {
+        $this->mailEnvoye = $mailEnvoye;
         return $this;
     }
 }

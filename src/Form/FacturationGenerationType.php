@@ -18,18 +18,14 @@ class FacturationGenerationType extends AbstractType
         $builder
             ->add('entreprise', EntityType::class, [
                 'class' => Entreprise::class,
-                'attr' => [
-                    'class' => 'select',
-                ],
+
                 'choice_label' => 'nom',
                 'placeholder' => 'Choisir une entreprise facturante',
                 'required' => true,
             ])
             ->add('moisDeGestion', EntityType::class, [
                 'class' => MoisDeGestion::class,
-                'attr' => [
-                    'class' => 'select',
-                ],
+
                 'choice_label' => fn(MoisDeGestion $m) =>
                 sprintf('%02d / %d', $m->getMois(), $m->getAnnee()),
                 'placeholder' => 'Choisir un mois',

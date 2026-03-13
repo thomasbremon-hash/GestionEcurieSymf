@@ -1,107 +1,89 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Ajouter une structure
+  BackOffice | {{ structureId is not null ? 'Modifier une structure' : 'Ajouter une structure' }}
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>BackOffice</li>
-            <li>Structures</li>
-          </ul>
-        </div>
+  <div class="form-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_structures') }}">Structures</a>
+      <span class="sep">›</span>
+      <span class="current">{{ structureId is not null ? 'Modifier' : 'Ajouter' }}</span>
+    </div>
+
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Structures</div>
+        <h1 class="page-title">{{ structureId is not null ? 'Modifier la structure' : 'Ajouter une structure' }}</h1>
       </div>
     </div>
-  </section>
 
-  <section class="section is-main-section">
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-account-plus"></span></span>
-          {% if structureId is not null %}
-            Modifier
-          {% else %}
-            Ajouter
-          {% endif %}une structure
-        </p>
-      </header>
-      <div class="card-content">
-        {{ form_start(formStructure) }}
+    {# ── Form card ── #}
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="section-icon" style="background:var(--accent-light);color:var(--accent);">
+          <i class="mdi mdi-office-building-outline"></i>
+        </div>
+        <h2 class="form-card-title">{{ structureId is not null ? 'Modifier les informations' : 'Nouvelle structure' }}</h2>
+      </div>
 
-        {# Nom #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Nom</label>
+      {{ form_start(formStructure, { attr: { novalidate: 'novalidate' } }) }}
+
+      <div class="form-body">
+        {# ── Identité ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-domain"></i> Identité
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-1">
+            <div class="form-field">
               {{ form_label(formStructure.nom) }}
-              <p class="control is-expanded">{{ form_widget(formStructure.nom) }}</p>
-              {{ form_errors(formStructure.nom) }}
+              {{ form_widget(formStructure.nom) }}
+              <div class="field-error">{{ form_errors(formStructure.nom) }}</div>
             </div>
           </div>
         </div>
 
-        {# Rue / Ville / CP #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-
-              <label class="label">Rue / Ville / Code postal</label>
+        {# ── Adresse ── #}
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-map-marker-outline"></i> Adresse
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-1" style="margin-bottom:1.25rem;">
+            <div class="form-field">
               {{ form_label(formStructure.rue) }}
-              <p class="control is-expanded">{{ form_widget(formStructure.rue) }}</p>
-              {{ form_errors(formStructure.rue) }}
+              {{ form_widget(formStructure.rue) }}
+              <div class="field-error">{{ form_errors(formStructure.rue) }}</div>
             </div>
-
-            <div class="field">
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
               {{ form_label(formStructure.ville) }}
-              <p class="control is-expanded">{{ form_widget(formStructure.ville) }}</p>
-              {{ form_errors(formStructure.ville) }}
+              {{ form_widget(formStructure.ville) }}
+              <div class="field-error">{{ form_errors(formStructure.ville) }}</div>
             </div>
-
-            <div class="field">
+            <div class="form-field">
               {{ form_label(formStructure.cp) }}
-              <p class="control is-expanded">{{ form_widget(formStructure.cp) }}</p>
-              {{ form_errors(formStructure.cp) }}
-            </div>
-
-          </div>
-        </div>
-
-
-        <hr />
-
-        {# Bouton de soumission #}
-        <div class="field is-horizontal">
-          <div class="field-label">
-            {# Vide pour alignement #}
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <div class="field is-grouped">
-                <div class="control">
-                  <button type="submit" class="button is-primary">
-                    {% if structureId is not null %}
-                      Modifier
-                    {% else %}
-                      Ajouter
-                    {% endif %}
-                  </button>
-                </div>
-              </div>
+              {{ form_widget(formStructure.cp) }}
+              <div class="field-error">{{ form_errors(formStructure.cp) }}</div>
             </div>
           </div>
         </div>
-
-        {{ form_end(formStructure) }}
       </div>
+
+      {# ── Footer ── #}
+      <div class="form-footer">
+        <a href="{{ path('app_admin_structures') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+        <button type="submit" class="btn-primary-custom">
+          <i class="mdi mdi-{{ structureId is not null ? 'content-save' : 'plus-circle' }}"></i>
+          {{ structureId is not null ? 'Enregistrer les modifications' : 'Ajouter la structure' }}
+        </button>
+      </div>
+
+      {{ form_end(formStructure) }}
     </div>
-  </section>
+  </div>
 {% endblock %}

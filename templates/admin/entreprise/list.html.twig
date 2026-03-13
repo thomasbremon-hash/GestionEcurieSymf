@@ -1,99 +1,153 @@
 {% extends 'layouts/base.admin.html.twig' %}
+
 {% block title %}
-  BackOffice | Liste entreprise
+  BackOffice | Liste entreprises
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Entreprise</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_entreprise_new') }}" class="button is-small is-primary">
-          <span>Ajouter</span>
-          <span class="icon"><i class="mdi mdi-plus"></i></span>
-        </a>
-      </div>
-    </div>
-  </section>
-  <section class="section is-main-section">
+  <div class="admin-wrapper--wide">
+    {# ── Flash ── #}
     {% for label, messages in app.flashes(['success', 'danger']) %}
       {% for message in messages %}
-        <div class="notification is-{{ label }}">
-          <button class="delete"></button>
-          {{ message }}
+        <div class="flash {{ label }}">
+          <span><i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i> {{ message }}</span>
+          <button class="flash-close" onclick="this.parentElement.remove()"><i class="mdi mdi-close"></i></button>
         </div>
       {% endfor %}
     {% endfor %}
 
-    <div class="card has-table">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-shopping-outline"></span></span>
-          {{ entreprises|length }} Entreprises
-        </p>
-        <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
-      </header>
-      <div class="card-content">
-        <div class="b-table has-pagination">
-          <div class="table-wrapper has-mobile-cards">
-            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth" id="table">
-              <thead>
-                <tr>
-                  <th>Nom</th>
-                  <th>Rue</th>
-                  <th>Ville</th>
-                  <th>Code postal</th>
-                  <th>Pays</th>
+    {# ── Page top ── #}
+    <div class="page-top">
+      <div>
+        <div class="page-eyebrow">Admin › Gestion</div>
+        <h1 class="page-title">Entreprises <span class="subtitle">{{ entreprises|length }} au total</span></h1>
+      </div>
+      <a href="{{ path('app_admin_entreprise_new') }}" class="btn-primary-custom"><i class="mdi mdi-plus"></i> Ajouter une entreprise</a>
+    </div>
 
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in entreprises %}
-                  <tr>
-                    <td data-label="Description">{{ item.nom }}</td>
-                    <td data-label="Description">{{ item.rue }}</td>
-                    <td data-label="Description">{{ item.ville }}</td>
-                    <td data-label="Description">{{ item.cp }}</td>
-                    <td data-label="Description">{{ item.pays }}</td>
-                    <td class="is-actions-cell">
-                      <div class="buttons is-right">
-                        <a href="{{ path('app_admin_entreprise_show', { id: item.id }) }}" class="button is-small is-info" type="button"><span class="icon"><i class="mdi mdi-eye"></i></span></a>
-                        <a href="{{ path('app_admin_entreprise_update', { id: item.id }) }}" class="button is-small is-primary" type="button"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
-                        <button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <div id="sample-modal-{{ item.id }}" class="modal">
-                    <div class="modal-background jb-modal-close"></div>
-                    <div class="modal-card">
-                      <header class="modal-card-head">
-                        <p class="modal-card-title">Confirmer la suppression</p>
-                        <button class="delete jb-modal-close" aria-label="close"></button>
-                      </header>
-                      <section class="modal-card-body">
-                        <p>Voulez-vous vraiment supprimer l'entreprise ?</p>
-                      </section>
-                      <footer class="modal-card-foot">
-                        <button class="button jb-modal-close">Annuler</button>
-                        <a href="{{ path('app_admin_entreprise_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
-                      </footer>
-                    </div>
-                    <button class="modal-close is-large jb-modal-close" aria-label="close"></button>
-                  </div>
-                {% endfor %}
-              </tbody>
-            </table>
+    {# ── Table card ── #}
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-card-header-left">
+          <div class="table-card-title">
+            <i class="mdi mdi-domain" style="color:var(--accent)"></i>
+            Liste des entreprises
+            <span class="count-badge">{{ entreprises|length }}</span>
           </div>
+          <div class="per-page-wrap">
+            Afficher<select id="per-page-select">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>par page
+          </div>
+        </div>
+        <div class="search-wrap">
+          <i class="mdi mdi-magnify search-icon"></i>
+          <input type="text" id="search-input" placeholder="Rechercher…" />
+        </div>
+      </div>
+
+      <table class="data-table" id="entreprise-table">
+        <thead>
+          <tr>
+            <th>Entreprise</th>
+            <th>Adresse</th>
+            <th>Pays</th>
+            <th>Utilisateurs</th>
+            <th>Chevaux</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="entreprise-tbody">
+          {% for item in entreprises %}
+            <tr data-index="{{ loop.index0 }}">
+              {# Entreprise #}
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar">{{ item.nom|slice(0, 1)|upper }}</div>
+                  <div>
+                    <div class="user-name">{{ item.nom }}</div>
+                    {% if item.siren %}
+                      <div class="user-email">SIREN : {{ item.siren }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+
+              {# Adresse #}
+              <td>
+                <div class="address-text">
+                  {{ item.rue }}<br />
+                  {{ item.cp }} {{ item.ville }}
+                </div>
+              </td>
+
+              {# Pays #}
+              <td>
+                <span style="font-size:0.88rem; color:var(--ink-soft);">{{ item.pays }}</span>
+              </td>
+
+              {# Utilisateurs #}
+              <td>
+                <span class="count-inline">
+                  <i class="mdi mdi-account-multiple" style="color:var(--accent);font-size:0.95rem;"></i>
+                  {{ item.users|length }}
+                </span>
+              </td>
+
+              {# Chevaux #}
+              <td>
+                <span class="count-inline">
+                  <i class="mdi mdi-horseshoe" style="color:var(--green);font-size:0.95rem;"></i>
+                  {{ item.cheval|length }}
+                </span>
+              </td>
+
+              {# Actions #}
+              <td>
+                <div class="action-btns">
+                  <a href="{{ path('app_admin_entreprise_show', { id: item.id }) }}" class="action-btn view" title="Voir"><i class="mdi mdi-eye"></i></a>
+                  <a href="{{ path('app_admin_entreprise_update', { id: item.id }) }}" class="action-btn edit" title="Modifier"><i class="mdi mdi-pencil"></i></a>
+                  <button class="action-btn del" onclick="openModal('modal-{{ item.id }}')" title="Supprimer"><i class="mdi mdi-trash-can"></i></button>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr class="empty-row">
+              <td colspan="6">
+                <i class="mdi mdi-domain-off" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>
+                Aucune entreprise trouvée.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        <div class="pagination-info" id="pagination-info">—</div>
+        <div class="pagination-controls" id="pagination-controls"></div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Modals ── #}
+  {% for item in entreprises %}
+    <div class="modal-overlay" id="modal-{{ item.id }}">
+      <div class="modal-box">
+        <div class="modal-icon">
+          <i class="mdi mdi-trash-can-outline"></i>
+        </div>
+        <div class="modal-title">Supprimer l'entreprise ?</div>
+        <div class="modal-text">
+          Vous êtes sur le point de supprimer <strong>{{ item.nom }}</strong>.<br />Cette action est irréversible.
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
+          <a href="{{ path('app_admin_entreprise_delete', { id: item.id }) }}" class="btn-danger"><i class="mdi mdi-trash-can"></i> Supprimer</a>
         </div>
       </div>
     </div>
-  </section>
+  {% endfor %}
 {% endblock %}

@@ -1,104 +1,89 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Ajouter un produit
+  BackOffice | {{ produitId is not null ? 'Modifier un produit' : 'Ajouter un produit' }}
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>BackOffice</li>
-            <li>Produits</li>
-          </ul>
-        </div>
+  <div class="form-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_produits') }}">Produits</a>
+      <span class="sep">›</span>
+      <span class="current">{{ produitId is not null ? 'Modifier' : 'Ajouter' }}</span>
+    </div>
+
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Produits</div>
+        <h1 class="page-title">{{ produitId is not null ? 'Modifier le produit' : 'Ajouter un produit' }}</h1>
       </div>
     </div>
-  </section>
 
-  <section class="section is-main-section">
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-account-plus"></span></span>
-          {% if produitId is not null %}
-            Modifier
-          {% else %}
-            Ajouter
-          {% endif %}un produit
-        </p>
-      </header>
-      <div class="card-content">
-        {{ form_start(formProduit) }}
+    {# ── Form card ── #}
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="section-icon" style="background:var(--green-light);color:var(--green);">
+          <i class="mdi mdi-shopping-outline"></i>
+        </div>
+        <h2 class="form-card-title">{{ produitId is not null ? 'Modifier les informations' : 'Nouveau produit' }}</h2>
+      </div>
 
-        {# Nom / Prix #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Nom / Prix / Taux TVA</label>
+      {{ form_start(formProduit, { attr: { novalidate: 'novalidate' } }) }}
+
+      <div class="form-body">
+        {# ── Identité ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-tag-outline"></i> Identité
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-2" style="margin-bottom:1.25rem;">
+            <div class="form-field" style="grid-column: 1 / -1;">
               {{ form_label(formProduit.nom) }}
-              <p class="control is-expanded">{{ form_widget(formProduit.nom) }}</p>
-              {{ form_errors(formProduit.nom) }}
+              {{ form_widget(formProduit.nom) }}
+              <div class="field-error">{{ form_errors(formProduit.nom) }}</div>
             </div>
-
-            <div class="field">
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
               {{ form_label(formProduit.prix) }}
-              <p class="control is-expanded">{{ form_widget(formProduit.prix) }}</p>
-              {{ form_errors(formProduit.prix) }}
+              {{ form_widget(formProduit.prix) }}
+              <div class="field-error">{{ form_errors(formProduit.prix) }}</div>
             </div>
-
-            <div class="field">
+            <div class="form-field">
               {{ form_label(formProduit.tauxTVA) }}
-              <p class="control is-expanded">{{ form_widget(formProduit.tauxTVA) }}</p>
-              {{ form_errors(formProduit.tauxTVA) }}
+              {{ form_widget(formProduit.tauxTVA) }}
+              <div class="field-error">{{ form_errors(formProduit.tauxTVA) }}</div>
             </div>
           </div>
         </div>
 
-        {# Description #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Description</label>
+        {# ── Description ── #}
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-text-box-outline"></i> Description
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-1">
+            <div class="form-field">
               {{ form_label(formProduit.description) }}
-              <p class="control is-expanded">{{ form_widget(formProduit.description) }}</p>
-              {{ form_errors(formProduit.description) }}
+              {{ form_widget(formProduit.description) }}
+              <div class="field-error">{{ form_errors(formProduit.description) }}</div>
             </div>
           </div>
         </div>
-
-        <hr />
-
-        {# Bouton de soumission #}
-        <div class="field is-horizontal">
-          <div class="field-label">
-            {# Vide pour alignement #}
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <div class="field is-grouped">
-                <div class="control">
-                  <button type="submit" class="button is-primary">
-                    {% if produitId is not null %}
-                      Modifier
-                    {% else %}
-                      Ajouter
-                    {% endif %}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {{ form_end(formProduit) }}
       </div>
+
+      {# ── Footer ── #}
+      <div class="form-footer">
+        <a href="{{ path('app_admin_produits') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+        <button type="submit" class="btn-primary-custom">
+          <i class="mdi mdi-{{ produitId is not null ? 'content-save' : 'plus-circle' }}"></i>
+          {{ produitId is not null ? 'Enregistrer les modifications' : 'Ajouter le produit' }}
+        </button>
+      </div>
+
+      {{ form_end(formProduit) }}
     </div>
-  </section>
+  </div>
 {% endblock %}

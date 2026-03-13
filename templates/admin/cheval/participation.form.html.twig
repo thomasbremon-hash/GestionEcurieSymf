@@ -1,119 +1,87 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-	BackOffice | Ajouter une participation
+  BackOffice | {{ participationId is not null ? 'Modifier une participation' : 'Ajouter une participation' }}
 {% endblock %}
 
 {% block body %}
-	<section class="section is-title-bar">
-		<div class="level">
-			<div class="level-left">
-				<div class="level-item">
-					<ul>
-						<li>BackOffice</li>
-						<li>Participations</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</section>
+  <div class="form-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_participations') }}">Participations</a>
+      <span class="sep">›</span>
+      <span class="current">{{ participationId is not null ? 'Modifier' : 'Ajouter' }}</span>
+    </div>
 
-	<section class="section is-main-section">
-		<div class="card">
-			<header class="card-header">
-				<p class="card-header-title">
-					<span class="icon">
-						<span class="mdi mdi-horseshoe"></span>
-					</span>
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Participations</div>
+        <h1 class="page-title">{{ participationId is not null ? 'Modifier la participation' : 'Ajouter une participation' }}</h1>
+      </div>
+    </div>
 
-					{% if participationId is not null %}
-						Modifier
-					{% else %}
-						Ajouter
-					{% endif %}
-					une participation
-				</p>
-			</header>
+    {# ── Form card ── #}
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="section-icon" style="background:var(--gold-light);color:var(--gold);">
+          <i class="mdi mdi-trophy"></i>
+        </div>
+        <h2 class="form-card-title">{{ participationId is not null ? 'Modifier les informations' : 'Nouvelle participation' }}</h2>
+      </div>
 
-			<div class="card-content">
-				{{ form_start(formParticipation) }}
+      {{ form_start(formParticipation, { attr: { novalidate: 'novalidate' } }) }}
 
-				{# CHEVAL / COURSE #}
-				<div class="field is-horizontal">
-					<div class="field-label is-normal">
-						<label class="label">Cheval / Course</label>
-					</div>
-					<div class="field-body">
+      <div class="form-body">
+        {# ── Association ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-link-variant"></i> Association
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
+              {{ form_label(formParticipation.cheval) }}
+              {{ form_widget(formParticipation.cheval) }}
+              <div class="field-error">{{ form_errors(formParticipation.cheval) }}</div>
+            </div>
+            <div class="form-field">
+              {{ form_label(formParticipation.course) }}
+              {{ form_widget(formParticipation.course) }}
+              <div class="field-error">{{ form_errors(formParticipation.course) }}</div>
+            </div>
+          </div>
+        </div>
 
-						<div class="field">
-							{{ form_label(formParticipation.cheval) }}
-							<p class="control is-expanded">
-								<div class="select is-fullwidth">
-									{{ form_widget(formParticipation.cheval) }}
-								</div>
-							</p>
-							{{ form_errors(formParticipation.cheval) }}
-						</div>
+        {# ── Résultat ── #}
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-podium"></i> Résultat
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
+              {{ form_label(formParticipation.position) }}
+              {{ form_widget(formParticipation.position) }}
+              <div class="field-error">{{ form_errors(formParticipation.position) }}</div>
+            </div>
+            <div class="form-field">
+              {{ form_label(formParticipation.temps) }}
+              {{ form_widget(formParticipation.temps) }}
+              <div class="field-error">{{ form_errors(formParticipation.temps) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-						<div class="field">
-							{{ form_label(formParticipation.course) }}
-							<p class="control is-expanded">
-								<div class="select is-fullwidth">
-									{{ form_widget(formParticipation.course) }}
-								</div>
-							</p>
-							{{ form_errors(formParticipation.course) }}
-						</div>
+      {# ── Footer ── #}
+      <div class="form-footer">
+        <a href="{{ path('app_admin_participations') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+        <button type="submit" class="btn-primary-custom">
+          <i class="mdi mdi-{{ participationId is not null ? 'content-save' : 'plus-circle' }}"></i>
+          {{ participationId is not null ? 'Enregistrer les modifications' : 'Ajouter la participation' }}
+        </button>
+      </div>
 
-					</div>
-				</div>
-
-				{# POSITION #}
-				<div class="field is-horizontal">
-					<div class="field-label is-normal">
-						<label class="label">Position</label>
-					</div>
-					<div class="field-body">
-
-						<div class="field">
-							{{ form_label(formParticipation.position) }}
-							<p class="control is-expanded">{{ form_widget(formParticipation.position) }}</p>
-							{{ form_errors(formParticipation.position) }}
-						</div>
-
-                        <div class="field">
-							{{ form_label(formParticipation.temps) }}
-							<p class="control is-expanded">{{ form_widget(formParticipation.temps) }}</p>
-							{{ form_errors(formParticipation.temps) }}
-						</div>
-
-					</div>
-				</div>
-
-				<hr/>
-
-				{# BOUTON #}
-				<div class="field is-horizontal">
-					<div class="field-label"></div>
-					<div class="field-body">
-						<div class="field">
-							<div class="buttons">
-								<button type="submit" class="button is-primary">
-
-									{% if participationId %}
-										Modifier
-									{% else %}
-										Ajouter
-									{% endif %}
-
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{{ form_end(formParticipation) }}
-			</div>
-		</div>
-	</section>
+      {{ form_end(formParticipation) }}
+    </div>
+  </div>
 {% endblock %}

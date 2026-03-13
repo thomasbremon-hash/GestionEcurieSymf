@@ -1,137 +1,138 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Ajouter une entreprise
+  BackOffice | {{ entrepriseId is not null ? 'Modifier' : 'Ajouter' }} une entreprise
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>BackOffice</li>
-            <li>Entreprises</li>
-          </ul>
-        </div>
+  <div class="form-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_entreprises') }}">Entreprises</a>
+      <span class="sep">›</span>
+      <span class="current">{{ entrepriseId is not null ? 'Modifier' : 'Ajouter' }}</span>
+    </div>
+
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Entreprises</div>
+        <h1 class="page-title">{{ entrepriseId is not null ? "Modifier l'entreprise" : 'Ajouter une entreprise' }}</h1>
       </div>
     </div>
-  </section>
 
-  <section class="section is-main-section">
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-office-building"></span></span>
-          {% if entrepriseId is not null %}
-            Modifier
-          {% else %}
-            Ajouter
-          {% endif %}une entreprise
-        </p>
-      </header>
-      <div class="card-content">
-        {{ form_start(formEntreprise) }}
+    {# ── Form card ── #}
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="section-icon">
+          <i class="mdi mdi-{{ entrepriseId is not null ? 'office-building-cog' : 'office-building-plus' }}"></i>
+        </div>
+        <h2 class="form-card-title">{{ entrepriseId is not null ? 'Modifier les informations' : 'Nouvelle entreprise' }}</h2>
+      </div>
 
-        {# Nom / Rue #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Nom / Rue</label>
+      {{ form_start(formEntreprise, { attr: { novalidate: 'novalidate' } }) }}
+
+      <div class="form-body">
+        {# ── Identité ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-domain"></i> Identité
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-1">
+            <div class="form-field">
               {{ form_label(formEntreprise.nom) }}
-              <p class="control is-expanded">{{ form_widget(formEntreprise.nom) }}</p>
-              {{ form_errors(formEntreprise.nom) }}
-            </div>
-            <div class="field">
-              {{ form_label(formEntreprise.rue) }}
-              <p class="control is-expanded">{{ form_widget(formEntreprise.rue) }}</p>
-              {{ form_errors(formEntreprise.rue) }}
+              {{ form_widget(formEntreprise.nom) }}
+              <div class="field-error">{{ form_errors(formEntreprise.nom) }}</div>
             </div>
           </div>
         </div>
 
-        {# Ville / Code postal #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Ville / Code postal</label>
+        {# ── Coordonnées ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-phone-outline"></i> Coordonnées
           </div>
-          <div class="field-body">
-            <div class="field">
-              {{ form_label(formEntreprise.ville) }}
-              <p class="control is-expanded">{{ form_widget(formEntreprise.ville) }}</p>
-              {{ form_errors(formEntreprise.ville) }}
-            </div>
-            <div class="field">
-              {{ form_label(formEntreprise.cp) }}
-              <p class="control is-expanded">{{ form_widget(formEntreprise.cp) }}</p>
-              {{ form_errors(formEntreprise.cp) }}
-            </div>
-          </div>
-        </div>
-
-        {# Pays / Téléphone #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Pays / Téléphone</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              {{ form_label(formEntreprise.pays) }}
-              <p class="control is-expanded">{{ form_widget(formEntreprise.pays) }}</p>
-              {{ form_errors(formEntreprise.pays) }}
-            </div>
-            <div class="field">
+          <div class="fields-row cols-1">
+            <div class="form-field">
               {{ form_label(formEntreprise.telephone) }}
-              <p class="control is-expanded">{{ form_widget(formEntreprise.telephone) }}</p>
-              {{ form_errors(formEntreprise.telephone) }}
+              {{ form_widget(formEntreprise.telephone) }}
+              <div class="field-error">{{ form_errors(formEntreprise.telephone) }}</div>
             </div>
           </div>
         </div>
 
-        {# SIREN / SIRET #}
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">SIREN / SIRET</label>
+        {# ── Adresse ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-map-marker-outline"></i> Adresse
           </div>
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-1" style="margin-bottom:1.25rem;">
+            <div class="form-field">
+              {{ form_label(formEntreprise.rue) }}
+              {{ form_widget(formEntreprise.rue) }}
+              <div class="field-error">{{ form_errors(formEntreprise.rue) }}</div>
+            </div>
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
+              {{ form_label(formEntreprise.ville) }}
+              {{ form_widget(formEntreprise.ville) }}
+              <div class="field-error">{{ form_errors(formEntreprise.ville) }}</div>
+            </div>
+            <div class="form-field">
+              {{ form_label(formEntreprise.cp) }}
+              {{ form_widget(formEntreprise.cp) }}
+              <div class="field-error">{{ form_errors(formEntreprise.cp) }}</div>
+            </div>
+          </div>
+          <div class="fields-row cols-1" style="margin-top:1.25rem;">
+            <div class="form-field">
+              {{ form_label(formEntreprise.pays) }}
+              {{ form_widget(formEntreprise.pays) }}
+              <div class="field-error">{{ form_errors(formEntreprise.pays) }}</div>
+            </div>
+          </div>
+        </div>
+
+        {# ── Informations légales ── #}
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-file-document-outline"></i> Informations légales
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
               {{ form_label(formEntreprise.siren) }}
-              <p class="control is-expanded">{{ form_widget(formEntreprise.siren) }}</p>
-              {{ form_errors(formEntreprise.siren) }}
+              {{ form_widget(formEntreprise.siren) }}
+              <div class="field-error">{{ form_errors(formEntreprise.siren) }}</div>
             </div>
-            <div class="field">
+            <div class="form-field">
               {{ form_label(formEntreprise.siret) }}
-              <p class="control is-expanded">{{ form_widget(formEntreprise.siret) }}</p>
-              {{ form_errors(formEntreprise.siret) }}
+              {{ form_widget(formEntreprise.siret) }}
+              <div class="field-error">{{ form_errors(formEntreprise.siret) }}</div>
             </div>
           </div>
-        </div>
-
-        {# Bouton de soumission #}
-        <hr />
-        <div class="field is-horizontal">
-          <div class="field-label"></div>
-          <div class="field-body">
-            <div class="field">
-              <div class="field is-grouped">
-                <div class="control">
-                  <button type="submit" class="button is-primary">
-                    {% if entrepriseId is not null %}
-                      Modifier
-                    {% else %}
-                      Ajouter
-                    {% endif %}
-                  </button>
-                </div>
+          {% if formEntreprise.numTVA is defined %}
+            <div class="fields-row cols-1" style="margin-top:1.25rem;">
+              <div class="form-field">
+                {{ form_label(formEntreprise.numTVA) }}
+                {{ form_widget(formEntreprise.numTVA) }}
+                <div class="field-error">{{ form_errors(formEntreprise.numTVA) }}</div>
               </div>
             </div>
-          </div>
+          {% endif %}
         </div>
-
-        {{ form_end(formEntreprise) }}
       </div>
+
+      {# ── Footer ── #}
+      <div class="form-footer">
+        <a href="{{ path('app_admin_entreprises') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+        <button type="submit" class="btn-primary-custom">
+          <i class="mdi mdi-{{ entrepriseId is not null ? 'content-save' : 'office-building-plus' }}"></i>
+          {{ entrepriseId is not null ? 'Enregistrer les modifications' : "Créer l'entreprise" }}
+        </button>
+      </div>
+
+      {{ form_end(formEntreprise) }}
     </div>
-  </section>
+  </div>
 {% endblock %}

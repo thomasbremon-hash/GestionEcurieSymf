@@ -77,9 +77,7 @@ class DeplacementType extends AbstractType
                 'choice_label' => 'nom', // adapte selon ton entity
                 'label' => 'Structure',
                 'placeholder' => 'Sélectionner une structure',
-                'attr' => [
-                    'class' => 'select'
-                ],
+
                 'constraints' => [
                     new NotBlank(['message' => 'La structure est obligatoire'])
                 ]
@@ -91,9 +89,7 @@ class DeplacementType extends AbstractType
                 'choice_label' => 'nom', // adapte selon ton entity
                 'label' => 'Entreprise',
                 'placeholder' => 'Sélectionner une entreprise',
-                'attr' => [
-                    'class' => 'select'
-                ],
+
                 'constraints' => [
                     new NotBlank(['message' => "L'entreprise est obligatoire"])
                 ]

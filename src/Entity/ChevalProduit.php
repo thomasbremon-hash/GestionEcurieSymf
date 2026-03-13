@@ -23,8 +23,8 @@ class ChevalProduit
     #[ORM\ManyToOne(inversedBy: 'chevalProduits')]
     private ?MoisDeGestion $moisDeGestion = null;
 
-    #[ORM\Column]
-    private ?float $quantite = null;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $quantite = null;
 
     #[ORM\Column]
     private ?float $prixUnitaire = null;
@@ -76,12 +76,12 @@ class ChevalProduit
         return $this;
     }
 
-    public function getQuantite(): ?float
+    public function getQuantite(): ?int
     {
         return $this->quantite;
     }
 
-    public function setQuantite(float $quantite): static
+    public function setQuantite(?int $quantite): static
     {
         $this->quantite = $quantite;
 

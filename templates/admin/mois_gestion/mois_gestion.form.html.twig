@@ -1,127 +1,116 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-	BackOffice | Gestion Mensuelle
+  BackOffice | {{ moisDeGestionId is not null ? 'Modifier' : 'Ajouter' }} un mois de gestion
 {% endblock %}
 
 {% block body %}
-	<section class="section is-title-bar">
-		<div class="level">
-			<div class="level-left">
-				<div class="level-item">
-					<ul>
-						<li>Admin</li>
-						<li>Mois de gestion</li>
-					</ul>
-				</div>
-			</div>
-			<div class="level-right">
-				<a href="{{ path('app_admin_mois_gestion') }}" class="button is-small is-primary">
-					<span class="icon">
-						<i class="mdi mdi-arrow-left"></i>
-					</span>
-					<span>Retour</span>
-				</a>
-			</div>
-		</div>
-	</section>
+  <div class="form-wrapper form-wrapper--wide">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_mois_gestion') }}">Gestion mensuelle</a>
+      <span class="sep">›</span>
+      <span class="current">{{ moisDeGestionId is not null ? 'Modifier' : 'Ajouter' }}</span>
+    </div>
 
-	<section class="section is-main-section">
-		<div class="card">
-			<header class="card-header">
-				<p class="card-header-title">
-					<span class="icon">
-						<i class="mdi mdi-calendar-month"></i>
-					</span>
-					{% if moisDeGestionId is not null %}
-						Modifier un mois
-					{% else %}
-						Ajouter un mois
-					{% endif %}
-				</p>
-			</header>
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Gestion financière</div>
+        <h1 class="page-title">{{ moisDeGestionId is not null ? 'Modifier le mois de gestion' : 'Ajouter un mois de gestion' }}</h1>
+      </div>
+    </div>
 
-			<div class="card-content">
-				{{ form_start(formMoisDeGestion) }}
+    {{ form_start(formMoisDeGestion, { attr: { novalidate: 'novalidate' } }) }}
 
-				{# Informations du mois #}
-				<div class="columns">
-					<div class="column is-one-quarter">
-						<div class="field">{{ form_label(formMoisDeGestion.mois) }}
-							{{ form_widget(formMoisDeGestion.mois) }}
-							{{ form_errors(formMoisDeGestion.mois) }}</div>
-					</div>
+    {# ── Carte période ── #}
+    <div class="form-card" style="margin-bottom:1.5rem;">
+      <div class="form-card-header">
+        <div class="section-icon">
+          <i class="mdi mdi-calendar-month"></i>
+        </div>
+        <h2 class="form-card-title">Période</h2>
+      </div>
+      <div class="form-body">
+        <div class="fields-row cols-2" style="max-width:480px;">
+          <div class="form-field">
+            {{ form_label(formMoisDeGestion.mois) }}
+            {{ form_widget(formMoisDeGestion.mois) }}
+            <div class="field-error">{{ form_errors(formMoisDeGestion.mois) }}</div>
+          </div>
+          <div class="form-field">
+            {{ form_label(formMoisDeGestion.annee) }}
+            {{ form_widget(formMoisDeGestion.annee) }}
+            <div class="field-error">{{ form_errors(formMoisDeGestion.annee) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-					<div class="column is-one-quarter">
-						<div class="field">{{ form_label(formMoisDeGestion.annee) }}
-							{{ form_widget(formMoisDeGestion.annee) }}
-							{{ form_errors(formMoisDeGestion.annee) }}</div>
-					</div>
-				</div>
+    {# ── Carte tableau chevaux x produits ── #}
+    <div class="form-card" style="margin-bottom:1.5rem;">
+      <div class="form-card-header">
+        <div class="section-icon" style="background:var(--green-light);color:var(--green);">
+          <i class="mdi mdi-horseshoe"></i>
+        </div>
+        <h2 class="form-card-title">Chevaux & Produits</h2>
+        <span class="count-badge" style="margin-left:auto;">{{ chevaux|length }} {{ (chevaux|length) > 1 ? 'Chevaux' : 'Cheval' }}</span>
+      </div>
 
-				<hr/>
+      <div style="overflow-x:auto;">
+        <table class="mgestion-table">
+          <thead>
+            <tr>
+              <th class="col-cheval">Cheval</th>
+              {% for produit in produits %}
+                <th class="col-produit">
+                  <span class="produit-nom">{{ produit.nom }}</span>
+                  <span class="produit-prix">{{ produit.prix|number_format(2, '.', ',') }} €</span>
+                </th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for cheval in chevaux %}
+              <tr>
+                <td class="col-cheval">
+                  <div class="cheval-cell">
+                    <div class="user-avatar" style="width:30px;height:30px;font-size:0.72rem;background:var(--green);flex-shrink:0;">{{ cheval.nom|slice(0, 1)|upper }}</div>
+                    <span class="cheval-nom">{{ cheval.nom }}</span>
+                  </div>
+                </td>
+                {% for produit in produits %}
+                  {% set cp_field = null %}
+                  {% for cp in formMoisDeGestion.chevalProduits %}
+                    {% if cp.vars.data.cheval.id == cheval.id and cp.vars.data.produit.id == produit.id %}
+                      {% set cp_field = cp %}
+                    {% endif %}
+                  {% endfor %}
+                  <td class="col-qty">
+                    {% if cp_field %}
+                      {{ form_widget(cp_field.quantite) }}
+                      <div class="field-error">{{ form_errors(cp_field.quantite) }}</div>
+                    {% else %}
+                      <input type="number" value="0" min="0" step="1" />
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-				{# Tableau chevaux x produits #}
-				<div class="table-container">
-					<table class="table is-fullwidth is-striped is-hoverable">
-						<thead>
-							<tr>
-								<th>Cheval</th>
-								{% for produit in produits %}
-									<th>
-										{{ produit.nom }}<br/>
-										<small>{{ produit.prix|number_format(2, '.', ',') }}
-											€</small>
-									</th>
-								{% endfor %}
-							</tr>
-						</thead>
-						<tbody>
-							{% for cheval in chevaux %}
-								<tr>
-									<td>{{ cheval.nom }}</td>
-									{% for produit in produits %}
-										{% set cp_field = null %}
-										{% for cp in formMoisDeGestion.chevalProduits %}
-											{% if cp.vars.data.cheval.id == cheval.id and cp.vars.data.produit.id == produit.id %}
-												{% set cp_field = cp %}
-											{% endif %}
-										{% endfor %}
+    {# ── Footer ── #}
+    <div class="form-footer" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem 2rem;">
+      <a href="{{ path('app_admin_mois_gestion') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+      <button type="submit" class="btn-primary-custom">
+        <i class="mdi mdi-{{ moisDeGestionId is not null ? 'content-save' : 'calendar-plus' }}"></i>
+        {{ moisDeGestionId is not null ? 'Enregistrer les modifications' : 'Créer le mois de gestion' }}
+      </button>
+    </div>
 
-										<td>
-											{% if cp_field %}
-												{{ form_widget(cp_field.quantite) }}
-												{{ form_errors(cp_field.quantite) }}
-											{% else %}
-												{# Ce else ne devrait jamais arriver si ton contrôleur ajoute toutes les lignes #}
-												<input type="number" value="0" min="0" step="1" class="input is-small"/>
-											{% endif %}
-										</td>
-									{% endfor %}
-								</tr>
-							{% endfor %}
-
-						</tbody>
-					</table>
-				</div>
-
-				<hr/>
-
-				{# Bouton de soumission #}
-				<div class="field">
-					<div class="control">
-						<button type="submit" class="button is-primary">
-							{% if moisDeGestionId is not null %}
-								Modifier
-							{% else %}
-								Ajouter
-							{% endif %}
-						</button>
-					</div>
-				</div>
-
-				{{ form_end(formMoisDeGestion) }}
-			</div>
-		</div>
-	</section>
+    {{ form_end(formMoisDeGestion) }}
+  </div>
 {% endblock %}

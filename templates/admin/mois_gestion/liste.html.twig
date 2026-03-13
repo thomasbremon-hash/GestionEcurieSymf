@@ -1,122 +1,151 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Gestion Mensuelle
+  BackOffice | Gestion mensuelle
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>Admin</li>
-            <li>Mois de gestion</li>
-          </ul>
-        </div>
-      </div>
-      <div class="level-right">
-        <a href="{{ path('app_admin_mois_gestion_new') }}" class="button is-small is-primary">
-          <span>Ajouter</span>
-          <span class="icon"><i class="mdi mdi-plus"></i></span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section is-main-section">
+  <div class="admin-wrapper--wide">
+    {# ── Flash ── #}
     {% for label, messages in app.flashes(['success', 'danger']) %}
       {% for message in messages %}
-        <div class="notification is-{{ label }}">
-          <button class="delete"></button>
-          {{ message }}
+        <div class="flash {{ label }}">
+          <span><i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i> {{ message }}</span>
+          <button class="flash-close" onclick="this.parentElement.remove()"><i class="mdi mdi-close"></i></button>
         </div>
       {% endfor %}
     {% endfor %}
 
-    <div class="card has-table">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><span class="mdi mdi-calendar-month-outline"></span></span>
-          {{ moisGestion|length }} mois de gestion
-        </p>
-        <a href="#" class="card-header-icon"><span class="icon"><i class="mdi mdi-reload"></i></span></a>
-      </header>
+    {# ── Page top ── #}
+    <div class="page-top">
+      <div>
+        <div class="page-eyebrow">Admin › Gestion financière</div>
+        <h1 class="page-title">Gestion mensuelle <span class="subtitle">{{ moisGestion|length }} relevés</span></h1>
+      </div>
+      <a href="{{ path('app_admin_mois_gestion_new') }}" class="btn-primary-custom"><i class="mdi mdi-plus"></i> Ajouter un mois</a>
+    </div>
 
-      <div class="card-content">
-        <div class="b-table has-pagination">
-          <div class="table-wrapper has-mobile-cards">
-            <table class="table is-fullwidth is-striped is-hoverable is-fullwidth" id="table">
-              <thead>
-                <tr>
-                  <th class="has-text-left">Mois / Année</th>
-                  <th class="has-text-left">Chevaux</th>
-                  <th class="has-text-left">Total général</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in moisGestion %}
-                  <tr>
-                    <td data-label="Mois / Année" class="has-text-left">
-                      <span class="tag is-info">{{ '%02d'|format(item.mois) }}/{{ item.annee }}</span>
-                    </td>
-
-                    <td data-label="Chevaux" class="has-text-left">
-                      {% set chevaux_ids = [] %}
-                      {% for cp in item.chevalProduits %}
-                        {% if cp.cheval.id not in chevaux_ids %}
-                          {% set chevaux_ids = chevaux_ids|merge([cp.cheval.id]) %}
-                        {% endif %}
-                      {% endfor %}
-                      <span class="tag is-info">{{ chevaux_ids|length }}</span>
-                    </td>
-
-                    <td data-label="Total général" class="has-text-left">
-                      {% set total = 0 %}
-                      {% for cp in item.chevalProduits %}
-                        {% set total = total + cp.total %}
-                      {% endfor %}
-                      <span class="tag is-success">{{ total|number_format(2, ',', ' ') }} €</span>
-                    </td>
-
-                    <td class="is-actions-cell">
-                      <div class="buttons is-right">
-                        <a href="{{ path('app_admin_mois_gestion_show', { id: item.id }) }}" class="button is-small is-info"><span class="icon"><i class="mdi mdi-eye"></i></span></a>
-                        <a href="{{ path('app_admin_mois_gestion_update', { id: item.id }) }}" class="button is-small is-primary"><span class="icon"><i class="mdi mdi-pencil"></i></span></a>
-
-                        {# Bouton suppression #}
-                        <button class="button is-small is-danger jb-modal" data-target="modal-delete-{{ item.id }}"><span class="icon"><i class="mdi mdi-trash-can"></i></span></button>
-                      </div>
-                    </td>
-
-                    {# Modal suppression #}
-                    <div id="modal-delete-{{ item.id }}" class="modal">
-                      <div class="modal-background jb-modal-close"></div>
-                      <div class="modal-card">
-                        <header class="modal-card-head">
-                          <p class="modal-card-title">Confirmer la suppression</p>
-                          <button class="delete jb-modal-close"></button>
-                        </header>
-                        <section class="modal-card-body">
-                          <p>
-                            Voulez-vous vraiment supprimer le mois de gestion
-                            <strong>{{ item.mois }}/{{ item.annee }}</strong> ?
-                          </p>
-                        </section>
-                        <footer class="modal-card-foot">
-                          <button class="button jb-modal-close">Annuler</button>
-                          <a href="{{ path('app_admin_mois_gestion_delete', { id: item.id }) }}" class="button is-danger jb-modal-close">Supprimer</a>
-                        </footer>
-                      </div>
-                    </div>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+    {# ── Table card ── #}
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-card-header-left">
+          <div class="table-card-title">
+            <i class="mdi mdi-calendar-month-outline" style="color:var(--accent)"></i>
+            Relevés mensuels
+            <span class="count-badge">{{ moisGestion|length }}</span>
           </div>
+          <div class="per-page-wrap">
+            Afficher<select id="per-page-select">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>par page
+          </div>
+        </div>
+        <div class="search-wrap">
+          <i class="mdi mdi-magnify search-icon"></i>
+          <input type="text" id="search-input" placeholder="Rechercher…" />
+        </div>
+      </div>
+
+      <table class="data-table" id="mois-table">
+        <thead>
+          <tr>
+            <th>Période</th>
+            <th>Chevaux suivis</th>
+            <th>Total général</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="mois-tbody">
+          {% for item in moisGestion %}
+            {# Calculs Twig #}
+            {% set chevaux_ids = [] %}
+            {% for cp in item.chevalProduits %}
+              {% if cp.cheval.id not in chevaux_ids %}
+                {% set chevaux_ids = chevaux_ids|merge([cp.cheval.id]) %}
+              {% endif %}
+            {% endfor %}
+
+            {% set total = 0 %}
+            {% for cp in item.chevalProduits %}
+              {% set total = total + cp.total %}
+            {% endfor %}
+
+            <tr data-index="{{ loop.index0 }}">
+              {# Période #}
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:var(--blue);border-radius:var(--radius-sm);">
+                    <i class="mdi mdi-calendar" style="font-size:1rem;"></i>
+                  </div>
+                  <div>
+                    <div class="user-name">{{ '%02d'|format(item.mois) }} / {{ item.annee }}</div>
+                    <div class="user-email">{{ item.chevalProduits|length }} ligne{{ (item.chevalProduits|length) > 1 ? 's' }}</div>
+                  </div>
+                </div>
+              </td>
+
+              {# Chevaux #}
+              <td>
+                <span class="count-inline">
+                  <i class="mdi mdi-horseshoe" style="color:var(--green);font-size:1rem;"></i>
+                  <strong>{{ chevaux_ids|length }}</strong>
+                  {{ (chevaux_ids|length) > 1 ? 'Chevaux' : 'Cheval' }}
+                </span>
+              </td>
+
+              {# Total #}
+              <td>
+                <span class="amount-cell">{{ total|number_format(2, ',', ' ') }} €</span>
+              </td>
+
+              {# Actions #}
+              <td>
+                <div class="action-btns">
+                  <a href="{{ path('app_admin_mois_gestion_show', { id: item.id }) }}" class="action-btn view" title="Voir"><i class="mdi mdi-eye"></i></a>
+                  <a href="{{ path('app_admin_mois_gestion_update', { id: item.id }) }}" class="action-btn edit" title="Modifier"><i class="mdi mdi-pencil"></i></a>
+                  <button class="action-btn del" onclick="openModal('modal-{{ item.id }}')" title="Supprimer"><i class="mdi mdi-trash-can"></i></button>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr class="empty-row">
+              <td colspan="4">
+                <i class="mdi mdi-calendar-remove" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>
+                Aucun mois de gestion trouvé.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        <div class="pagination-info" id="pagination-info">—</div>
+        <div class="pagination-controls" id="pagination-controls"></div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Modals ── #}
+  {% for item in moisGestion %}
+    <div class="modal-overlay" id="modal-{{ item.id }}">
+      <div class="modal-box">
+        <div class="modal-icon">
+          <i class="mdi mdi-trash-can-outline"></i>
+        </div>
+        <div class="modal-title">Supprimer ce relevé ?</div>
+        <div class="modal-text">
+          Vous êtes sur le point de supprimer le mois de gestion
+          <strong>{{ '%02d'|format(item.mois) }}/{{ item.annee }}</strong>.<br />
+          Cette action est irréversible.
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
+          <a href="{{ path('app_admin_mois_gestion_delete', { id: item.id }) }}" class="btn-danger"><i class="mdi mdi-trash-can"></i> Supprimer</a>
         </div>
       </div>
     </div>
-  </section>
+  {% endfor %}
 {% endblock %}

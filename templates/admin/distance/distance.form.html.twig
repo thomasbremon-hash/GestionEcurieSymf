@@ -1,112 +1,85 @@
 {% extends 'layouts/base.admin.html.twig' %}
 
 {% block title %}
-  BackOffice | Distance
+  BackOffice | {{ distanceId is not null ? 'Modifier une distance' : 'Ajouter une distance' }}
 {% endblock %}
 
 {% block body %}
-  <section class="section is-title-bar">
-    <div class="level">
-      <div class="level-left">
-        <div class="level-item">
-          <ul>
-            <li>BackOffice</li>
-            <li>Distances</li>
-          </ul>
-        </div>
+  <div class="form-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_distances') }}">Distances</a>
+      <span class="sep">›</span>
+      <span class="current">{{ distanceId is not null ? 'Modifier' : 'Ajouter' }}</span>
+    </div>
+
+    {# ── Page top ── #}
+    <div class="page-top" style="margin-bottom:1.5rem;">
+      <div>
+        <div class="page-eyebrow">Admin › Distances</div>
+        <h1 class="page-title">{{ distanceId is not null ? 'Modifier la distance' : 'Ajouter une distance' }}</h1>
       </div>
     </div>
-  </section>
 
-  <section class="section is-main-section">
-    <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          <span class="icon"><i class="mdi mdi-map-marker-distance"></i></span>
+    {# ── Form card ── #}
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="section-icon" style="background:var(--blue-light);color:var(--blue);">
+          <i class="mdi mdi-map-marker-distance"></i>
+        </div>
+        <h2 class="form-card-title">{{ distanceId is not null ? 'Modifier les informations' : 'Nouvelle distance' }}</h2>
+      </div>
 
-          {% if distanceId %}
-            Modifier une distance
-          {% else %}
-            Ajouter une distance
-          {% endif %}
-        </p>
-      </header>
+      {{ form_start(formDistance, { attr: { novalidate: 'novalidate' } }) }}
 
-      <div class="card-content">
-        {{ form_start(formDistance) }}
-
-        {# ENTREPRISE / STRUCTURE #}
-
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Localisation</label>
+      <div class="form-body">
+        {# ── Localisation ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-domain"></i> Localisation
           </div>
-
-          <div class="field-body">
-            <div class="field">
+          <div class="fields-row cols-2">
+            <div class="form-field">
               {{ form_label(formDistance.entreprise) }}
-
-              <div class="control">
-                <div class="select is-fullwidth">{{ form_widget(formDistance.entreprise) }}</div>
-              </div>
-
-              {{ form_errors(formDistance.entreprise) }}
+              {{ form_widget(formDistance.entreprise) }}
+              <div class="field-error">{{ form_errors(formDistance.entreprise) }}</div>
             </div>
-
-            <div class="field">
+            <div class="form-field">
               {{ form_label(formDistance.structure) }}
-
-              <div class="control">
-                <div class="select is-fullwidth">{{ form_widget(formDistance.structure) }}</div>
-              </div>
-
-              {{ form_errors(formDistance.structure) }}
+              {{ form_widget(formDistance.structure) }}
+              <div class="field-error">{{ form_errors(formDistance.structure) }}</div>
             </div>
           </div>
         </div>
 
-        {# DISTANCE MANUELLE #}
-
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Distance</label>
+        {# ── Distance ── #}
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-map-marker-distance"></i> Distance
           </div>
-
-          <div class="field-body">
-            <div class="field">
-              <div class="control">{{ form_widget(formDistance.distance) }}</div>
-
-              {{ form_errors(formDistance.distance) }}
-
-              <p class="help">Distance en kilomètres</p>
+          <div class="fields-row cols-2">
+            <div class="form-field">
+              {{ form_label(formDistance.distance) }}
+              {{ form_widget(formDistance.distance) }}
+              <div class="field-error">{{ form_errors(formDistance.distance) }}</div>
+              <p style="font-size:0.78rem;color:var(--ink-muted);margin-top:0.35rem;">
+                <i class="mdi mdi-information-outline"></i> Distance en kilomètres
+              </p>
             </div>
           </div>
         </div>
-
-        <hr />
-
-        {# BOUTON #}
-
-        <div class="field is-horizontal">
-          <div class="field-label"></div>
-
-          <div class="field-body">
-            <div class="field">
-              <div class="control">
-                <button type="submit" class="button is-primary">
-                  {% if distanceId %}
-                    Modifier
-                  {% else %}
-                    Ajouter
-                  {% endif %}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {{ form_end(formDistance) }}
       </div>
+
+      {# ── Footer ── #}
+      <div class="form-footer">
+        <a href="{{ path('app_admin_distances') }}" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Annuler</a>
+        <button type="submit" class="btn-primary-custom">
+          <i class="mdi mdi-{{ distanceId is not null ? 'content-save' : 'plus-circle' }}"></i>
+          {{ distanceId is not null ? 'Enregistrer les modifications' : 'Ajouter la distance' }}
+        </button>
+      </div>
+
+      {{ form_end(formDistance) }}
     </div>
-  </section>
+  </div>
 {% endblock %}

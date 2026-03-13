@@ -28,12 +28,6 @@ class MoisDeGestion
     private Collection $chevalProduits;
 
     /**
-     * @var Collection<int, FacturationEntreprise>
-     */
-    #[ORM\OneToMany(targetEntity: FacturationEntreprise::class, mappedBy: 'moisDeGestion')]
-    private Collection $facturationEntreprises;
-
-    /**
      * @var Collection<int, FacturationUtilisateur>
      */
     #[ORM\OneToMany(targetEntity: FacturationUtilisateur::class, mappedBy: 'moisDeGestion')]
@@ -42,7 +36,6 @@ class MoisDeGestion
     public function __construct()
     {
         $this->chevalProduits = new ArrayCollection();
-        $this->facturationEntreprises = new ArrayCollection();
         $this->facturationUtilisateurs = new ArrayCollection();
     }
 
@@ -100,36 +93,6 @@ class MoisDeGestion
             // set the owning side to null (unless already changed)
             if ($chevalProduit->getMoisDeGestion() === $this) {
                 $chevalProduit->setMoisDeGestion(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, FacturationEntreprise>
-     */
-    public function getFacturationEntreprises(): Collection
-    {
-        return $this->facturationEntreprises;
-    }
-
-    public function addFacturationEntreprise(FacturationEntreprise $facturationEntreprise): static
-    {
-        if (!$this->facturationEntreprises->contains($facturationEntreprise)) {
-            $this->facturationEntreprises->add($facturationEntreprise);
-            $facturationEntreprise->setMoisDeGestion($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFacturationEntreprise(FacturationEntreprise $facturationEntreprise): static
-    {
-        if ($this->facturationEntreprises->removeElement($facturationEntreprise)) {
-            // set the owning side to null (unless already changed)
-            if ($facturationEntreprise->getMoisDeGestion() === $this) {
-                $facturationEntreprise->setMoisDeGestion(null);
             }
         }
 

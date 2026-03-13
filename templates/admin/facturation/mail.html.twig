@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Votre facture {{ facture.numFacture }}</title>
+    <style>
+      @media only screen and (max-width: 620px) {
+        .wrapper {
+          width: 100% !important;
+          padding: 12px !important;
+        }
+        .content {
+          padding: 24px 20px !important;
+        }
+        .btn {
+          width: 100% !important;
+          text-align: center !important;
+        }
+        .kpi-cell {
+          display: block !important;
+          width: 100% !important;
+          padding: 10px 0 !important;
+        }
+      }
+      a {
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body style="margin:0;padding:0;background:#f0ede8;font-family:'Helvetica Neue',Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding:32px 12px;">
+          <table class="wrapper" width="580" cellpadding="0" cellspacing="0" style="max-width:580px;width:100%;border-radius:16px;overflow:hidden;
+                    box-shadow:0 4px 24px rgba(26,23,20,0.10);">
+            {# ── Top accent bar ── #}
+            <tr>
+              <td style="background:#1f2937;height:4px;font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+
+            {# ── Header ── #}
+            <tr>
+              <td style="background:#1f2937;padding:28px 36px 24px;text-align:left;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="vertical-align:middle;">
+                      <div style="font-size:11px;font-weight:700;text-transform:uppercase;
+                              letter-spacing:0.12em;color:rgba(255,255,255,0.45);
+                              margin-bottom:4px;">Gestion Écurie</div>
+                      <div style="font-size:20px;font-weight:800;color:#ffffff;
+                              letter-spacing:-0.03em;line-height:1.1;">Facture {{ facture.numFacture }}</div>
+                      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px;">Période {{ '%02d'|format(facture.moisDeGestion.mois) }}/{{ facture.moisDeGestion.annee }}</div>
+                    </td>
+                    <td style="vertical-align:middle;text-align:right;">
+                      {% if facture.statut != 'impayee' %}
+                        <span style="background:#d1fae5;color:#065f46;font-size:10px;font-weight:700;
+                                 text-transform:uppercase;letter-spacing:0.08em;
+                                 padding:4px 10px;border-radius:20px;">✓ Réglée</span>
+                      {% else %}
+                        <span style="background:#fee2e2;color:#991b1b;font-size:10px;font-weight:700;
+                                 text-transform:uppercase;letter-spacing:0.08em;
+                                 padding:4px 10px;border-radius:20px;">⏱ En attente</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            {# ── KPI montant ── #}
+            <tr>
+              <td style="background:#f7f6f3;padding:20px 36px;border-bottom:1px solid #e8e5e0;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td class="kpi-cell" style="width:50%;padding-right:12px;vertical-align:top;">
+                      <div style="font-size:10px;font-weight:700;text-transform:uppercase;
+                              letter-spacing:0.1em;color:#a09b96;margin-bottom:3px;">Montant total TTC</div>
+                      <div style="font-size:26px;font-weight:800;color:#1f2937;letter-spacing:-0.04em;line-height:1;">{{ total|number_format(2, ',', ' ') }} €</div>
+                    </td>
+                    <td class="kpi-cell" style="width:50%;border-left:1px solid #e8e5e0;
+                            padding-left:20px;vertical-align:top;">
+                      <div style="font-size:10px;font-weight:700;text-transform:uppercase;
+                              letter-spacing:0.1em;color:#a09b96;margin-bottom:3px;">Échéance</div>
+                      <div style="font-size:14px;font-weight:700;color:#1a1714;">30 jours</div>
+                      <div style="font-size:11px;color:#6b6560;margin-top:2px;">Réf. {{ facture.numFacture }}</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            {# ── Corps ── #}
+            <tr>
+              <td class="content" style="background:#ffffff;padding:30px 36px;
+                                     color:#1a1714;font-size:14px;line-height:1.7;">
+                <p style="margin:0 0 14px;">
+                  Bonjour <strong>{{ facture.utilisateur.prenom }}</strong>,
+                </p>
+
+                <p style="margin:0 0 14px;color:#6b6560;">
+                  Veuillez trouver ci-joint votre facture pour la période
+                  <strong style="color:#1a1714;">{{ '%02d'|format(facture.moisDeGestion.mois) }}/{{ facture.moisDeGestion.annee }}</strong>. Le document PDF est joint à cet email.
+                </p>
+
+                {% if facture.statut == 'impayee' %}
+                  {# Bloc alerte impayée #}
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+                    <tr>
+                      <td style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;
+                             padding:14px 16px;">
+                        <div style="font-size:12px;font-weight:700;color:#c2410c;margin-bottom:3px;">Règlement en attente</div>
+                        <div style="font-size:12px;color:#9a3412;line-height:1.5;">
+                          Cette facture de <strong>{{ total|number_format(2, ',', ' ') }} €</strong>
+                          est en attente de règlement. Merci de nous contacter si vous avez la moindre question.
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                {% endif %}
+
+                <p style="margin:0 0 14px;color:#6b6560;">Pour toute question concernant cette facture, n'hésitez pas à nous contacter directement par retour d'email.</p>
+
+                <p style="margin:0;color:#6b6560;">
+                  Cordialement,<br />
+                  <strong style="color:#1a1714;">L'équipe Gestion Écurie</strong>
+                </p>
+              </td>
+            </tr>
+
+            {# ── Séparateur ── #}
+            <tr>
+              <td style="background:#1f2937;height:2px;font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+
+            {# ── Footer ── #}
+            <tr>
+              <td style="background:#f7f6f3;padding:18px 36px;text-align:center;">
+                <div style="font-size:11px;color:#a09b96;line-height:1.7;">
+                  © {{ 'now'|date('Y') }} Gestion Écurie — Tous droits réservés<br />
+                  <span style="font-size:10px;">Vous recevez cet email car vous êtes client de notre écurie.</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

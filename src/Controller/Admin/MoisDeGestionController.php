@@ -53,9 +53,14 @@ final class MoisDeGestionController extends AbstractController
         }
 
         $chevaux = $chevalRepo->findAll();
-        $produits = $produitRepo->findAll();
 
-        // 🔹 Génération ChevalProduit pour chaque cheval x produit (uniquement nouveau mois)
+        $produits = $produitRepo->createQueryBuilder('p')
+            ->where('p.nom != :nom')
+            ->setParameter('nom', 'Déplacement')
+            ->getQuery()
+            ->getResult();
+
+        // Génération ChevalProduit pour chaque cheval x produit (uniquement nouveau mois)
         if ($moisDeGestion->getId() === null) {
             foreach ($chevaux as $cheval) {
                 foreach ($produits as $produit) {
@@ -63,7 +68,7 @@ final class MoisDeGestionController extends AbstractController
                     $cp->setCheval($cheval);
                     $cp->setProduit($produit);
                     $cp->setMoisDeGestion($moisDeGestion);
-                    $cp->setQuantite(0);
+                    $cp->setQuantite(null);
                     $cp->setPrixUnitaire($produit->getPrix());
                     $cp->setTotal(0);
 
@@ -73,7 +78,7 @@ final class MoisDeGestionController extends AbstractController
             }
         }
 
-        // 🔹 Récupérer le formulaire
+        // Récupérer le formulaire
         $form = $this->createForm(MoisDeGestionType::class, $moisDeGestion);
         $form->handleRequest($request);
 
@@ -82,7 +87,7 @@ final class MoisDeGestionController extends AbstractController
             foreach ($moisDeGestion->getChevalProduits() as $ligne) {
                 $prixUnitaire = $ligne->getProduit()->getPrix();
                 $ligne->setPrixUnitaire($prixUnitaire);
-                $ligne->setTotal($prixUnitaire * $ligne->getQuantite());
+                $ligne->setTotal($prixUnitaire * ($ligne->getQuantite() ?? 0));
             }
 
             $this->em->persist($moisDeGestion);
@@ -98,9 +103,9 @@ final class MoisDeGestionController extends AbstractController
 
         return $this->render('admin/mois_gestion/mois_gestion.form.html.twig', [
             'formMoisDeGestion' => $form,
-            'moisDeGestionId' => $moisDeGestion->getId(),
-            'chevaux' => $chevaux,
-            'produits' => $produits,
+            'moisDeGestionId'   => $moisDeGestion->getId(),
+            'chevaux'           => $chevaux,
+            'produits'          => $produits,
         ]);
     }
 
