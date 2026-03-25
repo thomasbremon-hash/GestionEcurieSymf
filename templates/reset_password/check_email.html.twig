@@ -1,11 +1,44 @@
 {% extends 'layouts/base.html.twig' %}
 
-{% block title %}Password Reset Email Sent{% endblock %}
+{% block title %}
+	Email envoyé — Gestion Écurie
+{% endblock %}
 
 {% block body %}
-    <p>
-        If an account matching your email exists, then an email was just sent that contains a link that you can use to reset your password.
-        This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
-    </p>
-    <p>If you don't receive an email please check your spam folder or <a href="{{ path('app_forgot_password_request') }}">try again</a>.</p>
+	<div class="login-page">
+		<div class="login-box anim-fade-up">
+
+			<div class="login-header">
+				<div class="login-icon">
+					<i class="mdi mdi-email-check-outline"></i>
+				</div>
+				<h1 class="login-title">Vérifiez vos emails</h1>
+				<p class="login-subtitle">Un lien de réinitialisation vous a été envoyé</p>
+			</div>
+
+			<div class="login-card">
+				<div style="text-align:center; padding: 8px 0 16px;">
+					<p style="color: var(--text-muted, #6b6560); font-size: 14px; line-height: 1.75; margin: 0 0 12px;">
+						Si un compte correspond à votre adresse email, vous recevrez dans quelques instants
+						            un lien valable
+						<strong>{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</strong>.
+					</p>
+					<p style="color: var(--text-muted, #6b6560); font-size: 13px; margin: 0;">
+						Vous ne recevez rien ? Vérifiez vos spams ou
+						<a href="{{ path('app_forgot_password_request') }}" style="color: #1f2937; font-weight: 600;">
+							réessayez
+						</a>.
+					</p>
+				</div>
+			</div>
+
+			<div class="login-footer">
+				<a href="{{ path('app_login') }}">
+					<i class="mdi mdi-arrow-left"></i>
+					Retour à la connexion
+				</a>
+			</div>
+
+		</div>
+	</div>
 {% endblock %}

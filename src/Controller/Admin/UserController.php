@@ -5,118 +5,90 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
+use App\Security\BackofficeAccessTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
-#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/user')]
 final class UserController extends AbstractController
 {
+    use BackofficeAccessTrait;
 
-    private $em;
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
+    public function __construct(private EntityManagerInterface $em) {}
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route(name: 'app_admin_users')]
     public function index(UserRepository $userRepository): Response
     {
+        $this->requireBackofficeAccess();
+
         return $this->render('admin/user/list.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_user_new')]
     #[Route('/update/{id}', name: 'app_admin_user_update')]
-    public function new(Request $request, ResetPasswordHelperInterface $resetPasswordHelper, MailerInterface $mailer, ?User $user): Response
+    public function new(Request $request, ResetPasswordHelperInterface $resetPasswordHelper, MailerInterface $mailer, ?User $user = null): Response
     {
+        $this->requireAdminAccess();
+
         $isEdit = $user !== null;
+        if (!$user) $user = new User();
 
-        if (!$user) {
-            $user = new User();
-        }
-
-        $form = $this->createForm(RegistrationFormType::class, $user, [
-            'is_edit' => $isEdit
-        ]);
+        $form = $this->createForm(RegistrationFormType::class, $user, ['is_edit' => $isEdit]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $user->setIsActive(false);
-
             $this->em->persist($user);
             $this->em->flush();
 
             if (!$isEdit) {
-
                 $resetToken = $resetPasswordHelper->generateResetToken($user);
+                $resetUrl = $this->generateUrl('app_reset_password', ['token' => $resetToken->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-                $resetUrl = $this->generateUrl(
-                    'app_reset_password',
-                    ['token' => $resetToken->getToken()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
+                $mailer->send((new TemplatedEmail())
+                        ->from('thomas.bremon@logicielpourtous.com')
+                        ->to($user->getEmail())
+                        ->subject('Création de votre compte')
+                        ->htmlTemplate('reset_password/welcome.html.twig')
+                        ->context(['user' => $user, 'resetUrl' => $resetUrl])
                 );
-
-                $email = (new TemplatedEmail())
-                    ->from('thomas.bremon@logicielpourtous.com')
-                    ->to($user->getEmail())
-                    ->subject('Création de votre compte')
-                    ->htmlTemplate('reset_password/welcome.html.twig')
-                    ->context([
-                        'user' => $user,
-                        'resetUrl' => $resetUrl,
-                    ]);
-
-                $mailer->send($email);
             }
 
-            $txt = $isEdit ? 'modifié' : 'enregistré';
-            $this->addFlash('success', "L'utilisateur a été $txt avec succès !");
-
+            $this->addFlash('success', "L'utilisateur a été " . ($isEdit ? 'modifié' : 'enregistré') . " avec succès !");
             return $this->redirectToRoute('app_admin_users');
         }
 
-
         return $this->render('admin/user/user.form.html.twig', [
             'formUser' => $form,
-            'userId' => $user->getId()
+            'userId'   => $user->getId(),
         ]);
     }
 
-
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'app_admin_user_show')]
     public function show(User $user): Response
     {
-        return $this->render('admin/user/show.html.twig', [
-            'user' => $user,
-        ]);
+        $this->requireBackofficeAccess();
+
+        return $this->render('admin/user/show.html.twig', ['user' => $user]);
     }
 
-
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/delete/{id}', name: 'app_admin_user_delete')]
-    public function adminCategoryRemove(?User $user)
+    public function delete(?User $user): Response
     {
-
+        $this->requireAdminAccess();
 
         $this->em->remove($user);
         $this->em->flush();
-        $this->addFlash('success', "L'utilisateur " . $user->getPrenom() . " " . $user->getPrenom() . " a bien été supprimée !");
+        $this->addFlash('success', "L'utilisateur {$user->getPrenom()} {$user->getNom()} a bien été supprimé !");
         return $this->redirectToRoute('app_admin_users');
     }
 }

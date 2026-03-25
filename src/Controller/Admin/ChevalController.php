@@ -3,108 +3,82 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Cheval;
+use App\Entity\ChevalProprietaire;
 use App\Form\ChevalType;
 use App\Repository\ChevalRepository;
+use App\Security\BackofficeAccessTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-#[IsGranted('ROLE_GESTIONNAIRE')]
-#[IsGranted('ROLE_COMPTABILITE')]
-#[IsGranted('ROLE_CLIENT')]
 #[Route('/admin/cheval')]
 final class ChevalController extends AbstractController
 {
+    use BackofficeAccessTrait;
 
-    private $em;
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
+    public function __construct(private EntityManagerInterface $em) {}
 
-    #[IsGranted('ROLE_ADMIN')]
-    #[IsGranted('ROLE_GESTIONNAIRE')]
-    #[IsGranted('ROLE_COMPTABILITE')]
-    #[IsGranted('ROLE_CLIENT')]
     #[Route('/liste', name: 'app_admin_chevaux')]
     public function index(ChevalRepository $chevalRepository): Response
     {
+        $this->requireBackofficeAccess();
+
         return $this->render('admin/cheval/list.html.twig', [
             'chevaux' => $chevalRepository->findAll(),
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_cheval_new')]
     #[Route('/edit/{id}', name: 'app_admin_cheval_update')]
-    public function form(Request $request, EntityManagerInterface $em, ?Cheval $cheval): Response
+    public function form(Request $request, EntityManagerInterface $em, ?Cheval $cheval = null): Response
     {
-        $isEdit = true;
+        $this->requireAdminAccess();
+
+        $isEdit = $cheval !== null;
         if (!$cheval) {
             $cheval = new Cheval();
-            $isEdit = false;
         }
 
-
-        // ⚡ Pré-remplir la collection avec au moins un propriétaire vide
         if ($cheval->getChevalProprietaires()->isEmpty()) {
-            $chevalProprietaire = new \App\Entity\ChevalProprietaire();
-            $cheval->addChevalProprietaire($chevalProprietaire);
+            $cheval->addChevalProprietaire(new ChevalProprietaire());
         }
-
 
         $form = $this->createForm(ChevalType::class, $cheval);
         $form->handleRequest($request);
 
-
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($cheval);
             $em->flush();
-
-
-            $this->addFlash('success', $isEdit ? 'Cheval modifiée !' : 'Cheval créée !');
-
-
+            $this->addFlash('success', $isEdit ? 'Cheval modifié !' : 'Cheval créé !');
             return $this->redirectToRoute('app_admin_chevaux');
         }
-
 
         return $this->render('admin/cheval/cheval.form.html.twig', [
             'formCheval' => $form,
-            'chevalId' => $cheval->getId(),
+            'chevalId'   => $cheval->getId(),
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/delete/{id}', name: 'app_admin_cheval_delete')]
-    public function adminChevauxRemove(?Cheval $cheval)
+    public function delete(?Cheval $cheval): Response
     {
+        $this->requireAdminAccess();
+
         if (!$cheval) {
-            $this->addFlash('danger', "Cheval introuvable.");
+            $this->addFlash('danger', 'Cheval introuvable.');
             return $this->redirectToRoute('app_admin_chevaux');
         }
 
-        // Vérification si un propriétaire est associé
-        if ($cheval->getChevalProprietaires() !== null && !$cheval->getChevalProprietaires()->isEmpty()) {
-            $this->addFlash(
-                'danger',
-                "Impossible de supprimer le cheval « " . $cheval->getNom() . " » car il est associé à un propriétaire."
-            );
+        if (!$cheval->getChevalProprietaires()->isEmpty()) {
+            $this->addFlash('danger', "Impossible de supprimer « {$cheval->getNom()} » car il est associé à un propriétaire.");
             return $this->redirectToRoute('app_admin_chevaux');
         }
 
         $this->em->remove($cheval);
         $this->em->flush();
-
-        $this->addFlash(
-            'success',
-            "Le cheval « " . $cheval->getNom() . " » a bien été supprimé !"
-        );
-
+        $this->addFlash('success', "Le cheval « {$cheval->getNom()} » a bien été supprimé !");
         return $this->redirectToRoute('app_admin_chevaux');
     }
 }

@@ -5,83 +5,78 @@ namespace App\Controller\Admin;
 use App\Entity\Entreprise;
 use App\Form\EntrepriseType;
 use App\Repository\EntrepriseRepository;
+use App\Security\BackofficeAccessTrait;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/entreprise')]
 final class EntrepriseController extends AbstractController
 {
+    use BackofficeAccessTrait;
 
-    private $em;
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
+    public function __construct(private EntityManagerInterface $em) {}
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route(name: 'app_admin_entreprises')]
     public function index(EntrepriseRepository $entrepriseRepository): Response
     {
+        $this->requireBackofficeAccess();
+
         return $this->render('admin/entreprise/list.html.twig', [
             'entreprises' => $entrepriseRepository->findAll(),
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_entreprise_new')]
     #[Route('/edit/{id}', name: 'app_admin_entreprise_update')]
-    public function form(Request $request, EntityManagerInterface $em, ?Entreprise $entreprise): Response
+    public function form(Request $request, EntityManagerInterface $em, ?Entreprise $entreprise = null): Response
     {
-        $isEdit = true;
-        if (!$entreprise) {
-            $entreprise = new Entreprise();
-            $isEdit = false;
-        }
+        $this->requireAdminAccess();
+
+        $isEdit = $entreprise !== null;
+        if (!$entreprise) $entreprise = new Entreprise();
 
         $form = $this->createForm(EntrepriseType::class, $entreprise);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($entreprise); // persist l'entreprise (propriétaire de la relation ManyToMany)
+            $em->persist($entreprise);
             $em->flush();
-
             $this->addFlash('success', $isEdit ? 'Entreprise modifiée !' : 'Entreprise créée !');
-
             return $this->redirectToRoute('app_admin_entreprises');
         }
 
         return $this->render('admin/entreprise/entreprise.form.html.twig', [
             'formEntreprise' => $form,
-            'entrepriseId' => $entreprise->getId(),
+            'entrepriseId'   => $entreprise->getId(),
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
-    #[Route('/delete/{id}', name: 'app_admin_entreprise_delete')]
-    public function adminEntreprisesRemove(?Entreprise $entreprise)
-    {
-        if (!$entreprise->getUsers()->isEmpty()) {
-
-            $this->addFlash('danger', "Impossible de supprimer l'entreprise " . $entreprise->getNom() . " car il est affilié à un utilisateur !");
-            return $this->redirectToRoute('app_admin_entreprises');
-        }
-        $this->em->remove($entreprise);
-        $this->em->flush();
-        $this->addFlash('success', "L'entreprise " . $entreprise->getNom() . " a bien été supprimée !");
-        return $this->redirectToRoute('app_admin_entreprises');
-    }
-
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/show/{id}', name: 'app_admin_entreprise_show', methods: ['GET'])]
     public function show(Entreprise $entreprise): Response
     {
+        $this->requireBackofficeAccess();
+
         return $this->render('admin/entreprise/show.html.twig', [
             'entreprise' => $entreprise,
         ]);
+    }
+
+    #[Route('/delete/{id}', name: 'app_admin_entreprise_delete')]
+    public function delete(?Entreprise $entreprise): Response
+    {
+        $this->requireAdminAccess();
+
+        if (!$entreprise->getUsers()->isEmpty()) {
+            $this->addFlash('danger', "Impossible de supprimer « {$entreprise->getNom()} » car elle est affiliée à un utilisateur !");
+            return $this->redirectToRoute('app_admin_entreprises');
+        }
+
+        $this->em->remove($entreprise);
+        $this->em->flush();
+        $this->addFlash('success', "L'entreprise « {$entreprise->getNom()} » a bien été supprimée !");
+        return $this->redirectToRoute('app_admin_entreprises');
     }
 }

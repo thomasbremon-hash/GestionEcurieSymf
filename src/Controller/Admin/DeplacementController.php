@@ -6,103 +6,80 @@ use App\Entity\Deplacement;
 use App\Form\DeplacementType;
 use App\Repository\DeplacementRepository;
 use App\Repository\DistanceStructureRepository;
+use App\Security\BackofficeAccessTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/deplacement')]
 final class DeplacementController extends AbstractController
 {
+    use BackofficeAccessTrait;
 
-    private $em;
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
+    public function __construct(private EntityManagerInterface $em) {}
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/liste', name: 'app_admin_deplacements')]
     public function index(DeplacementRepository $deplacementRepository): Response
     {
+        $this->requireBackofficeAccess();
+
         $deplacements = $deplacementRepository->createQueryBuilder('d')
             ->orderBy('d.date', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->getQuery()->getResult();
 
         return $this->render('admin/deplacement/liste.html.twig', [
             'deplacements' => $deplacements,
         ]);
     }
 
-
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new', name: 'app_admin_deplacement_new')]
     #[Route('/edit/{id}', name: 'app_admin_deplacement_update')]
-    public function form(Request $request, EntityManagerInterface $em, ?Deplacement $deplacement, DistanceStructureRepository $distanceRepo): Response
+    public function form(Request $request, EntityManagerInterface $em, ?Deplacement $deplacement = null, DistanceStructureRepository $distanceRepo): Response
     {
-        $isEdit = true;
-        if (!$deplacement) {
-            $deplacement = new Deplacement();
-            $isEdit = false;
-        }
+        $this->requireAdminAccess();
+
+        $isEdit = $deplacement !== null;
+        if (!$deplacement) $deplacement = new Deplacement();
 
         $form = $this->createForm(DeplacementType::class, $deplacement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entreprise = $deplacement->getEntreprise();
-            $structure = $deplacement->getStructure();
-
-            $distance = $distanceRepo->findDistance($entreprise, $structure);
+            $distance = $distanceRepo->findDistance($deplacement->getEntreprise(), $deplacement->getStructure());
 
             if ($distance === null) {
-
-                $this->addFlash(
-                    'danger',
-                    'Distance non définie pour cette entreprise et structure'
-                );
-
+                $this->addFlash('danger', 'Distance non définie pour cette entreprise et structure.');
                 return $this->redirectToRoute('app_admin_deplacement_new');
             }
 
             $deplacement->setDistance($distance);
-
             $em->persist($deplacement);
             $em->flush();
-
             $this->addFlash('success', $isEdit ? 'Déplacement modifié !' : 'Déplacement créé !');
-
             return $this->redirectToRoute('app_admin_deplacements');
         }
 
         return $this->render('admin/deplacement/deplacement.form.html.twig', [
             'formDeplacement' => $form,
-            'deplacementId' => $deplacement->getId(),
+            'deplacementId'   => $deplacement->getId(),
         ]);
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/delete/{id}', name: 'app_admin_deplacement_delete')]
-    public function adminChevauxRemove(?Deplacement $deplacement)
+    public function delete(?Deplacement $deplacement): Response
     {
+        $this->requireAdminAccess();
+
         if (!$deplacement) {
-            $this->addFlash('danger', "deplacement introuvable.");
+            $this->addFlash('danger', 'Déplacement introuvable.');
             return $this->redirectToRoute('app_admin_deplacements');
         }
 
-
         $this->em->remove($deplacement);
         $this->em->flush();
-
-        $this->addFlash(
-            'success',
-            "Le déplacement « " . $deplacement->getNom() . " » a bien été supprimé !"
-        );
-
+        $this->addFlash('success', "Le déplacement « {$deplacement->getNom()} » a bien été supprimé !");
         return $this->redirectToRoute('app_admin_deplacements');
     }
 }

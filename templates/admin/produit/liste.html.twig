@@ -1,133 +1,138 @@
 {% extends 'layouts/base.admin.html.twig' %}
-
-{% block title %}
-  BackOffice | Liste des produits
+{% block title %}BackOffice | Liste des produits
 {% endblock %}
-
 {% block body %}
-  <div class="admin-wrapper--wide">
-    {# ── Flash ── #}
-    {% for label, messages in app.flashes(['success', 'danger']) %}
-      {% for message in messages %}
-        <div class="flash {{ label }}">
-          <span><i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i> {{ message }}</span>
-          <button class="flash-close" onclick="this.parentElement.remove()"><i class="mdi mdi-close"></i></button>
-        </div>
-      {% endfor %}
-    {% endfor %}
+	<div class="admin-wrapper--wide">
+		{% for label, messages in app.flashes(['success', 'danger']) %}
+			{% for message in messages %}
+				<div class="flash {{ label }}">
+					<span>
+						<i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i>
+						{{ message }}</span>
+					<button class="flash-close" onclick="this.parentElement.remove()">
+						<i class="mdi mdi-close"></i>
+					</button>
+				</div>
+			{% endfor %}
+		{% endfor %}
 
-    {# ── Page top ── #}
-    <div class="page-top">
-      <div>
-        <div class="page-eyebrow">Admin › Gestion</div>
-        <h1 class="page-title">Produits <span class="subtitle">{{ produits|length }} au total</span></h1>
-      </div>
-      <a href="{{ path('app_admin_produit_new') }}" class="btn-primary-custom"><i class="mdi mdi-plus"></i> Ajouter un produit</a>
-    </div>
+		<div class="page-top">
+			<div>
+				<div class="page-eyebrow">Admin › Gestion</div>
+				<h1 class="page-title">Produits
+					<span class="subtitle">{{ produits|length }}
+						au total</span>
+				</h1>
+			</div>
+			{% if is_granted('ROLE_ADMIN') %}
+				<a href="{{ path('app_admin_produit_new') }}" class="btn-primary-custom">
+					<i class="mdi mdi-plus"></i>
+					Ajouter un produit</a>
+			{% endif %}
+		</div>
 
-    {# ── Table card ── #}
-    <div class="table-card">
-      <div class="table-card-header">
-        <div class="table-card-header-left">
-          <div class="table-card-title">
-            <i class="mdi mdi-shopping-outline" style="color:var(--green)"></i>
-            Liste des produits
-            <span class="count-badge">{{ produits|length }}</span>
-          </div>
-          <div class="per-page-wrap">
-            Afficher<select id="per-page-select">
-              <option value="10">10</option>
-              <option value="25" selected>25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>par page
-          </div>
-        </div>
-        <div class="search-wrap">
-          <i class="mdi mdi-magnify search-icon"></i>
-          <input type="text" id="search-input" placeholder="Rechercher…" />
-        </div>
-      </div>
+		<div class="table-card">
+			<div class="table-card-header">
+				<div class="table-card-header-left">
+					<div class="table-card-title">
+						<i class="mdi mdi-shopping-outline" style="color:var(--green)"></i>
+						Liste des produits
+						<span class="count-badge">{{ produits|length }}</span>
+					</div>
+					<div class="per-page-wrap">
+						Afficher<select id="per-page-select">
+							<option value="10">10</option>
+							<option value="25" selected>25</option>
+							<option value="50">50</option>
+							<option value="100">100</option>
+						</select>par page
+					</div>
+				</div>
+				<div class="search-wrap">
+					<i class="mdi mdi-magnify search-icon"></i>
+					<input type="text" id="search-input" placeholder="Rechercher…"/>
+				</div>
+			</div>
 
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Description</th>
-            <th>Prix</th>
-            <th>Taux TVA</th>
-            <th style="text-align:right">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="produit-tbody">
-          {% for item in produits %}
-            <tr data-index="{{ loop.index0 }}">
-              {# Nom #}
-              <td>
-                <div class="user-cell">
-                  <div class="user-avatar" style="background:var(--green);">{{ item.nom|slice(0, 1)|upper }}</div>
-                  <div class="user-name">{{ item.nom }}</div>
-                </div>
-              </td>
+			<table class="data-table">
+				<thead>
+					<tr>
+						<th>Nom</th>
+						<th>Description</th>
+						<th>Prix</th>
+						<th>Taux TVA</th>
+						{% if is_granted('ROLE_ADMIN') %}
+							<th style="text-align:right">Actions</th>
+						{% endif %}
+					</tr>
+				</thead>
+				<tbody id="produit-tbody" data-noun="produit" data-noun-plural="produits">
+					{% for item in produits %}
+						<tr data-index="{{ loop.index0 }}">
+							<td>
+								<div class="user-cell">
+									<div class="user-avatar" style="background:var(--green);">{{ item.nom|slice(0,1)|upper }}</div>
+									<div class="user-name">{{ item.nom }}</div>
+								</div>
+							</td>
+							<td>
+								<span style="font-size:0.88rem;color:var(--ink-soft);">{{ item.description ?: '—' }}</span>
+							</td>
+							<td>
+								<span class="amount-cell">{{ item.prix|number_format(2, ',', ' ') }}
+									€</span>
+							</td>
+							<td>
+								<span class="pill tag-neutral" style="font-family:'Sora',sans-serif;font-weight:700;">{{ item.tauxTVA }}
+									%</span>
+							</td>
+							{% if is_granted('ROLE_ADMIN') %}
+								<td>
+									<div class="action-btns">
+										<a href="{{ path('app_admin_produit_update', {id: item.id}) }}" class="action-btn edit" title="Modifier">
+											<i class="mdi mdi-pencil"></i>
+										</a>
+										<button class="action-btn del" onclick="openModal('modal-{{ item.id }}')" title="Supprimer">
+											<i class="mdi mdi-trash-can"></i>
+										</button>
+									</div>
+								</td>
+							{% endif %}
+						</tr>
+					{% else %}
+						<tr class="empty-row">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 5 : 4 }}">
+								<i class="mdi mdi-shopping-outline" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun produit trouvé.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<div class="table-footer">
+				<div class="pagination-info" id="pagination-info">—</div>
+				<div class="pagination-controls" id="pagination-controls"></div>
+			</div>
+		</div>
+	</div>
 
-              {# Description #}
-              <td>
-                <span style="font-size:0.88rem;color:var(--ink-soft);">{{ item.description ? item.description : '—' }}</span>
-              </td>
-
-              {# Prix #}
-              <td>
-                <span class="amount-cell">{{ item.prix|number_format(2, ',', ' ') }} €</span>
-              </td>
-
-              {# Taux TVA #}
-              <td>
-                <span class="pill tag-neutral" style="font-family:'Sora',sans-serif;font-weight:700;">{{ item.tauxTVA }} %</span>
-              </td>
-
-              {# Actions #}
-              <td>
-                <div class="action-btns">
-                  <a href="{{ path('app_admin_produit_update', { id: item.id }) }}" class="action-btn edit" title="Modifier"><i class="mdi mdi-pencil"></i></a>
-                  <button class="action-btn del" onclick="openModal('modal-{{ item.id }}')" title="Supprimer"><i class="mdi mdi-trash-can"></i></button>
-                </div>
-              </td>
-            </tr>
-          {% else %}
-            <tr class="empty-row">
-              <td colspan="5">
-                <i class="mdi mdi-shopping-outline" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>
-                Aucun produit trouvé.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      <div class="table-footer">
-        <div class="pagination-info" id="pagination-info">—</div>
-        <div class="pagination-controls" id="pagination-controls"></div>
-      </div>
-    </div>
-  </div>
-
-  {# ── Modals suppression ── #}
-  {% for item in produits %}
-    <div class="modal-overlay" id="modal-{{ item.id }}">
-      <div class="modal-box">
-        <div class="modal-icon">
-          <i class="mdi mdi-trash-can-outline"></i>
-        </div>
-        <div class="modal-title">Supprimer ce produit ?</div>
-        <div class="modal-text">
-          Vous êtes sur le point de supprimer <strong>{{ item.nom }}</strong>.<br />
-          Cette action est irréversible.
-        </div>
-        <div class="modal-actions">
-          <button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
-          <a href="{{ path('app_admin_produit_delete', { id: item.id }) }}" class="btn-danger"><i class="mdi mdi-trash-can"></i> Supprimer</a>
-        </div>
-      </div>
-    </div>
-  {% endfor %}
+	{% if is_granted('ROLE_ADMIN') %}
+		{% for item in produits %}
+			<div class="modal-overlay" id="modal-{{ item.id }}">
+				<div class="modal-box">
+					<div class="modal-icon">
+						<i class="mdi mdi-trash-can-outline"></i>
+					</div>
+					<div class="modal-title">Supprimer ce produit ?</div>
+					<div class="modal-text">Vous êtes sur le point de supprimer
+						<strong>{{ item.nom }}</strong>.<br/>Cette action est irréversible.</div>
+					<div class="modal-actions">
+						<button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
+						<a href="{{ path('app_admin_produit_delete', {id: item.id}) }}" class="btn-danger">
+							<i class="mdi mdi-trash-can"></i>
+							Supprimer</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	{% endif %}
 {% endblock %}

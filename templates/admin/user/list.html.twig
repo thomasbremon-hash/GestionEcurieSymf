@@ -1,145 +1,164 @@
 {% extends 'layouts/base.admin.html.twig' %}
-
-{% block title %}
-  BackOffice | Liste utilisateurs
+{% block title %}BackOffice | Liste utilisateurs
 {% endblock %}
-
 {% block body %}
-  <div class="admin-wrapper">
-    {# ── Flash ── #}
-    {% for label, messages in app.flashes(['success', 'danger']) %}
-      {% for message in messages %}
-        <div class="flash {{ label }}">
-          <span><i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i> {{ message }}</span>
-          <button class="flash-close" onclick="this.parentElement.remove()"><i class="mdi mdi-close"></i></button>
-        </div>
-      {% endfor %}
-    {% endfor %}
+	<div class="admin-wrapper">
+		{% for label, messages in app.flashes(['success', 'danger']) %}
+			{% for message in messages %}
+				<div class="flash {{ label }}">
+					<span>
+						<i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i>
+						{{ message }}</span>
+					<button class="flash-close" onclick="this.parentElement.remove()">
+						<i class="mdi mdi-close"></i>
+					</button>
+				</div>
+			{% endfor %}
+		{% endfor %}
 
-    {# ── Page top ── #}
-    <div class="page-top">
-      <div>
-        <div class="page-eyebrow">Admin › Gestion</div>
-        <h1 class="page-title">Utilisateurs <span>{{ users|length }} au total</span></h1>
-      </div>
-      <a href="{{ path('app_admin_user_new') }}" class="btn-primary-custom"><i class="mdi mdi-plus"></i> Ajouter un utilisateur</a>
-    </div>
+		<div class="page-top">
+			<div>
+				<div class="page-eyebrow">Admin › Gestion</div>
+				<h1 class="page-title">Utilisateurs
+					<span>{{ users|length }}
+						au total</span>
+				</h1>
+			</div>
+			{% if is_granted('ROLE_ADMIN') %}
+				<a href="{{ path('app_admin_user_new') }}" class="btn-primary-custom">
+					<i class="mdi mdi-plus"></i>
+					Ajouter un utilisateur</a>
+			{% endif %}
+		</div>
 
-    {# ── Table card ── #}
-    <div class="table-card">
-      <div class="table-card-header">
-        <div class="table-card-header-left">
-          <div class="table-card-title">
-            <i class="mdi mdi-account-group" style="color:var(--accent)"></i>
-            Liste des utilisateurs
-            <span class="count-badge">{{ users|length }}</span>
-          </div>
-          <div class="per-page-wrap">
-            Afficher<select id="per-page-select">
-              <option value="10">10</option>
-              <option value="25" selected>25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>par page
-          </div>
-        </div>
-        <div class="search-wrap">
-          <i class="mdi mdi-magnify search-icon"></i>
-          <input type="text" id="search-input" placeholder="Rechercher…" />
-        </div>
-      </div>
+		<div class="table-card">
+			<div class="table-card-header">
+				<div class="table-card-header-left">
+					<div class="table-card-title">
+						<i class="mdi mdi-account-group" style="color:var(--accent)"></i>
+						Liste des utilisateurs
+						<span class="count-badge">{{ users|length }}</span>
+					</div>
+					<div class="per-page-wrap">
+						Afficher<select id="per-page-select">
+							<option value="10">10</option>
+							<option value="25" selected>25</option>
+							<option value="50">50</option>
+							<option value="100">100</option>
+						</select>par page
+					</div>
+				</div>
+				<div class="search-wrap">
+					<i class="mdi mdi-magnify search-icon"></i>
+					<input type="text" id="search-input" placeholder="Rechercher…"/>
+				</div>
+			</div>
 
-      <table class="data-table" id="user-table">
-        <thead>
-          <tr>
-            <th>Utilisateur</th>
-            <th>Adresse</th>
-            <th>Rôles</th>
-            <th>Statut</th>
+			<table class="data-table" id="user-table">
+				<thead>
+					<tr>
+						<th>Utilisateur</th>
+						<th>Adresse</th>
+						<th>Rôles</th>
+						<th>Statut</th>
             <th style="text-align:right">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="user-tbody">
-          {% for item in users %}
-            <tr data-index="{{ loop.index0 }}">
-              <td>
-                <div class="user-cell">
-                  <div class="user-avatar">{{ item.prenom|slice(0, 1)|upper }}{{ item.nom|slice(0, 1)|upper }}</div>
-                  <div>
-                    <div class="user-name">{{ item.prenom }} {{ item.nom }}</div>
-                    <div class="user-email">{{ item.email }}</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="address-text">
-                  {{ item.rue }}<br />{{ item.cp }} {{ item.ville }}
-                </div>
-              </td>
-              <td>
-                {% for role in item.roles %}
-                  {% if role == 'ROLE_ADMIN' %}
-                    <span class="pill pill-admin">Admin</span>
-                  {% elseif role == 'ROLE_USER' %}
-                    <span class="pill pill-user">User</span>
-                  {% elseif role == 'ROLE_CLIENT' %}
-                    <span class="pill pill-client">Client</span>
-                  {% elseif role == 'ROLE_GESTIONNAIRE' %}
-                    <span class="pill pill-gest">Gestionnaire</span>
-                  {% elseif role == 'ROLE_COMPTABILITE' %}
-                    <span class="pill pill-compta">Comptabilité</span>
-                  {% endif %}
-                {% endfor %}
-              </td>
-              <td>
-                {% if item.isActive %}
-                  <span class="pill pill-active"><i class="mdi mdi-check-circle"></i> Actif</span>
-                {% else %}
-                  <span class="pill pill-pending"><i class="mdi mdi-email-outline"></i> Invitation envoyée</span>
-                {% endif %}
-              </td>
-              <td>
-                <div class="action-btns">
-                  <a href="{{ path('app_admin_user_show', { id: item.id }) }}" class="action-btn view" title="Voir"><i class="mdi mdi-eye"></i></a>
-                  <a href="{{ path('app_admin_user_update', { id: item.id }) }}" class="action-btn edit" title="Modifier"><i class="mdi mdi-pencil"></i></a>
-                  <button class="action-btn del" onclick="openModal('modal-{{ item.id }}')" title="Supprimer"><i class="mdi mdi-trash-can"></i></button>
-                </div>
-              </td>
-            </tr>
-          {% else %}
-            <tr class="empty-row">
-              <td colspan="5">
-                <i class="mdi mdi-account-off" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun utilisateur.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
 
-      <div class="table-footer">
-        <div class="pagination-info" id="pagination-info">—</div>
-        <div class="pagination-controls" id="pagination-controls"></div>
-      </div>
-    </div>
-  </div>
+					</tr>
+				</thead>
+				<tbody id="user-tbody" data-noun="utilisateur" data-noun-plural="utilisateurs">
+					{% for item in users %}
+						<tr data-index="{{ loop.index0 }}">
+							<td>
+								<div class="user-cell">
+									<div class="user-avatar">{{ item.prenom|slice(0,1)|upper }}{{ item.nom|slice(0,1)|upper }}</div>
+									<div>
+										<div class="user-name">{{ item.prenom }}
+											{{ item.nom }}</div>
+										<div class="user-email">{{ item.email }}</div>
+									</div>
+								</div>
+							</td>
+							<td>
+								<div class="address-text">{{ item.rue }}<br/>{{ item.cp }}
+									{{ item.ville }}</div>
+							</td>
+							<td>
+								{% for role in item.roles %}
+									{% if role == 'ROLE_ADMIN' %}
+										<span class="pill pill-admin">Admin</span>
+									{% elseif role == 'ROLE_USER' %}
+										<span class="pill pill-user">User</span>
+									{% elseif role == 'ROLE_CLIENT' %}
+										<span class="pill pill-client">Client</span>
+									{% elseif role == 'ROLE_GESTIONNAIRE' %}
+										<span class="pill pill-gest">Gestionnaire</span>
+									{% elseif role == 'ROLE_COMPTABILITE' %}
+										<span class="pill pill-compta">Comptabilité</span>
+									{% endif %}
+								{% endfor %}
+							</td>
+							<td>
+								{% if item.isActive %}
+									<span class="pill pill-active">
+										<i class="mdi mdi-check-circle"></i>
+										Actif</span>
+								{% else %}
+									<span class="pill pill-pending">
+										<i class="mdi mdi-email-outline"></i>
+										Invitation envoyée</span>
+								{% endif %}
+							</td>
+							<td>
+								<div class="action-btns">
+									<a href="{{ path('app_admin_user_show', {id: item.id}) }}" class="action-btn view" title="Voir">
+										<i class="mdi mdi-eye"></i>
+									</a>
+									{% if is_granted('ROLE_ADMIN') %}
+										<a href="{{ path('app_admin_user_update', {id: item.id}) }}" class="action-btn edit" title="Modifier">
+											<i class="mdi mdi-pencil"></i>
+										</a>
+										<button class="action-btn del" onclick="openModal('modal-{{ item.id }}')" title="Supprimer">
+											<i class="mdi mdi-trash-can"></i>
+										</button>
+									{% endif %}
+								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr class="empty-row">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 5 : 4 }}">
+								<i class="mdi mdi-account-off" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun utilisateur.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<div class="table-footer">
+				<div class="pagination-info" id="pagination-info">—</div>
+				<div class="pagination-controls" id="pagination-controls"></div>
+			</div>
+		</div>
+	</div>
 
-  {# ── Modals ── #}
-  {% for item in users %}
-    <div class="modal-overlay" id="modal-{{ item.id }}">
-      <div class="modal-box">
-        <div class="modal-icon">
-          <i class="mdi mdi-trash-can-outline"></i>
-        </div>
-        <div class="modal-title">Supprimer l'utilisateur ?</div>
-        <div class="modal-text">
-          Vous êtes sur le point de supprimer <strong>{{ item.prenom }} {{ item.nom }}</strong>.<br />Cette action est irréversible.
-        </div>
-        <div class="modal-actions">
-          <button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
-          <a href="{{ path('app_admin_user_delete', { id: item.id }) }}" class="btn-danger"><i class="mdi mdi-trash-can"></i> Supprimer</a>
-        </div>
-      </div>
-    </div>
-  {% endfor %}
-
+	{% if is_granted('ROLE_ADMIN') %}
+		{% for item in users %}
+			<div class="modal-overlay" id="modal-{{ item.id }}">
+				<div class="modal-box">
+					<div class="modal-icon">
+						<i class="mdi mdi-trash-can-outline"></i>
+					</div>
+					<div class="modal-title">Supprimer l'utilisateur ?</div>
+					<div class="modal-text">Vous êtes sur le point de supprimer
+						<strong>{{ item.prenom }}
+							{{ item.nom }}</strong>.<br/>Cette action est irréversible.</div>
+					<div class="modal-actions">
+						<button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
+						<a href="{{ path('app_admin_user_delete', {id: item.id}) }}" class="btn-danger">
+							<i class="mdi mdi-trash-can"></i>
+							Supprimer</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	{% endif %}
 {% endblock %}

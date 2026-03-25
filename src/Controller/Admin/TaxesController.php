@@ -13,6 +13,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_GESTIONNAIRE')]
+#[IsGranted('ROLE_COMPTABILITE')]
+#[IsGranted('ROLE_CLIENT')]
 #[Route('/admin/taxes')]
 final class TaxesController extends AbstractController
 {
@@ -24,6 +28,9 @@ final class TaxesController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_GESTIONNAIRE')]
+    #[IsGranted('ROLE_COMPTABILITE')]
+    #[IsGranted('ROLE_CLIENT')]
     #[Route('/liste', name: 'app_admin_taxes')]
     public function index(taxesRepository $taxesRepository): Response
     {
@@ -61,7 +68,7 @@ final class TaxesController extends AbstractController
         ]);
     }
 
-     #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/delete/{id}', name: 'app_admin_taxes_delete')]
     public function adminChevauxRemove(?taxes $taxes)
     {
@@ -80,6 +87,4 @@ final class TaxesController extends AbstractController
 
         return $this->redirectToRoute('app_admin_taxes');
     }
-
-
 }

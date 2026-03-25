@@ -1,59 +1,69 @@
 {% extends 'layouts/base.html.twig' %}
 
 {% block title %}
-  Connexion — Gestion Écurie
+	Connexion — Gestion Écurie
 {% endblock %}
 
 {% block body %}
-  <div class="login-page">
-    <div class="login-box anim-fade-up">
-      {# En-tête #}
-      <div class="login-header">
-        <div class="login-icon">
-          <i class="mdi mdi-horse"></i>
-        </div>
-        <h1 class="login-title">Connexion</h1>
-        <p class="login-subtitle">Connectez-vous à votre espace de gestion</p>
-      </div>
+	<div class="login-page">
+		<div
+			class="login-box anim-fade-up">
+			{# En-tête #}
+			<div class="login-header">
+				<div class="login-icon">
+					<i class="mdi mdi-horse"></i>
+				</div>
+				<h1 class="login-title">Connexion</h1>
+				<p class="login-subtitle">Connectez-vous à votre espace de gestion</p>
+			</div>
 
-      {# Carte formulaire #}
-      <div class="login-card">
-        {% if error %}
-          <div class="login-alert">
-            <i class="mdi mdi-alert-circle-outline"></i>
-            <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
-          </div>
-        {% endif %}
+			{# Carte formulaire #}
+			<div class="login-card">
+				{% if error %}
+					<div class="login-alert">
+						<i class="mdi mdi-alert-circle-outline"></i>
+						<span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+					</div>
+				{% endif %}
 
-        <form method="post" class="login-form">
-          <div class="login-field">
-            <label class="login-label" for="username">Adresse email</label>
-            <div class="login-input-wrap">
-              <i class="mdi mdi-email-outline login-input-icon"></i>
-              <input class="login-input" type="email" id="username" name="_username" value="{{ last_username }}" placeholder="votre@email.com" autocomplete="email" required autofocus />
-            </div>
-          </div>
+				<form method="post" class="login-form">
+					<div class="login-field">
+						<label class="login-label" for="username">Adresse email</label>
+						<div class="login-input-wrap">
+							<i class="mdi mdi-email-outline login-input-icon"></i>
+							<input class="login-input" type="email" id="username" name="_username" value="{{ last_username }}" placeholder="votre@email.com" autocomplete="email" required autofocus/>
+						</div>
+					</div>
 
-          <div class="login-field">
-            <label class="login-label" for="password">Mot de passe</label>
-            <div class="login-input-wrap">
-              <i class="mdi mdi-lock-outline login-input-icon"></i>
-              <input class="login-input" type="password" id="password" name="_password" placeholder="••••••••" autocomplete="current-password" required />
-            </div>
-          </div>
+					<div class="login-field">
+						<label class="login-label" for="password">Mot de passe</label>
+						<div class="login-input-wrap">
+							<i class="mdi mdi-lock-outline login-input-icon"></i>
+							<input class="login-input" type="password" id="password" name="_password" placeholder="••••••••" autocomplete="current-password" required/>
+						</div>
+						{# Lien mot de passe oublié #}
+						<div style="text-align: right; margin-top: 6px;">
+							<a href="{{ path('app_forgot_password_request') }}" style="font-size: 12px; color: #6b6560;">
+								Mot de passe oublié ?
+							</a>
+						</div>
+					</div>
 
-          <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
 
-          <button type="submit" class="login-submit">
-            <i class="mdi mdi-login-variant"></i>
-            Se connecter
-          </button>
-        </form>
-      </div>
+					<button type="submit" class="login-submit">
+						<i class="mdi mdi-login-variant"></i>
+						Se connecter
+					</button>
 
-      <div class="login-footer">
-        <a href="{{ path('app_home') }}"><i class="mdi mdi-arrow-left"></i> Retour à l'accueil</a>
-      </div>
-    </div>
-  </div>
+				</form>
+			</div>
+
+			<div class="login-footer">
+				<a href="{{ path('app_home') }}">
+					<i class="mdi mdi-arrow-left"></i>
+					Retour à l'accueil</a>
+			</div>
+		</div>
+	</div>
 {% endblock %}

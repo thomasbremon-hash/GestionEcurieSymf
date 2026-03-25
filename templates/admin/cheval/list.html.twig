@@ -1,154 +1,154 @@
 {% extends 'layouts/base.admin.html.twig' %}
-
-{% block title %}
-  BackOffice | Liste des chevaux
+{% block title %}BackOffice | Liste des chevaux
 {% endblock %}
-
 {% block body %}
-  <div class="admin-wrapper--wide">
-    {# ── Flash ── #}
-    {% for label, messages in app.flashes(['success', 'danger']) %}
-      {% for message in messages %}
-        <div class="flash {{ label }}">
-          <span><i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i> {{ message }}</span>
-          <button class="flash-close" onclick="this.parentElement.remove()"><i class="mdi mdi-close"></i></button>
-        </div>
-      {% endfor %}
-    {% endfor %}
+	<div class="admin-wrapper--wide">
+		{% for label, messages in app.flashes(['success', 'danger']) %}
+			{% for message in messages %}
+				<div class="flash {{ label }}">
+					<span>
+						<i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i>
+						{{ message }}</span>
+					<button class="flash-close" onclick="this.parentElement.remove()">
+						<i class="mdi mdi-close"></i>
+					</button>
+				</div>
+			{% endfor %}
+		{% endfor %}
 
-    {# ── Page top ── #}
-    <div class="page-top">
-      <div>
-        <div class="page-eyebrow">Admin › Gestion</div>
-        <h1 class="page-title">Chevaux <span class="subtitle">{{ chevaux|length }} au total</span></h1>
-      </div>
-      <a href="{{ path('app_admin_cheval_new') }}" class="btn-primary-custom"><i class="mdi mdi-plus"></i> Ajouter un cheval</a>
-    </div>
+		<div class="page-top">
+			<div>
+				<div class="page-eyebrow">Admin › Gestion</div>
+				<h1 class="page-title">Chevaux
+					<span class="subtitle">{{ chevaux|length }}
+						au total</span>
+				</h1>
+			</div>
+			{% if is_granted('ROLE_ADMIN') %}
+				<a href="{{ path('app_admin_cheval_new') }}" class="btn-primary-custom">
+					<i class="mdi mdi-plus"></i>
+					Ajouter un cheval</a>
+			{% endif %}
+		</div>
 
-    {# ── Table card ── #}
-    <div class="table-card">
-      <div class="table-card-header">
-        <div class="table-card-header-left">
-          <div class="table-card-title">
-            <i class="mdi mdi-horse" style="color:var(--accent)"></i>
-            Liste des chevaux
-            <span class="count-badge">{{ chevaux|length }}</span>
-          </div>
-          <div class="per-page-wrap">
-            Afficher<select id="per-page-select">
-              <option value="10">10</option>
-              <option value="25" selected>25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>par page
-          </div>
-        </div>
-        <div class="search-wrap">
-          <i class="mdi mdi-magnify search-icon"></i>
-          <input type="text" id="search-input" placeholder="Rechercher…" />
-        </div>
-      </div>
+		<div class="table-card">
+			<div class="table-card-header">
+				<div class="table-card-header-left">
+					<div class="table-card-title">
+						<i class="mdi mdi-horse" style="color:var(--accent)"></i>
+						Liste des chevaux
+						<span class="count-badge">{{ chevaux|length }}</span>
+					</div>
+					<div class="per-page-wrap">
+						Afficher<select id="per-page-select">
+							<option value="10">10</option>
+							<option value="25" selected>25</option>
+							<option value="50">50</option>
+							<option value="100">100</option>
+						</select>par page
+					</div>
+				</div>
+				<div class="search-wrap">
+					<i class="mdi mdi-magnify search-icon"></i>
+					<input type="text" id="search-input" placeholder="Rechercher…"/>
+				</div>
+			</div>
 
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Cheval</th>
-            <th>Race</th>
-            <th>Sexe</th>
-            <th>Date de naissance</th>
-            <th>Propriétaires</th>
-            <th style="text-align:right">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="cheval-tbody">
-          {% for cheval in chevaux %}
-            <tr data-index="{{ loop.index0 }}">
-              {# Nom #}
-              <td>
-                <div class="user-cell">
-                  <div class="user-avatar" style="background:var(--green);">{{ cheval.nom|slice(0, 1)|upper }}</div>
-                  <div class="user-name">{{ cheval.nom }}</div>
-                </div>
-              </td>
+			<table class="data-table">
+				<thead>
+					<tr>
+						<th>Cheval</th>
+						<th>Race</th>
+						<th>Sexe</th>
+						<th>Date de naissance</th>
+						<th>Propriétaires</th>
+						{% if is_granted('ROLE_ADMIN') %}
+							<th style="text-align:right">Actions</th>
+						{% endif %}
+					</tr>
+				</thead>
+				<tbody id="cheval-tbody" data-noun="cheval" data-noun-plural="chevaux">
+					{% for cheval in chevaux %}
+						<tr data-index="{{ loop.index0 }}">
+							<td>
+								<div class="user-cell">
+									<div class="user-avatar" style="background:var(--green);">{{ cheval.nom|slice(0,1)|upper }}</div>
+									<div class="user-name">{{ cheval.nom }}</div>
+								</div>
+							</td>
+							<td>
+								<span style="font-size:0.88rem;color:var(--ink-soft);">{{ cheval.race ?: '—' }}</span>
+							</td>
+							<td>
+								{% if cheval.sexe %}
+									<span class="pill tag-neutral" style="text-transform:capitalize;">{{ cheval.sexe }}</span>
+									{% else %}—
+								{% endif %}
+							</td>
+							<td>
+								<span style="font-size:0.88rem;color:var(--ink-soft);">{{ cheval.dateNaissance ? cheval.dateNaissance|date('d/m/Y') : '—' }}</span>
+							</td>
+							<td>
+								{% if cheval.chevalProprietaires|length > 0 %}
+									<div style="display:flex;flex-wrap:wrap;gap:0.35rem;">
+										{% for cp in cheval.chevalProprietaires %}
+											<span class="pill pill-user">{{ cp.proprietaire.prenom }}
+												{{ cp.proprietaire.nom }}
+												<span style="opacity:0.65;">({{ cp.pourcentage }}%)</span>
+											</span>
+										{% endfor %}
+									</div>
+								{% else %}
+									<span style="color:var(--ink-muted);font-size:0.85rem;font-style:italic;">Aucun</span>
+								{% endif %}
+							</td>
+							{% if is_granted('ROLE_ADMIN') %}
+								<td>
+									<div class="action-btns">
+										<a href="{{ path('app_admin_cheval_update', {id: cheval.id}) }}" class="action-btn edit" title="Modifier">
+											<i class="mdi mdi-pencil"></i>
+										</a>
+										<button class="action-btn del" onclick="openModal('modal-{{ cheval.id }}')" title="Supprimer">
+											<i class="mdi mdi-trash-can"></i>
+										</button>
+									</div>
+								</td>
+							{% endif %}
+						</tr>
+					{% else %}
+						<tr class="empty-row">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 6 : 5 }}">
+								<i class="mdi mdi-horse" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun cheval trouvé.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<div class="table-footer">
+				<div class="pagination-info" id="pagination-info">—</div>
+				<div class="pagination-controls" id="pagination-controls"></div>
+			</div>
+		</div>
+	</div>
 
-              {# Race #}
-              <td>
-                <span style="font-size:0.88rem;color:var(--ink-soft);">{{ cheval.race ? : '—' }}</span>
-              </td>
-
-              {# Sexe #}
-              <td>
-                {% if cheval.sexe %}
-                  <span class="pill tag-neutral" style="text-transform:capitalize;">{{ cheval.sexe }}</span>
-                {% else %}
-                  <span style="color:var(--ink-muted);font-size:0.85rem;">—</span>
-                {% endif %}
-              </td>
-
-              {# Date de naissance #}
-              <td>
-                <span style="font-size:0.88rem;color:var(--ink-soft);">{{ cheval.dateNaissance ? cheval.dateNaissance|date('d/m/Y') : '—' }}</span>
-              </td>
-
-              {# Propriétaires #}
-              <td>
-                {% if (cheval.chevalProprietaires|length) > 0 %}
-                  <div style="display:flex;flex-wrap:wrap;gap:0.35rem;">
-                    {% for cp in cheval.chevalProprietaires %}
-                      <span class="pill pill-user">
-                        {{ cp.proprietaire.prenom }} {{ cp.proprietaire.nom }}
-                        <span style="opacity:0.65;">({{ cp.pourcentage }}%)</span>
-                      </span>
-                    {% endfor %}
-                  </div>
-                {% else %}
-                  <span style="color:var(--ink-muted);font-size:0.85rem;font-style:italic;">Aucun</span>
-                {% endif %}
-              </td>
-
-              {# Actions #}
-              <td>
-                <div class="action-btns">
-                  <a href="{{ path('app_admin_cheval_update', { id: cheval.id }) }}" class="action-btn edit" title="Modifier"><i class="mdi mdi-pencil"></i></a>
-                  <button class="action-btn del" onclick="openModal('modal-{{ cheval.id }}')" title="Supprimer"><i class="mdi mdi-trash-can"></i></button>
-                </div>
-              </td>
-            </tr>
-          {% else %}
-            <tr class="empty-row">
-              <td colspan="6">
-                <i class="mdi mdi-horse" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>
-                Aucun cheval trouvé.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      <div class="table-footer">
-        <div class="pagination-info" id="pagination-info">—</div>
-        <div class="pagination-controls" id="pagination-controls"></div>
-      </div>
-    </div>
-  </div>
-
-  {# ── Modals ── #}
-  {% for cheval in chevaux %}
-    <div class="modal-overlay" id="modal-{{ cheval.id }}">
-      <div class="modal-box">
-        <div class="modal-icon">
-          <i class="mdi mdi-trash-can-outline"></i>
-        </div>
-        <div class="modal-title">Supprimer ce cheval ?</div>
-        <div class="modal-text">
-          Vous êtes sur le point de supprimer <strong>{{ cheval.nom }}</strong>.<br />
-          Cette action est irréversible.
-        </div>
-        <div class="modal-actions">
-          <button class="btn-ghost" onclick="closeModal('modal-{{ cheval.id }}')">Annuler</button>
-          <a href="{{ path('app_admin_cheval_delete', { id: cheval.id }) }}" class="btn-danger"><i class="mdi mdi-trash-can"></i> Supprimer</a>
-        </div>
-      </div>
-    </div>
-  {% endfor %}
+	{% if is_granted('ROLE_ADMIN') %}
+		{% for cheval in chevaux %}
+			<div class="modal-overlay" id="modal-{{ cheval.id }}">
+				<div class="modal-box">
+					<div class="modal-icon">
+						<i class="mdi mdi-trash-can-outline"></i>
+					</div>
+					<div class="modal-title">Supprimer ce cheval ?</div>
+					<div class="modal-text">Vous êtes sur le point de supprimer
+						<strong>{{ cheval.nom }}</strong>.<br/>Cette action est irréversible.</div>
+					<div class="modal-actions">
+						<button class="btn-ghost" onclick="closeModal('modal-{{ cheval.id }}')">Annuler</button>
+						<a href="{{ path('app_admin_cheval_delete', {id: cheval.id}) }}" class="btn-danger">
+							<i class="mdi mdi-trash-can"></i>
+							Supprimer</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	{% endif %}
 {% endblock %}

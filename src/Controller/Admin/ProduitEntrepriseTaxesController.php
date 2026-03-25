@@ -12,6 +12,10 @@ use App\Repository\ProduitEntrepriseTaxesRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_GESTIONNAIRE')]
+#[IsGranted('ROLE_COMPTABILITE')]
+#[IsGranted('ROLE_CLIENT')]
 #[Route('/admin/produit-entreprise')]
 final class ProduitEntrepriseTaxesController extends AbstractController
 {
@@ -22,6 +26,9 @@ final class ProduitEntrepriseTaxesController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_GESTIONNAIRE')]
+    #[IsGranted('ROLE_COMPTABILITE')]
+    #[IsGranted('ROLE_CLIENT')]
     #[Route('/liste', name: 'app_admin_produit_entreprise')]
     public function index(ProduitEntrepriseTaxesRepository $taxesRepository): Response
     {

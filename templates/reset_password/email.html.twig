@@ -1,9 +1,148 @@
-<h1>Hi!</h1>
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Réinitialisation de votre mot de passe</title>
+		<style>
+			@media only screen and(max-width: 620px) {
+				.wrapper {
+					width: 100% !important;
+					padding: 12px !important;
+				}
+				.content {
+					padding: 24px 20px !important;
+				}
+				.btn {
+					width: 100% !important;
+					text-align: center !important;
+					display: block !important;
+				}
+			}
+			a {
+				text-decoration: none;
+			}
+		</style>
+	</head>
+	<body style="margin:0;padding:0;background:#f0ede8;font-family:'Helvetica Neue',Arial,sans-serif;">
+		<table width="100%" cellpadding="0" cellspacing="0">
+			<tr>
+				<td align="center" style="padding:32px 12px;">
+					<table class="wrapper" width="580" cellpadding="0" cellspacing="0" style="max-width:580px;width:100%;border-radius:16px;overflow:hidden;
+							                   box-shadow:0 4px 24px rgba(26,23,20,0.10);">
 
-<p>To reset your password, please visit the following link</p>
+						<tr>
+							<td style="background:#1f2937;height:4px;font-size:0;line-height:0;">&nbsp;</td>
+						</tr>
 
-<a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a>
+						<tr>
+							<td style="background:#1f2937;padding:32px 36px 28px;">
+								<div style="font-size:11px;font-weight:700;text-transform:uppercase;
+										                            letter-spacing:0.12em;color:rgba(255,255,255,0.45);margin-bottom:6px;">
+									Gestion Écurie
+								</div>
+								<div style="font-size:22px;font-weight:800;color:#ffffff;
+										                            letter-spacing:-0.03em;line-height:1.15;margin-bottom:6px;">
+									Réinitialisation du mot de passe
+								</div>
+								<div style="font-size:12px;color:rgba(255,255,255,0.45);">
+									Une demande de réinitialisation a été effectuée pour votre compte.
+								</div>
+							</td>
+						</tr>
 
-<p>This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+						<tr>
+							<td style="background:#f7f6f3;padding:20px 36px;border-bottom:1px solid #e8e5e0;">
+								<table cellpadding="0" cellspacing="0">
+									<tr>
+										<td style="vertical-align:middle;padding-right:14px;">
+											<div style="width:44px;height:44px;border-radius:12px;background:#e3e6ea;
+												                                  text-align:center;line-height:44px;font-size:22px;">🔐</div>
+										</td>
+										<td style="vertical-align:middle;">
+											<div style="font-size:13px;font-weight:700;color:#1a1714;">Sécurité du compte</div>
+											<div style="font-size:11px;color:#6b6560;margin-top:2px;">Plateforme de gestion équestre</div>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
 
-<p>Cheers!</p>
+						<tr>
+							<td class="content" style="background:#ffffff;padding:32px 36px;
+									                                         color:#1a1714;font-size:14px;line-height:1.75;">
+								<p style="margin:0 0 20px;color:#6b6560;">
+									Vous avez demandé la réinitialisation du mot de passe associé à votre compte
+									<strong style="color:#1a1714;">Gestion Écurie</strong>.
+										                  Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.
+								</p>
+
+								<table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+									<tr>
+										<td align="center">
+											<table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+												<tr>
+													<td align="center" bgcolor="#1f2937" style="border-radius:8px;">
+														<a href="{{ url('app_reset_password', {token: resetToken.token}) }}" class="btn" style="display:block;background:#1f2937;color:#ffffff;
+																                                     font-size:13px;font-weight:700;letter-spacing:0.03em;
+																                                     padding:13px 32px;border-radius:8px;
+																                                     min-width:200px;text-align:center;">
+															Réinitialiser mon mot de passe →
+														</a>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+
+								<table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+									<tr>
+										<td style="background:#f7f6f3;border-radius:6px;padding:10px 14px;">
+											<div style="font-size:10px;color:#a09b96;margin-bottom:3px;font-weight:700;
+												                                  text-transform:uppercase;letter-spacing:0.08em;">Lien alternatif</div>
+											<div style="font-size:10px;color:#6b6560;word-break:break-all;">
+												{{ url('app_reset_password', {token: resetToken.token}) }}
+											</div>
+										</td>
+									</tr>
+								</table>
+
+								<p style="margin:0 0 6px;color:#6b6560;font-size:12px;">
+									Ce lien est valable
+									<strong style="color:#1a1714;">
+										{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}
+									</strong>.
+									                  Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email — votre mot de passe ne sera pas modifié.
+								</p>
+
+								<p style="margin:20px 0 0;color:#6b6560;">
+									Cordialement,<br/>
+									<strong style="color:#1a1714;">L'équipe Gestion Écurie</strong>
+								</p>
+							</td>
+						</tr>
+
+						<tr>
+							<td style="background:#1f2937;height:2px;font-size:0;line-height:0;">&nbsp;</td>
+						</tr>
+
+						<tr>
+							<td style="background:#f7f6f3;padding:18px 36px;text-align:center;">
+								<div style="font-size:11px;color:#a09b96;line-height:1.7;">
+									©
+									{{ 'now'|date('Y') }}
+									Gestion Écurie — Tous droits réservés<br/>
+									<span style="font-size:10px;">
+										Vous recevez cet email car une réinitialisation de mot de passe a été demandée pour votre compte.
+									</span>
+								</div>
+							</td>
+						</tr>
+
+					</table>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
