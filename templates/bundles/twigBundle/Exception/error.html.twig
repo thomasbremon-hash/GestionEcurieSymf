@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Erreur {{ status_code }} — Gestion Écurie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f0ede8; --surface: #faf9f7; --ink: #1a1714;
+      --ink-soft: #6b6560; --ink-muted: #a09b96;
+      --accent: #1f2937; --border: #e3dfd8;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg); color: var(--ink);
+      min-height: 100vh; display: flex;
+      flex-direction: column; align-items: center;
+      justify-content: center; padding: 2rem;
+    }
+    .error-wrap { text-align: center; max-width: 520px; }
+    .error-icon-wrap {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 96px; height: 96px; border-radius: 24px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      margin-bottom: 2rem; box-shadow: 0 4px 24px rgba(26,23,20,0.08);
+    }
+    .error-icon-wrap i { font-size: 2.5rem; color: var(--accent); opacity: 0.6; }
+    .error-title {
+      font-family: 'Sora', sans-serif; font-size: 1.75rem; font-weight: 800;
+      color: var(--ink); letter-spacing: -0.03em; margin-bottom: 0.75rem;
+    }
+    .error-sub { font-size: 0.95rem; color: var(--ink-soft); line-height: 1.7; margin-bottom: 2.5rem; }
+    .error-code-badge {
+      display: inline-block; background: var(--accent); color: #fff;
+      font-family: 'Sora', sans-serif; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 3px 10px; border-radius: 100px; margin-bottom: 1rem;
+    }
+    .error-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.5rem; background: var(--accent); color: #fff;
+      border-radius: 100px; font-family: 'Sora', sans-serif;
+      font-size: 0.82rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease;
+    }
+    .btn-primary:hover { background: #111827; transform: translateY(-1px); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.5rem; background: transparent; color: var(--ink-soft);
+      border: 1.5px solid var(--border); border-radius: 100px;
+      font-family: 'Sora', sans-serif; font-size: 0.82rem; font-weight: 600;
+      text-decoration: none; transition: all 0.2s ease;
+    }
+    .error-footer { margin-top: 3rem; font-size: 0.75rem; color: var(--ink-muted); }
+  </style>
+</head>
+<body>
+  <div class="error-wrap">
+    <div class="error-code-badge">Erreur {{ status_code }}</div>
+    <div class="error-icon-wrap">
+      <i class="mdi mdi-emoticon-confused-outline"></i>
+    </div>
+    <h1 class="error-title">{{ status_text }}</h1>
+    <p class="error-sub">
+      Une erreur s'est produite. Revenez à l'accueil ou contactez l'administrateur si le problème persiste.
+    </p>
+    <div class="error-actions">
+      <a href="/" class="btn-primary"><i class="mdi mdi-home-outline"></i> Accueil</a>
+      <a href="javascript:history.back()" class="btn-ghost"><i class="mdi mdi-arrow-left"></i> Retour</a>
+    </div>
+    <div class="error-footer">Gestion Écurie</div>
+  </div>
+</body>
+</html>
