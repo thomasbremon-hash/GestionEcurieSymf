@@ -50,6 +50,26 @@ class EntrepriseType extends AbstractType
                 'required' => false,
                 'attr' => ['class' => 'input', 'placeholder' => 'Numéro de téléphone'],
             ])
+            ->add('email', TextType::class, [
+                'label' => 'Email',
+                'required' => false,
+                'attr' => ['class' => 'input', 'placeholder' => 'Email de l\'entreprise'],
+            ])
+            ->add('codeAPE', TextType::class, [
+                'label' => 'Code APE',
+                'required' => false,
+                'attr' => ['class' => 'input', 'placeholder' => 'Ex: 0143Z'],
+            ])
+            ->add('iban', TextType::class, [
+                'label' => 'IBAN',
+                'required' => false,
+                'attr' => ['class' => 'input', 'placeholder' => 'FR76...'],
+            ])
+            ->add('bic', TextType::class, [
+                'label' => 'BIC',
+                'required' => false,
+                'attr' => ['class' => 'input', 'placeholder' => 'Ex: CMCIFRPP'],
+            ])
             // ->add('users', EntityType::class, [
             //     'class' => User::class,
             //     'choice_label' => function (User $user) {
