@@ -59,6 +59,13 @@
               <div class="field-error">{{ form_errors(formEntreprise.telephone) }}</div>
             </div>
           </div>
+          <div class="fields-row cols-1" style="margin-top:1.25rem;">
+            <div class="form-field">
+              {{ form_label(formEntreprise.email) }}
+              {{ form_widget(formEntreprise.email) }}
+              <div class="field-error">{{ form_errors(formEntreprise.email) }}</div>
+            </div>
+          </div>
         </div>
 
         {# ── Adresse ── #}
@@ -120,6 +127,32 @@
               </div>
             </div>
           {% endif %}
+          <div class="fields-row cols-1" style="margin-top:1.25rem;">
+            <div class="form-field">
+              {{ form_label(formEntreprise.codeAPE) }}
+              {{ form_widget(formEntreprise.codeAPE) }}
+              <div class="field-error">{{ form_errors(formEntreprise.codeAPE) }}</div>
+            </div>
+          </div>
+        </div>
+
+        {# ── Coordonnées bancaires ── #}
+        <div class="form-group" style="margin-bottom:0;">
+          <div class="form-group-title">
+            <i class="mdi mdi-bank-outline"></i> Coordonnées bancaires
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
+              {{ form_label(formEntreprise.iban) }}
+              {{ form_widget(formEntreprise.iban) }}
+              <div class="field-error">{{ form_errors(formEntreprise.iban) }}</div>
+            </div>
+            <div class="form-field">
+              {{ form_label(formEntreprise.bic) }}
+              {{ form_widget(formEntreprise.bic) }}
+              <div class="field-error">{{ form_errors(formEntreprise.bic) }}</div>
+            </div>
+          </div>
         </div>
       </div>
 
