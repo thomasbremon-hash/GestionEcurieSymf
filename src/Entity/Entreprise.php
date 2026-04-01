@@ -448,6 +448,7 @@ class Entreprise
     public function setEmail(?string $email): static
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -459,6 +460,7 @@ class Entreprise
     public function setCodeAPE(?string $codeAPE): static
     {
         $this->codeAPE = $codeAPE;
+
         return $this;
     }
 
@@ -470,6 +472,7 @@ class Entreprise
     public function setIban(?string $iban): static
     {
         $this->iban = $iban;
+
         return $this;
     }
 
@@ -481,6 +484,7 @@ class Entreprise
     public function setBic(?string $bic): static
     {
         $this->bic = $bic;
+
         return $this;
     }
 }
