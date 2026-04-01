@@ -73,6 +73,18 @@ class Entreprise
     #[ORM\Column(length: 255)]
     private ?string $numTVA = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $codeAPE = null;
+
+    #[ORM\Column(length: 34, nullable: true)]
+    private ?string $iban = null;
+
+    #[ORM\Column(length: 11, nullable: true)]
+    private ?string $bic = null;
+
     /**
      * @var Collection<int, FacturationUtilisateur>
      */
@@ -425,6 +437,50 @@ class Entreprise
             }
         }
 
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    public function getCodeAPE(): ?string
+    {
+        return $this->codeAPE;
+    }
+
+    public function setCodeAPE(?string $codeAPE): static
+    {
+        $this->codeAPE = $codeAPE;
+        return $this;
+    }
+
+    public function getIban(): ?string
+    {
+        return $this->iban;
+    }
+
+    public function setIban(?string $iban): static
+    {
+        $this->iban = $iban;
+        return $this;
+    }
+
+    public function getBic(): ?string
+    {
+        return $this->bic;
+    }
+
+    public function setBic(?string $bic): static
+    {
+        $this->bic = $bic;
         return $this;
     }
 }
