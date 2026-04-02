@@ -12,6 +12,7 @@ use App\Security\BackofficeAccessTrait;
 use App\Service\DeplacementToChevalProduitService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -112,6 +113,37 @@ final class MoisDeGestionController extends AbstractController
             'moisDeGestionId'   => $moisDeGestion->getId(),
             'chevaux'           => $chevaux,
             'produits'          => $produits,
+        ]);
+    }
+
+    #[Route('/api/dernier-mois', name: 'app_admin_mois_gestion_api_dernier', methods: ['GET'])]
+    public function apiDernierMois(MoisDeGestionRepository $moisRepo): JsonResponse
+    {
+        $this->requireAdminAccess();
+
+        $dernierMois = $moisRepo->createQueryBuilder('m')
+            ->orderBy('m.annee', 'DESC')
+            ->addOrderBy('m.mois', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$dernierMois) {
+            return new JsonResponse(['quantites' => [], 'label' => null]);
+        }
+
+        $quantites = [];
+        foreach ($dernierMois->getChevalProduits() as $cp) {
+            if ($cp->getProduit()->getNom() === 'Déplacement') {
+                continue;
+            }
+            $key = $cp->getCheval()->getId() . '-' . $cp->getProduit()->getId();
+            $quantites[$key] = $cp->getQuantite() ?? 0;
+        }
+
+        return new JsonResponse([
+            'quantites' => $quantites,
+            'label' => sprintf('%02d/%d', $dernierMois->getMois(), $dernierMois->getAnnee()),
         ]);
     }
 

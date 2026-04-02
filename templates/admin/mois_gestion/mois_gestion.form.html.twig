@@ -57,6 +57,15 @@
         <span class="count-badge" style="margin-left:auto;">{{ chevaux|length }} {{ (chevaux|length) > 1 ? 'Chevaux' : 'Cheval' }}</span>
       </div>
 
+      {% if moisDeGestionId is null %}
+        <div style="padding:0 1.5rem 1rem;">
+          <button type="button" id="btn-import-mois" class="btn-ghost" style="font-size:0.82rem;">
+            <i class="mdi mdi-content-copy"></i> Importer le mois précédent
+          </button>
+          <span id="import-status" style="margin-left:0.75rem;font-size:0.78rem;color:var(--text-muted);"></span>
+        </div>
+      {% endif %}
+
       <div style="overflow-x:auto;">
         <table class="mgestion-table">
           <thead>
@@ -88,7 +97,7 @@
                   {% endfor %}
                   <td class="col-qty">
                     {% if cp_field %}
-                      {{ form_widget(cp_field.quantite) }}
+                      {{ form_widget(cp_field.quantite, { attr: { 'data-cheval': cheval.id, 'data-produit': produit.id } }) }}
                       <div class="field-error">{{ form_errors(cp_field.quantite) }}</div>
                     {% else %}
                       <input type="number" value="0" min="0" step="1" />
@@ -113,4 +122,42 @@
 
     {{ form_end(formMoisDeGestion) }}
   </div>
+
+  {% if moisDeGestionId is null %}
+    <script>
+      document.getElementById('btn-import-mois').addEventListener('click', function() {
+        var btn = this;
+        var status = document.getElementById('import-status');
+        btn.disabled = true;
+        status.textContent = 'Chargement...';
+
+        fetch('{{ path("app_admin_mois_gestion_api_dernier") }}')
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (!data.label || Object.keys(data.quantites).length === 0) {
+              status.textContent = 'Aucun mois précédent trouvé.';
+              btn.disabled = false;
+              return;
+            }
+
+            var filled = 0;
+            var inputs = document.querySelectorAll('[data-cheval][data-produit]');
+            inputs.forEach(function(input) {
+              var key = input.getAttribute('data-cheval') + '-' + input.getAttribute('data-produit');
+              if (data.quantites[key] !== undefined) {
+                input.value = data.quantites[key];
+                filled++;
+              }
+            });
+
+            status.textContent = 'Importé depuis ' + data.label + ' (' + filled + ' champs remplis)';
+            btn.disabled = false;
+          })
+          .catch(function() {
+            status.textContent = 'Erreur lors du chargement.';
+            btn.disabled = false;
+          });
+      });
+    </script>
+  {% endif %}
 {% endblock %}
