@@ -319,7 +319,7 @@
             {% for taux, montantTVA in totalTVA %}
               <tr>
                 <td>{{ taux }} %</td>
-                <td>{{ (montantTVA / (taux / 100))|number_format(2, ',', ' ') }} €</td>
+                <td>{{ taux > 0 ? (montantTVA / (taux / 100))|number_format(2, ',', ' ') : '0,00' }} €</td>
                 <td>{{ montantTVA|number_format(2, ',', ' ') }} €</td>
               </tr>
             {% endfor %}
