@@ -71,17 +71,14 @@ class ProduitType extends AbstractType
             ->add('tauxTVA', NumberType::class, [
                 'label' => 'Taux de TVA (%)',
                 'scale' => 2,
+                'required' => false,
                 'attr' => [
                     'class' => 'input',
-                    'placeholder' => 'Entrez le taux de TVA',
+                    'placeholder' => '0 ou vide si non soumis à TVA',
                     'step' => '0.01',
                     'min' => 0,
                     'max' => 100
                 ],
-                'constraints' => [
-                    new NotBlank(['message' => 'Le taux de TVA est obligatoire']),
-                    new Positive(['message' => 'Le taux de TVA doit être positif'])
-                ]
             ])
         ;
     }
