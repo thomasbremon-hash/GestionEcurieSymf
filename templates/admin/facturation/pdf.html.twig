@@ -3,151 +3,82 @@
   <head>
     <meta charset="UTF-8" />
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
       body {
         font-family: DejaVu Sans, sans-serif;
         font-size: 8.5px;
         color: #1a1714;
         background: #fff;
-        padding: 24px 28px;
-        line-height: 1.35;
+        padding: 20px 24px;
+        line-height: 1.4;
       }
-      
-      /* ════ EN-TÊTE ════ */
+
+      /* ═══ EN-TÊTE ═══ */
       .header {
         display: table;
         width: 100%;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
       }
       .header-left {
         display: table-cell;
-        vertical-align: middle;
-        width: 50%;
+        vertical-align: top;
+        width: 55%;
       }
       .header-right {
         display: table-cell;
-        vertical-align: middle;
-        width: 50%;
-        text-align: right;
+        vertical-align: top;
+        width: 45%;
+        text-align: left;
+        padding-left: 20px;
       }
-      
-      .logo {
-        height: 38px;
-        display: block;
-        margin-bottom: 5px;
-      }
-      
-      .company-name {
-        font-size: 13px;
-        font-weight: bold;
-        color: #1f2937;
-        letter-spacing: -0.3px;
-      }
-      .company-sub {
-        font-size: 7.5px;
-        color: #a09b96;
-        margin-top: 1px;
-      }
-      
-      .invoice-label {
-        font-size: 7px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: #a09b96;
-        margin-bottom: 2px;
-      }
-      .invoice-num {
-        font-size: 15px;
-        font-weight: bold;
-        color: #1f2937;
-        letter-spacing: -0.5px;
-      }
-      .invoice-meta {
-        font-size: 7.5px;
-        color: #6b6560;
-        margin-top: 2px;
-      }
-      
-      .statut-pill {
-        display: inline-block;
-        padding: 2px 7px;
-        border-radius: 20px;
-        font-size: 7px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin-top: 3px;
-      }
-      .paid {
-        background: #d1fae5;
-        color: #065f46;
-      }
-      .unpaid {
-        background: #fee2e2;
-        color: #991b1b;
-      }
-      
-      /* ════ BARRE DE SÉPARATION ════ */
-      .divider {
-        height: 2px;
-        background: #1f2937;
-        margin-bottom: 12px;
-        border-radius: 1px;
-      }
-      
-      /* ════ INFOS 3 COLONNES ════ */
-      .meta-row {
+
+      .logo { height: 32px; display: block; margin-bottom: 4px; }
+
+      .company-name { font-size: 11px; font-weight: bold; color: #1f2937; margin-bottom: 2px; }
+      .company-info { font-size: 7.5px; color: #444; line-height: 1.6; }
+
+      .client-label { font-size: 7px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+      .client-name { font-size: 9px; font-weight: bold; color: #1f2937; margin-bottom: 2px; }
+      .client-address { font-size: 8px; color: #444; line-height: 1.6; }
+
+      /* ═══ TITRE FACTURE ═══ */
+      .facture-title-block {
+        margin: 10px 0 8px 0;
+        border-top: 2px solid #1f2937;
+        border-bottom: 1px solid #ddd;
+        padding: 6px 0;
         display: table;
         width: 100%;
-        margin-bottom: 14px;
-        background: #f7f6f3;
-        border-radius: 4px;
       }
-      .meta-cell {
+      .facture-title-cell {
         display: table-cell;
-        padding: 8px 10px;
-        vertical-align: top;
-        width: 33.33%;
-        border-right: 1px solid #e8e5e0;
+        vertical-align: middle;
+        width: 30%;
       }
-      .meta-cell:last-child {
-        border-right: none;
-      }
-      .meta-label {
-        font-size: 6.5px;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: #a09b96;
+      .facture-title {
+        font-size: 16px;
         font-weight: bold;
-        margin-bottom: 3px;
+        color: #1f2937;
+        letter-spacing: 0.05em;
       }
-      .meta-value {
-        font-size: 8.5px;
-        font-weight: bold;
-        color: #1a1714;
+      .facture-meta-cell {
+        display: table-cell;
+        vertical-align: middle;
+        width: 70%;
       }
-      .meta-sub {
-        font-size: 7.5px;
-        color: #6b6560;
-        margin-top: 1px;
-        line-height: 1.5;
-      }
-      
-      /* ════ TABLEAU ════ */
+      .facture-meta-table { width: 100%; border-collapse: collapse; }
+      .facture-meta-table td { font-size: 8px; padding: 1px 6px; }
+      .facture-meta-table td.label { color: #888; width: 40%; }
+      .facture-meta-table td.value { color: #1a1714; font-weight: bold; }
+
+      /* ═══ TABLEAU DES LIGNES ═══ */
       table.lignes {
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 10px;
       }
-      table.lignes thead tr {
-        background: #1f2937;
-      }
+      table.lignes thead tr { background: #1f2937; }
       table.lignes thead th {
         color: #fff;
         padding: 5px 7px;
@@ -157,33 +88,20 @@
         font-weight: bold;
         text-align: left;
       }
-      table.lignes thead th.r {
-        text-align: right;
-      }
-      table.lignes thead th.c {
-        text-align: center;
-      }
-      
-      table.lignes tbody tr {
-        border-bottom: 1px solid #f0ede8;
-      }
-      table.lignes tbody tr:last-child {
-        border-bottom: none;
-      }
+      table.lignes thead th.r { text-align: right; }
+      table.lignes thead th.c { text-align: center; }
+
+      table.lignes tbody tr { border-bottom: 1px solid #f0ede8; }
+      table.lignes tbody tr:last-child { border-bottom: none; }
       table.lignes tbody td {
         padding: 4px 7px;
         font-size: 8px;
         color: #1a1714;
         vertical-align: middle;
       }
-      table.lignes tbody td.r {
-        text-align: right;
-      }
-      table.lignes tbody td.c {
-        text-align: center;
-        color: #6b6560;
-      }
-      
+      table.lignes tbody td.r { text-align: right; }
+      table.lignes tbody td.c { text-align: center; color: #6b6560; }
+
       .cheval-row td {
         background: #eef0f5;
         font-weight: bold;
@@ -195,34 +113,51 @@
         letter-spacing: 0.03em;
         text-transform: uppercase;
       }
-      
-      /* ════ TOTAUX ════ */
+
+      /* ═══ BAS DE PAGE ═══ */
       .bottom-row {
         display: table;
         width: 100%;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
       }
       .bottom-left {
         display: table-cell;
-        width: 52%;
-        vertical-align: bottom;
+        width: 50%;
+        vertical-align: top;
+        padding-right: 12px;
       }
       .bottom-right {
         display: table-cell;
-        width: 48%;
+        width: 50%;
         vertical-align: top;
       }
-      
-      .note-box {
-        background: #f7f6f3;
-        border-left: 2px solid #1f2937;
-        padding: 6px 8px;
-        font-size: 7.5px;
-        color: #6b6560;
-        line-height: 1.6;
-        border-radius: 0 3px 3px 0;
+
+      /* Tableau récap TVA */
+      table.recap-tva {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 8px;
       }
-      
+      table.recap-tva thead tr { background: #1f2937; }
+      table.recap-tva thead th {
+        color: #fff;
+        padding: 4px 7px;
+        font-size: 7px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        text-align: right;
+      }
+      table.recap-tva thead th:first-child { text-align: left; }
+      table.recap-tva tbody td {
+        padding: 3px 7px;
+        font-size: 8px;
+        border-bottom: 1px solid #f0ede8;
+        text-align: right;
+      }
+      table.recap-tva tbody td:first-child { text-align: left; }
+      table.recap-tva tbody tr:last-child td { border-bottom: none; }
+
+      /* Tableau totaux */
       table.totaux {
         width: 100%;
         border-collapse: collapse;
@@ -232,102 +167,110 @@
         font-size: 8px;
         border-bottom: 1px solid #f0ede8;
       }
-      table.totaux td.r {
-        text-align: right;
-        font-weight: bold;
-      }
-      table.totaux tr:last-child td {
-        border-bottom: none;
-      }
-      
+      table.totaux td.r { text-align: right; font-weight: bold; }
+      table.totaux tr:last-child td { border-bottom: none; }
+
       .ttc-row td {
         background: #1f2937 !important;
         color: #fff !important;
         font-size: 10px !important;
         font-weight: bold !important;
-        padding: 6px 8px !important;
+        padding: 5px 7px !important;
         border: none !important;
       }
-      .ttc-row td.r {
-        text-align: right;
+      .ttc-row td.r { text-align: right; }
+
+      /* Coordonnées bancaires */
+      .bank-block {
+        margin-top: 8px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 5px 8px;
+        font-size: 7.5px;
+        color: #444;
+        line-height: 1.7;
       }
-      
-      /* ════ FOOTER ════ */
-      .footer {
-        border-top: 1px solid #e3dfd8;
-        padding-top: 7px;
+      .bank-block strong { color: #1f2937; }
+
+      /* Talon de règlement */
+      .talon {
+        margin-top: 12px;
+        border-top: 1px dashed #999;
+        padding-top: 6px;
+      }
+      .talon-label {
+        font-size: 6.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #999;
+        margin-bottom: 4px;
+      }
+      .talon-row {
         display: table;
         width: 100%;
       }
-      .footer-left {
+      .talon-cell {
         display: table-cell;
-        width: 65%;
-        font-size: 7px;
-        color: #b0aaa4;
-        line-height: 1.7;
-        vertical-align: bottom;
+        font-size: 8px;
+        vertical-align: middle;
       }
-      .footer-right {
-        display: table-cell;
-        width: 35%;
-        text-align: right;
-        font-size: 7px;
-        color: #6b6560;
-        vertical-align: bottom;
-        line-height: 1.7;
-      }
+      .talon-cell strong { font-size: 8.5px; color: #1f2937; }
     </style>
   </head>
   <body>
+
     {# ── En-tête ── #}
     <div class="header">
       <div class="header-left">
         <img src="assets/img/logopdf.png" class="logo" />
         <div class="company-name">{{ facture.entreprise.nom }}</div>
-        <div class="company-sub">{{ facture.entreprise.rue }} — {{ facture.entreprise.cp }} {{ facture.entreprise.ville }}</div>
+        <div class="company-info">
+          {{ facture.entreprise.rue }}<br />
+          {{ facture.entreprise.cp }} {{ facture.entreprise.ville }}<br />
+          {% if facture.entreprise.telephone %}Mob. {{ facture.entreprise.telephone }}{% endif %}
+          {% if facture.entreprise.telephone and facture.entreprise.email %} — {% endif %}
+          {% if facture.entreprise.email %}E-mail : {{ facture.entreprise.email }}{% endif %}<br />
+          SIRET : {{ facture.entreprise.siret }} — SIREN : {{ facture.entreprise.siren }}<br />
+          {% if facture.entreprise.numTVA %}TVA intra : {{ facture.entreprise.numTVA }}<br />{% endif %}
+          {% if facture.entreprise.codeAPE %}Code APE : {{ facture.entreprise.codeAPE }}<br />{% endif %}
+          Paiement de la TVA sur encaissement
+        </div>
       </div>
       <div class="header-right">
-        <div class="invoice-label">Facture</div>
-        <div class="invoice-num">{{ facture.numFacture }}</div>
-        <div class="invoice-meta">Période {{ '%02d'|format(mois.mois) }}/{{ mois.annee }} · Édité le {{ 'now'|date('d/m/Y') }}</div>
-        <div>
-          <span class="statut-pill {{ facture.statut != 'impayee' ? 'paid' : 'unpaid' }}">{{ facture.statut != 'impayee' ? '✓ Réglé' : '⏱ En attente' }}</span>
+        <div class="client-label">Facturé à</div>
+        <div class="client-name">{{ user.prenom }} {{ user.nom }}</div>
+        <div class="client-address">
+          {{ user.rue }}<br />
+          {{ user.cp }} {{ user.ville }}<br />
+          {{ user.pays }}
         </div>
       </div>
     </div>
 
-    <div class="divider"></div>
-
-    {# ── Bloc infos 3 colonnes ── #}
-    <div class="meta-row">
-      <div class="meta-cell">
-        <div class="meta-label">Émetteur</div>
-        <div class="meta-value">{{ facture.entreprise.nom }}</div>
-        <div class="meta-sub">
-          SIRET : {{ facture.entreprise.siret }}<br />
-          {% if facture.entreprise.numTVA %}
-            TVA : {{ facture.entreprise.numTVA }}<br />
-          {% endif %}
-          {{ facture.entreprise.telephone ?? '' }}
-        </div>
+    {# ── Titre FACTURE + méta ── #}
+    <div class="facture-title-block">
+      <div class="facture-title-cell">
+        <div class="facture-title">FACTURE</div>
       </div>
-      <div class="meta-cell">
-        <div class="meta-label">Facturé à</div>
-        <div class="meta-value">{{ user.prenom }} {{ user.nom }}</div>
-        <div class="meta-sub">
-          {{ user.email }}<br />
-          {{ user.rue }}<br />
-          {{ user.cp }} {{ user.ville }}
-        </div>
-      </div>
-      <div class="meta-cell">
-        <div class="meta-label">Détails</div>
-        <div class="meta-sub">
-          <strong>Période :</strong> {{ '%02d'|format(mois.mois) }}/{{ mois.annee }}<br />
-          <strong>N° :</strong> {{ facture.numFacture }}<br />
-          <strong>Échéance :</strong> 30 jours<br />
-          <strong>Statut :</strong> {{ facture.statut != 'impayee' ? 'Réglé' : 'En attente' }}
-        </div>
+      <div class="facture-meta-cell">
+        <table class="facture-meta-table">
+          <tr>
+            <td class="label">Référence :</td>
+            <td class="value">{{ facture.numFacture }}</td>
+          </tr>
+          <tr>
+            <td class="label">Type d'opération :</td>
+            <td class="value">Prestation de services</td>
+          </tr>
+          <tr>
+            <td class="label">Date :</td>
+            <td class="value">{{ 'now'|date('d/m/Y') }}</td>
+          </tr>
+          <tr>
+            <td class="label">Échéance :</td>
+            <td class="value">À la réception de la facture</td>
+          </tr>
+        </table>
       </div>
     </div>
 
@@ -337,16 +280,15 @@
         <tr>
           <th>Désignation</th>
           <th class="c">Qté</th>
-          <th class="r">PU HT</th>
-          <th class="r">HT</th>
-          <th class="c">TVA</th>
-          <th class="r">TVA €</th>
+          <th class="r">Prix unitaire HT</th>
+          <th class="r">Montant net HT</th>
+          <th class="c">Taux TVA</th>
         </tr>
       </thead>
       <tbody>
         {% for cheval, lignes in lignesParCheval %}
           <tr class="cheval-row">
-            <td colspan="6">{{ cheval }} — {{ lignes[0].pourcentage }} %</td>
+            <td colspan="5">{{ cheval }} — {{ lignes[0].pourcentage }} %</td>
           </tr>
           {% for ligne in lignes %}
             <tr>
@@ -355,21 +297,34 @@
               <td class="r">{{ ligne.prixUnitaire|number_format(2, ',', ' ') }} €</td>
               <td class="r">{{ ligne.montantHT|number_format(2, ',', ' ') }} €</td>
               <td class="c">{{ ligne.tauxTVA }} %</td>
-              <td class="r">{{ ligne.montantTVA|number_format(2, ',', ' ') }} €</td>
             </tr>
           {% endfor %}
         {% endfor %}
       </tbody>
     </table>
 
-    {# ── Bas de page : note + totaux ── #}
+    {# ── Bas de page ── #}
     <div class="bottom-row">
       <div class="bottom-left">
-        <div class="note-box">
-          <strong>Conditions de paiement :</strong> 30 jours nets<br />
-          Pénalités de retard : taux légal en vigueur<br />
-          Indemnité forfaitaire : 40 € — TVA non applicable art. 293B CGI (si applicable)
-        </div>
+        {# Tableau récapitulatif TVA #}
+        <table class="recap-tva">
+          <thead>
+            <tr>
+              <th>Taux</th>
+              <th>Total HT</th>
+              <th>Montant TVA</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for taux, montantTVA in totalTVA %}
+              <tr>
+                <td>{{ taux }} %</td>
+                <td>{{ (montantTVA / (taux / 100))|number_format(2, ',', ' ') }} €</td>
+                <td>{{ montantTVA|number_format(2, ',', ' ') }} €</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
       <div class="bottom-right">
         <table class="totaux">
@@ -388,20 +343,39 @@
               <td>Total TTC</td>
               <td class="r">{{ totalTTC|number_format(2, ',', ' ') }} €</td>
             </tr>
+            <tr>
+              <td><strong>Net à payer</strong></td>
+              <td class="r"><strong>{{ totalTTC|number_format(2, ',', ' ') }} €</strong></td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    {# ── Footer ── #}
-    <div class="footer">
-      <div class="footer-left">
-        {{ facture.entreprise.nom }} · SIRET {{ facture.entreprise.siret }}
-        {% if facture.entreprise.numTVA %}
-          · TVA {{ facture.entreprise.numTVA }}
-        {% endif %}· {{ facture.entreprise.rue }}, {{ facture.entreprise.cp }} {{ facture.entreprise.ville }}
+    {# ── Coordonnées bancaires ── #}
+    {% if facture.entreprise.iban or facture.entreprise.bic %}
+      <div class="bank-block">
+        <strong>Coordonnées bancaires</strong> —
+        {% if facture.entreprise.bic %}BIC : {{ facture.entreprise.bic }}{% endif %}
+        {% if facture.entreprise.iban %} · IBAN : {{ facture.entreprise.iban }}{% endif %}
       </div>
-      <div class="footer-right">Document généré le {{ 'now'|date('d/m/Y à H:i') }}</div>
+    {% endif %}
+
+    {# ── Talon de règlement ── #}
+    <div class="talon">
+      <div class="talon-label">Talon de règlement — à retourner avec votre paiement</div>
+      <div class="talon-row">
+        <div class="talon-cell" style="width:40%;">
+          Référence : <strong>{{ facture.numFacture }}</strong>
+        </div>
+        <div class="talon-cell" style="width:30%;">
+          Date : <strong>{{ 'now'|date('d/m/Y') }}</strong>
+        </div>
+        <div class="talon-cell" style="width:30%; text-align:right;">
+          Montant : <strong>{{ totalTTC|number_format(2, ',', ' ') }} €</strong>
+        </div>
+      </div>
     </div>
+
   </body>
 </html>
