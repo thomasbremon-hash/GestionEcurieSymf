@@ -33,7 +33,8 @@ class FactureCalculator
 
                 $prixProrata = $conso->getPrixUnitaire() * $pourcentage;
                 $montantHT = $prixProrata * $conso->getQuantite();
-                $montantTVA = $montantHT * ($conso->getProduit()->getTauxTVA() / 100);
+                $tauxTVA = $conso->getProduit()->getTauxTVA() ?? 0;
+                $montantTVA = $tauxTVA > 0 ? $montantHT * ($tauxTVA / 100) : 0;
                 $montantTTC = $montantHT + $montantTVA;
 
                 // 🔹 Si c'est un déplacement, on prend le commentaire comme description
@@ -51,17 +52,19 @@ class FactureCalculator
                     'prixBase' => $conso->getPrixUnitaire(),
                     'prixUnitaire' => $prixProrata,
                     'montantHT' => $montantHT,
-                    'tauxTVA' => $conso->getProduit()->getTauxTVA(),
+                    'tauxTVA' => $tauxTVA,
                     'montantTVA' => $montantTVA,
                 ];
 
                 $totalHT += $montantHT;
                 $totalTTC += $montantTTC;
 
-                if (!isset($totalTVA[$conso->getProduit()->getTauxTVA()])) {
-                    $totalTVA[$conso->getProduit()->getTauxTVA()] = 0;
+                if ($tauxTVA > 0) {
+                    if (!isset($totalTVA[$tauxTVA])) {
+                        $totalTVA[$tauxTVA] = 0;
+                    }
+                    $totalTVA[$tauxTVA] += $montantTVA;
                 }
-                $totalTVA[$conso->getProduit()->getTauxTVA()] += $montantTVA;
             }
         }
 

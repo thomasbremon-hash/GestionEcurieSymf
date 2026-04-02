@@ -37,7 +37,7 @@ class Produit
     #[ORM\OneToMany(targetEntity: ChevalProduit::class, mappedBy: 'produit')]
     private Collection $chevalProduits;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?float $tauxTVA = null;
 
     public function __construct()
