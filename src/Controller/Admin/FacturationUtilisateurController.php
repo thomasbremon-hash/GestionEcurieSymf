@@ -151,7 +151,7 @@ class FacturationUtilisateurController extends AbstractController
                 }
 
                 $facture->setTotal($total)
-                    ->setNumFacture(sprintf('%02d-%d-%04d', $mois->getMois(), $mois->getAnnee(), $compteur))
+                    ->setNumFacture(sprintf('%d-%02d-%04d', $mois->getAnnee(), $mois->getMois(), $compteur))
                     ->setStatut('impayee');
 
                 $this->em->persist($facture);
