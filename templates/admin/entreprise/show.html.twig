@@ -77,24 +77,56 @@
 
         <div class="info-field">
           <div class="info-label">Téléphone</div>
-          <div class="info-value {% if not entreprise.telephone %}{% endif %}">{{ entreprise.telephone ? : 'Non renseigné' }}</div>
+          <div class="info-value">{{ entreprise.telephone ?: 'Non renseigné' }}</div>
+        </div>
+
+        <div class="info-field">
+          <div class="info-label">Email</div>
+          <div class="info-value">{{ entreprise.email ?: 'Non renseigné' }}</div>
         </div>
 
         <div class="info-divider"></div>
 
         <div class="info-field">
           <div class="info-label">SIREN</div>
-          <div class="info-value {% if not entreprise.siren %}{% endif %}">{{ entreprise.siren ? : 'Non renseigné' }}</div>
+          <div class="info-value">{{ entreprise.siren ?: 'Non renseigné' }}</div>
         </div>
 
         <div class="info-field">
           <div class="info-label">SIRET</div>
-          <div class="info-value {% if not entreprise.siret %}{% endif %}">{{ entreprise.siret ? : 'Non renseigné' }}</div>
+          <div class="info-value">{{ entreprise.siret ?: 'Non renseigné' }}</div>
         </div>
 
         <div class="info-field">
           <div class="info-label">Numéro TVA</div>
-          <div class="info-value {% if not entreprise.numTVA %}{% endif %}">{{ entreprise.numTVA ? : 'Non renseigné' }}</div>
+          <div class="info-value">{{ entreprise.numTVA ?: 'Non renseigné' }}</div>
+        </div>
+
+        <div class="info-field">
+          <div class="info-label">Code APE</div>
+          <div class="info-value">{{ entreprise.codeAPE ?: 'Non renseigné' }}</div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Coordonnées bancaires ── #}
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="bi bi-bank"></i>
+        </div>
+        <h4 class="section-title">Coordonnées bancaires</h4>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-field">
+          <div class="info-label">IBAN</div>
+          <div class="info-value">{{ entreprise.iban ?: 'Non renseigné' }}</div>
+        </div>
+
+        <div class="info-field">
+          <div class="info-label">BIC</div>
+          <div class="info-value">{{ entreprise.bic ?: 'Non renseigné' }}</div>
         </div>
       </div>
     </div>
