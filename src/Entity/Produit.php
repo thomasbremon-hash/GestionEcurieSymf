@@ -152,7 +152,7 @@ class Produit
         return $this->tauxTVA;
     }
 
-    public function setTauxTVA(float $tauxTVA): static
+    public function setTauxTVA(?float $tauxTVA): static
     {
         $this->tauxTVA = $tauxTVA;
 
