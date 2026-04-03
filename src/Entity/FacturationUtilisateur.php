@@ -6,6 +6,7 @@ use App\Repository\FacturationUtilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FacturationUtilisateurRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_NUM_FACTURE', columns: ['num_facture'])]
 class FacturationUtilisateur
 {
     #[ORM\Id]
@@ -25,12 +26,20 @@ class FacturationUtilisateur
     #[ORM\ManyToOne(inversedBy: 'ManyToOne')]
     private ?Entreprise $entreprise = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $numFacture = null;
-
 
     #[ORM\Column(length: 255)]
     private ?string $statut = "impayee";
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeImmutable $dateEmission = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $datePaiement = null;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: 'boolean')]
     private bool $mailEnvoye = false;
@@ -120,6 +129,42 @@ class FacturationUtilisateur
     public function setMailEnvoye(bool $mailEnvoye): self
     {
         $this->mailEnvoye = $mailEnvoye;
+        return $this;
+    }
+
+    public function getDateEmission(): ?\DateTimeImmutable
+    {
+        return $this->dateEmission;
+    }
+
+    public function setDateEmission(\DateTimeImmutable $dateEmission): static
+    {
+        $this->dateEmission = $dateEmission;
+
+        return $this;
+    }
+
+    public function getDatePaiement(): ?\DateTimeImmutable
+    {
+        return $this->datePaiement;
+    }
+
+    public function setDatePaiement(?\DateTimeImmutable $datePaiement): static
+    {
+        $this->datePaiement = $datePaiement;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
         return $this;
     }
 }

@@ -215,6 +215,18 @@
         vertical-align: middle;
       }
       .talon-cell strong { font-size: 8.5px; color: #1f2937; }
+
+      /* Mentions légales */
+      .legal-mentions {
+        margin-top: 10px;
+        padding: 5px 8px;
+        border: 1px solid #e5e5e5;
+        border-radius: 3px;
+        font-size: 6.5px;
+        color: #666;
+        line-height: 1.7;
+      }
+      .legal-mentions strong { color: #444; }
     </style>
   </head>
   <body>
@@ -230,7 +242,10 @@
           {% if facture.entreprise.telephone %}Mob. {{ facture.entreprise.telephone }}{% endif %}
           {% if facture.entreprise.telephone and facture.entreprise.email %} — {% endif %}
           {% if facture.entreprise.email %}E-mail : {{ facture.entreprise.email }}{% endif %}<br />
+          {% if facture.entreprise.formeJuridique %}{{ facture.entreprise.formeJuridique }}{% endif %}
+          {% if facture.entreprise.capitalSocial %} au capital de {{ facture.entreprise.capitalSocial }} €{% endif %}<br />
           SIRET : {{ facture.entreprise.siret }} — SIREN : {{ facture.entreprise.siren }}<br />
+          {% if facture.entreprise.rcs %}RCS : {{ facture.entreprise.rcs }}<br />{% endif %}
           {% if facture.entreprise.numTVA %}TVA intra : {{ facture.entreprise.numTVA }}<br />{% endif %}
           {% if facture.entreprise.codeAPE %}Code APE : {{ facture.entreprise.codeAPE }}<br />{% endif %}
           Paiement de la TVA sur encaissement
@@ -263,12 +278,12 @@
             <td class="value">Prestation de services</td>
           </tr>
           <tr>
-            <td class="label">Date :</td>
-            <td class="value">{{ 'now'|date('d/m/Y') }}</td>
+            <td class="label">Date d'émission :</td>
+            <td class="value">{{ facture.dateEmission ? facture.dateEmission|date('d/m/Y') : 'now'|date('d/m/Y') }}</td>
           </tr>
           <tr>
             <td class="label">Échéance :</td>
-            <td class="value">À la réception de la facture</td>
+            <td class="value">À réception — délai de paiement : 30 jours</td>
           </tr>
         </table>
       </div>
@@ -361,6 +376,14 @@
       </div>
     {% endif %}
 
+    {# ── Mentions légales obligatoires ── #}
+    <div class="legal-mentions">
+      <strong>Conditions de paiement :</strong> Paiement à 30 jours à compter de la date d'émission de la facture.<br />
+      <strong>Pénalités de retard :</strong> En cas de retard de paiement, une pénalité égale à 3 fois le taux d'intérêt légal sera exigée (article L441-10 du Code de Commerce).<br />
+      <strong>Indemnité forfaitaire de recouvrement :</strong> En cas de retard de paiement, une indemnité forfaitaire de 40 € sera due au titre des frais de recouvrement (article D441-5 du Code de Commerce).<br />
+      <strong>Escompte :</strong> Pas d'escompte pour paiement anticipé.
+    </div>
+
     {# ── Talon de règlement ── #}
     <div class="talon">
       <div class="talon-label">Talon de règlement — à retourner avec votre paiement</div>
@@ -369,7 +392,7 @@
           Référence : <strong>{{ facture.numFacture }}</strong>
         </div>
         <div class="talon-cell" style="width:30%;">
-          Date : <strong>{{ 'now'|date('d/m/Y') }}</strong>
+          Date : <strong>{{ facture.dateEmission ? facture.dateEmission|date('d/m/Y') : 'now'|date('d/m/Y') }}</strong>
         </div>
         <div class="talon-cell" style="width:30%; text-align:right;">
           Montant : <strong>{{ totalTTC|number_format(2, ',', ' ') }} €</strong>

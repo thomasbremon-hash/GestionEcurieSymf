@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Entity\Cheval;
+use App\Entity\Entreprise;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -74,6 +75,16 @@ class ChevalType extends AbstractType
                 'attr' => [
                     'class' => 'input',
                 ]
+            ])
+
+            // ENTREPRISE
+            ->add('entreprise', EntityType::class, [
+                'class' => Entreprise::class,
+                'choice_label' => 'nom',
+                'label' => 'Entreprise',
+                'placeholder' => 'Sélectionner une entreprise',
+                'required' => false,
+                'attr' => ['class' => 'input'],
             ])
 
             ->add('chevalProprietaires', CollectionType::class, [

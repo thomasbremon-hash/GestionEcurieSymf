@@ -66,21 +66,23 @@ final class ProduitEntrepriseTaxesController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/delete/{id}', name: 'app_admin_produit_entreprise_delete')]
-    public function adminChevauxRemove(?ProduitEntrepriseTaxes $produitEntreprise): Response
+    #[Route('/delete/{id}', name: 'app_admin_produit_entreprise_delete', methods: ['POST'])]
+    public function adminChevauxRemove(?ProduitEntrepriseTaxes $produitEntreprise, Request $request): Response
     {
         if (!$produitEntreprise) {
             $this->addFlash('danger', "Produit | Entreprise | Taxes introuvable.");
             return $this->redirectToRoute('app_admin_produit_entreprise');
         }
 
-        $this->em->remove($produitEntreprise);
-        $this->em->flush();
+        if ($this->isCsrfTokenValid('delete'.$produitEntreprise->getId(), $request->request->get('_token'))) {
+            $this->em->remove($produitEntreprise);
+            $this->em->flush();
 
-        $this->addFlash(
-            'success',
-            "Produit | Entreprise | Taxes a bien été supprimé !"
-        );
+            $this->addFlash(
+                'success',
+                "Produit | Entreprise | Taxes a bien été supprimé !"
+            );
+        }
 
         return $this->redirectToRoute('app_admin_produit_entreprise');
     }

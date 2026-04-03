@@ -64,19 +64,22 @@ final class EntrepriseController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_entreprise_delete')]
-    public function delete(?Entreprise $entreprise): Response
+    #[Route('/delete/{id}', name: 'app_admin_entreprise_delete', methods: ['POST'])]
+    public function delete(?Entreprise $entreprise, Request $request): Response
     {
         $this->requireAdminAccess();
 
-        if (!$entreprise->getUsers()->isEmpty()) {
-            $this->addFlash('danger', "Impossible de supprimer « {$entreprise->getNom()} » car elle est affiliée à un utilisateur !");
-            return $this->redirectToRoute('app_admin_entreprises');
+        if ($this->isCsrfTokenValid('delete'.$entreprise->getId(), $request->request->get('_token'))) {
+            if (!$entreprise->getUsers()->isEmpty()) {
+                $this->addFlash('danger', "Impossible de supprimer « {$entreprise->getNom()} » car elle est affiliée à un utilisateur !");
+                return $this->redirectToRoute('app_admin_entreprises');
+            }
+
+            $this->em->remove($entreprise);
+            $this->em->flush();
+            $this->addFlash('success', "L'entreprise « {$entreprise->getNom()} » a bien été supprimée !");
         }
 
-        $this->em->remove($entreprise);
-        $this->em->flush();
-        $this->addFlash('success', "L'entreprise « {$entreprise->getNom()} » a bien été supprimée !");
         return $this->redirectToRoute('app_admin_entreprises');
     }
 }

@@ -26,7 +26,9 @@ final class DeplacementController extends AbstractController
         $this->requireBackofficeAccess();
 
         $deplacements = $deplacementRepository->createQueryBuilder('d')
-            ->orderBy('d.date', 'DESC')
+            ->leftJoin('d.entreprise', 'e')
+            ->orderBy('e.nom', 'ASC')
+            ->addOrderBy('d.date', 'DESC')
             ->getQuery()->getResult();
 
         return $this->render('admin/deplacement/liste.html.twig', [
@@ -67,8 +69,8 @@ final class DeplacementController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_deplacement_delete')]
-    public function delete(?Deplacement $deplacement): Response
+    #[Route('/delete/{id}', name: 'app_admin_deplacement_delete', methods: ['POST'])]
+    public function delete(?Deplacement $deplacement, Request $request): Response
     {
         $this->requireAdminAccess();
 
@@ -77,9 +79,12 @@ final class DeplacementController extends AbstractController
             return $this->redirectToRoute('app_admin_deplacements');
         }
 
-        $this->em->remove($deplacement);
-        $this->em->flush();
-        $this->addFlash('success', "Le déplacement « {$deplacement->getNom()} » a bien été supprimé !");
+        if ($this->isCsrfTokenValid('delete'.$deplacement->getId(), $request->request->get('_token'))) {
+            $this->em->remove($deplacement);
+            $this->em->flush();
+            $this->addFlash('success', "Le déplacement « {$deplacement->getNom()} » a bien été supprimé !");
+        }
+
         return $this->redirectToRoute('app_admin_deplacements');
     }
 }

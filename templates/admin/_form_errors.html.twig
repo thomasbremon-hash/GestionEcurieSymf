@@ -1,0 +1,27 @@
+{# Bloc récapitulatif des erreurs de formulaire — à inclure après form_start() #}
+{% set has_errors = form.vars.errors|length > 0 %}
+{% set child_errors = [] %}
+{% for child in form.children %}
+  {% if child.vars.errors|length > 0 %}
+    {% for error in child.vars.errors %}
+      {% set child_errors = child_errors|merge([{ label: child.vars.label|default(child.vars.name|capitalize), message: error.message }]) %}
+    {% endfor %}
+    {% set has_errors = true %}
+  {% endif %}
+{% endfor %}
+
+{% if has_errors %}
+  <div class="form-error-summary">
+    <div class="form-error-summary-title">
+      <i class="mdi mdi-alert-circle"></i> Des erreurs ont été détectées
+    </div>
+    <ul class="form-error-summary-list">
+      {% for error in form.vars.errors %}
+        <li>{{ error.message }}</li>
+      {% endfor %}
+      {% for err in child_errors %}
+        <li>{{ err.label }} : {{ err.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

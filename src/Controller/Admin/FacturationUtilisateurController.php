@@ -58,6 +58,17 @@ class FacturationUtilisateurController extends AbstractController
     #[Route('/pdf/{id}', name: 'app_admin_facturation_pdf_utilisateur')]
     public function pdf(FacturationUtilisateur $facture, FactureCalculator $calculator): Response
     {
+        return $this->generatePdf($facture, $calculator, 'attachment');
+    }
+
+    #[Route('/voir/{id}', name: 'app_admin_facturation_voir_utilisateur')]
+    public function voir(FacturationUtilisateur $facture, FactureCalculator $calculator): Response
+    {
+        return $this->generatePdf($facture, $calculator, 'inline');
+    }
+
+    private function generatePdf(FacturationUtilisateur $facture, FactureCalculator $calculator, string $disposition): Response
+    {
         $this->requireBackofficeAccess();
 
         $user = $facture->getUtilisateur();
@@ -89,9 +100,11 @@ class FacturationUtilisateurController extends AbstractController
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
+        $filename = sprintf('facture_%s_%02d_%d.pdf', $user->getNom(), $mois->getMois(), $mois->getAnnee());
+
         return new Response($dompdf->output(), Response::HTTP_OK, [
             'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => sprintf('attachment; filename="facture_%s_%02d_%d.pdf"', $user->getNom(), $mois->getMois(), $mois->getAnnee()),
+            'Content-Disposition' => sprintf('%s; filename="%s"', $disposition, $filename),
         ]);
     }
 
@@ -101,6 +114,7 @@ class FacturationUtilisateurController extends AbstractController
         $this->requireAdminAccess();
 
         $facture->setStatut('payee');
+        $facture->setDatePaiement(new \DateTimeImmutable());
         $this->em->flush();
         $this->addFlash('success', 'Facture marquée comme payée.');
         return $this->redirectToRoute('app_admin_facturation_utilisateur');
@@ -150,9 +164,12 @@ class FacturationUtilisateurController extends AbstractController
                     }
                 }
 
+                $now = new \DateTimeImmutable();
                 $facture->setTotal($total)
                     ->setNumFacture(sprintf('%d-%02d-%04d', $mois->getAnnee(), $mois->getMois(), $compteur))
-                    ->setStatut('impayee');
+                    ->setStatut('impayee')
+                    ->setDateEmission($now)
+                    ->setCreatedAt($now);
 
                 $this->em->persist($facture);
             }
@@ -226,14 +243,13 @@ class FacturationUtilisateurController extends AbstractController
         return $this->redirectToRoute('app_admin_facturation_utilisateur');
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_facturation_delete_utilisateur')]
-    public function delete(FacturationUtilisateur $facture): Response
+    #[Route('/delete/{id}', name: 'app_admin_facturation_delete_utilisateur', methods: ['POST'])]
+    public function delete(FacturationUtilisateur $facture, Request $request): Response
     {
         $this->requireAdminAccess();
 
-        $this->em->remove($facture);
-        $this->em->flush();
-        $this->addFlash('success', 'La facture utilisateur a été supprimée.');
+        $this->addFlash('danger', 'La suppression de factures est interdite (obligation légale de conservation 10 ans — Article L123-22 du Code de Commerce).');
+
         return $this->redirectToRoute('app_admin_facturation_utilisateur');
     }
 }

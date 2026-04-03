@@ -395,6 +395,56 @@
           padding: 0 1rem;
         }
       }
+
+      /* ══════════════════════════════════════
+         FORM ERROR HANDLING
+      ══════════════════════════════════════ */
+      .form-error-summary {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: var(--radius-sm);
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+      .form-error-summary-title {
+        font-family: 'Sora', sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #b91c1c;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .form-error-summary-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .form-error-summary-list li {
+        font-size: 0.82rem;
+        color: #dc2626;
+        padding: 0.2rem 0;
+        padding-left: 1rem;
+        position: relative;
+      }
+      .form-error-summary-list li::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #f87171;
+      }
+      .form-field.has-error .input,
+      .form-field.has-error select,
+      .form-field.has-error textarea {
+        border-color: #dc2626 !important;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+      }
+      .field-error {
+        color: #dc2626;
+        font-size: 0.78rem;
+        margin-top: 0.25rem;
+      }
     </style>
   </head>
 
@@ -555,6 +605,19 @@
         new DataTable('#table', {
           language: { url: 'https://cdn.datatables.net/plug-ins/2.3.5/i18n/fr-FR.json' }
         })
+      }
+
+      // Field error highlighting
+      document.querySelectorAll('.field-error').forEach(function(el) {
+        if (el.textContent.trim() !== '') {
+          var field = el.closest('.form-field');
+          if (field) field.classList.add('has-error');
+        }
+      });
+      // Scroll to error summary if present
+      var errorSummary = document.querySelector('.form-error-summary');
+      if (errorSummary) {
+        errorSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     </script>
   </body>

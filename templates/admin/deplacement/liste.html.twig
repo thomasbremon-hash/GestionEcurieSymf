@@ -69,13 +69,27 @@
 					</tr>
 				</thead>
 				<tbody id="deplacement-tbody" data-noun="déplacement" data-noun-plural="déplacements">
+					{% set currentEntreprise = null %}
 					{% set moisActuel = null %}
 					{% for deplacement in deplacements %}
+						{% set entrepriseNom = deplacement.entreprise ? deplacement.entreprise.nom : 'Sans entreprise' %}
+						{% if currentEntreprise != entrepriseNom %}
+							<tr class="month-separator-row" data-separator="true">
+								<td colspan="{{ is_granted('ROLE_ADMIN') ? 7 : 6 }}">
+									<span class="month-separator-label" style="font-size:0.88rem;">
+										<i class="mdi mdi-domain"></i>
+										{{ entrepriseNom }}
+									</span>
+								</td>
+							</tr>
+							{% set currentEntreprise = entrepriseNom %}
+							{% set moisActuel = null %}
+						{% endif %}
 						{% set moisDeplacement = deplacement.date|date('Y-m') %}
 						{% if moisActuel != moisDeplacement %}
 							<tr class="month-separator-row" data-separator="true">
 								<td colspan="{{ is_granted('ROLE_ADMIN') ? 7 : 6 }}">
-									<span class="month-separator-label">
+									<span class="month-separator-label" style="font-size:0.8rem;opacity:0.7;padding-left:1rem;">
 										<i class="mdi mdi-calendar-month-outline"></i>
 										{{ deplacement.date|format_datetime(locale='fr', pattern='MMMM yyyy')|capitalize }}
 									</span>
@@ -177,9 +191,12 @@
 						<strong>{{ deplacement.date|date('d/m/Y') }}</strong>.<br/>Cette action est irréversible.</div>
 					<div class="modal-actions">
 						<button class="btn-ghost" onclick="closeModal('modal-{{ deplacement.id }}')">Annuler</button>
-						<a href="{{ path('app_admin_deplacement_delete', {id: deplacement.id}) }}" class="btn-danger">
-							<i class="mdi mdi-trash-can"></i>
-							Supprimer</a>
+						<form method="post" action="{{ path('app_admin_deplacement_delete', {id: deplacement.id}) }}" style="display:inline;">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ deplacement.id) }}">
+								<button type="submit" class="btn-danger">
+									<i class="mdi mdi-trash-can"></i>
+									Supprimer</button>
+							</form>
 					</div>
 				</div>
 			</div>

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(php bin/console make:migration)",
+      "Bash(php bin/console doctrine:schema:update --dump-sql)",
+      "Bash(php bin/console make:migration -v)",
+      "Bash(find . -name *.php -path */var/cache/*)",
+      "Bash(php bin/console cache:clear)",
+      "Bash(php bin/console make:migration --no-interaction --ansi)",
+      "Bash(php bin/console doctrine:migrations:migrate --no-interaction)",
+      "Bash(find /c/Code/Git_gestion_ecurie_symf/gestionEcurieSymf/templates/Layouts -type f -name *.html.twig)",
+      "Bash(php bin/console doctrine:migrations:diff --no-interaction)",
+      "Bash(php bin/console doctrine:migrations:status)"
+    ]
+  }
+}

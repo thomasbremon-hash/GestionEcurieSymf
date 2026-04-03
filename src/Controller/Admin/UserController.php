@@ -81,14 +81,17 @@ final class UserController extends AbstractController
         return $this->render('admin/user/show.html.twig', ['user' => $user]);
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_user_delete')]
-    public function delete(?User $user): Response
+    #[Route('/delete/{id}', name: 'app_admin_user_delete', methods: ['POST'])]
+    public function delete(?User $user, Request $request): Response
     {
         $this->requireAdminAccess();
 
-        $this->em->remove($user);
-        $this->em->flush();
-        $this->addFlash('success', "L'utilisateur {$user->getPrenom()} {$user->getNom()} a bien été supprimé !");
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            $this->em->remove($user);
+            $this->em->flush();
+            $this->addFlash('success', "L'utilisateur {$user->getPrenom()} {$user->getNom()} a bien été supprimé !");
+        }
+
         return $this->redirectToRoute('app_admin_users');
     }
 }

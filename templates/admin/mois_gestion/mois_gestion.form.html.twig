@@ -22,6 +22,7 @@
     </div>
 
     {{ form_start(formMoisDeGestion, { attr: { novalidate: 'novalidate' } }) }}
+    {% include 'admin/_form_errors.html.twig' with { form: formMoisDeGestion } %}
 
     {# ── Carte période ── #}
     <div class="form-card" style="margin-bottom:1.5rem;">
@@ -58,11 +59,23 @@
       </div>
 
       {% if moisDeGestionId is null %}
-        <div style="padding:0 1.5rem 1rem;">
-          <button type="button" id="btn-import-mois" class="btn-ghost" style="font-size:0.82rem;">
-            <i class="mdi mdi-content-copy"></i> Importer le mois précédent
+        <div style="padding:0.75rem 1.5rem 1.25rem;display:flex;align-items:center;gap:0.75rem;border-bottom:1px solid var(--border);">
+          <button type="button" id="btn-import-mois" style="
+            display:inline-flex;align-items:center;gap:0.5rem;
+            padding:0.55rem 1.1rem;
+            background:var(--sidebar-accent);color:#fff;
+            border:none;border-radius:8px;
+            font-family:'Sora',sans-serif;font-size:0.82rem;font-weight:600;
+            cursor:pointer;
+            box-shadow:0 2px 8px rgba(79,128,196,0.25);
+            transition:all var(--transition);
+          "
+          onmouseover="this.style.background='#3d6db0';this.style.boxShadow='0 4px 14px rgba(79,128,196,0.4)';this.style.transform='translateY(-1px)'"
+          onmouseout="this.style.background='var(--sidebar-accent)';this.style.boxShadow='0 2px 8px rgba(79,128,196,0.25)';this.style.transform='none'"
+          >
+            <i class="mdi mdi-content-copy" style="font-size:1rem;"></i> Importer le mois précédent
           </button>
-          <span id="import-status" style="margin-left:0.75rem;font-size:0.78rem;color:var(--text-muted);"></span>
+          <span id="import-status" style="font-size:0.8rem;color:var(--ink-muted);"></span>
         </div>
       {% endif %}
 

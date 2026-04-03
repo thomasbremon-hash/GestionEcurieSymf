@@ -31,6 +31,7 @@
       </div>
 
       {{ form_start(formEntreprise, { attr: { novalidate: 'novalidate' } }) }}
+      {% include 'admin/_form_errors.html.twig' with { form: formEntreprise } %}
 
       <div class="form-body">
         {# ── Identité ── #}
@@ -132,6 +133,23 @@
               {{ form_label(formEntreprise.codeAPE) }}
               {{ form_widget(formEntreprise.codeAPE) }}
               <div class="field-error">{{ form_errors(formEntreprise.codeAPE) }}</div>
+            </div>
+          </div>
+          <div class="fields-row cols-3" style="margin-top:1.25rem;">
+            <div class="form-field">
+              {{ form_label(formEntreprise.formeJuridique) }}
+              {{ form_widget(formEntreprise.formeJuridique) }}
+              <div class="field-error">{{ form_errors(formEntreprise.formeJuridique) }}</div>
+            </div>
+            <div class="form-field">
+              {{ form_label(formEntreprise.capitalSocial) }}
+              {{ form_widget(formEntreprise.capitalSocial) }}
+              <div class="field-error">{{ form_errors(formEntreprise.capitalSocial) }}</div>
+            </div>
+            <div class="form-field">
+              {{ form_label(formEntreprise.rcs) }}
+              {{ form_widget(formEntreprise.rcs) }}
+              <div class="field-error">{{ form_errors(formEntreprise.rcs) }}</div>
             </div>
           </div>
         </div>

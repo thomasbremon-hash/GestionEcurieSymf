@@ -106,6 +106,23 @@
           <div class="info-label">Code APE</div>
           <div class="info-value">{{ entreprise.codeAPE ?: 'Non renseigné' }}</div>
         </div>
+
+        <div class="info-divider"></div>
+
+        <div class="info-field">
+          <div class="info-label">Forme juridique</div>
+          <div class="info-value">{{ entreprise.formeJuridique ?: 'Non renseigné' }}</div>
+        </div>
+
+        <div class="info-field">
+          <div class="info-label">Capital social</div>
+          <div class="info-value">{{ entreprise.capitalSocial ?: 'Non renseigné' }}</div>
+        </div>
+
+        <div class="info-field">
+          <div class="info-label">RCS</div>
+          <div class="info-value">{{ entreprise.rcs ?: 'Non renseigné' }}</div>
+        </div>
       </div>
     </div>
 
@@ -129,6 +146,59 @@
           <div class="info-value">{{ entreprise.bic ?: 'Non renseigné' }}</div>
         </div>
       </div>
+    </div>
+
+    {# ── Chevaux affiliés ── #}
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="mdi mdi-horse"></i>
+        </div>
+        <h4 class="section-title">Chevaux affiliés</h4>
+        <span class="count-badge" style="margin-left:auto;">{{ entreprise.cheval|length }}</span>
+      </div>
+
+      {% if entreprise.cheval|length > 0 %}
+        <div style="overflow-x:auto;">
+          <table class="data-table" style="margin:0;">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Race</th>
+                <th>Sexe</th>
+                <th>Propriétaires</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cheval in entreprise.cheval %}
+                <tr>
+                  <td style="font-weight:600;">{{ cheval.nom }}</td>
+                  <td>{{ cheval.race ?: '—' }}</td>
+                  <td>{{ cheval.sexe ?: '—' }}</td>
+                  <td>
+                    {% for cp in cheval.chevalProprietaires %}
+                      <span class="pill pill-user">{{ cp.proprietaire.prenom }} {{ cp.proprietaire.nom }} <span style="opacity:0.65;">({{ cp.pourcentage }}%)</span></span>
+                    {% else %}
+                      <span style="color:var(--ink-muted);font-size:0.85rem;font-style:italic;">Aucun</span>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    <a href="{{ path('app_admin_cheval_show', { id: cheval.id }) }}" class="action-btn" title="Voir">
+                      <i class="mdi mdi-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="mdi mdi-horse" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;opacity:0.4"></i>
+          Aucun cheval affilié à cette entreprise.
+        </div>
+      {% endif %}
     </div>
 
     {# ── Utilisateurs ── #}

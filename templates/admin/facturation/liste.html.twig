@@ -145,7 +145,10 @@
 			<td>
 				<div
 					class="action-btns">
-					{# PDF — visible par tous #}
+					{# Voir / Télécharger PDF — visible par tous #}
+					<a href="{{ path('app_admin_facturation_voir_utilisateur', {id: facture.id}) }}" class="action-btn" style="color:var(--sidebar-accent);border-color:rgba(79,128,196,0.3);background:rgba(79,128,196,0.08);" title="Voir la facture" target="_blank">
+						<i class="mdi mdi-eye"></i>
+					</a>
 					<a href="{{ path('app_admin_facturation_pdf_utilisateur', {id: facture.id}) }}" class="action-btn" style="color:var(--red);border-color:rgba(185,28,28,0.3);background:var(--red-light);" title="Télécharger PDF">
 						<i class="mdi mdi-file-pdf-box"></i>
 					</a>
@@ -161,9 +164,6 @@
 								<i class="mdi mdi-email-send"></i>
 							</a>
 						{% endif %}
-						<button class="action-btn del" onclick="openModal('modal-{{ facture.id }}')" title="Supprimer">
-							<i class="mdi mdi-trash-can"></i>
-						</button>
 					{% endif %}
 				</div>
 			</td>
@@ -175,16 +175,4 @@
 </table>
 <div class="table-footer">
 	<div class="pagination-info"></div>
-</div></div></div>{% endif %}</div>{% if is_granted('ROLE_ADMIN') %}{% for facture in factures %}<div class="modal-overlay" id="modal-{{ facture.id }}"><div class="modal-box">
-<div class="modal-icon">
-	<i class="mdi mdi-trash-can-outline"></i>
-</div>
-<div class="modal-title">Supprimer la facture ?</div>
-<div class="modal-text">Vous êtes sur le point de supprimer la facture
-	<strong>{{ facture.numFacture }}</strong>.<br/>Cette action est irréversible.</div>
-<div class="modal-actions">
-	<button class="btn-ghost" onclick="closeModal('modal-{{ facture.id }}')">Annuler</button>
-	<a href="{{ path('app_admin_facturation_delete_utilisateur', {id: facture.id}) }}" class="btn-danger">
-		<i class="mdi mdi-trash-can"></i>
-		Supprimer</a>
-</div></div></div>{% endfor %}{% endif %}{% endblock %}
+</div></div></div>{% endif %}</div>{% endblock %}

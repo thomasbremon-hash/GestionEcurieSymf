@@ -54,8 +54,8 @@ final class ProduitController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_produit_delete')]
-    public function delete(?Produit $produit): Response
+    #[Route('/delete/{id}', name: 'app_admin_produit_delete', methods: ['POST'])]
+    public function delete(?Produit $produit, Request $request): Response
     {
         $this->requireAdminAccess();
 
@@ -64,9 +64,12 @@ final class ProduitController extends AbstractController
             return $this->redirectToRoute('app_admin_produits');
         }
 
-        $this->em->remove($produit);
-        $this->em->flush();
-        $this->addFlash('success', "Le produit « {$produit->getNom()} » a bien été supprimé !");
+        if ($this->isCsrfTokenValid('delete'.$produit->getId(), $request->request->get('_token'))) {
+            $this->em->remove($produit);
+            $this->em->flush();
+            $this->addFlash('success', "Le produit « {$produit->getNom()} » a bien été supprimé !");
+        }
+
         return $this->redirectToRoute('app_admin_produits');
     }
 }

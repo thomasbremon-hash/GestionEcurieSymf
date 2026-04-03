@@ -153,10 +153,14 @@
       {% if (user.chevalProprietaires|length) > 0 %}
         <div class="entities-grid">
           {% for cp in user.chevalProprietaires %}
-            <div class="entity-card">
-              <div class="entity-avatar">{{ cp.cheval.nom|slice(0, 1)|upper }}</div>
-              <div class="entity-name" title="{{ cp.cheval.nom }}">{{ cp.cheval.nom }}</div>
-            </div>
+            <a href="{{ path('app_admin_cheval_show', { id: cp.cheval.id }) }}" class="entity-card" style="text-decoration:none;color:inherit;">
+              <div class="entity-avatar" style="background:var(--green);">{{ cp.cheval.nom|slice(0, 1)|upper }}</div>
+              <div style="flex:1;min-width:0;">
+                <div class="entity-name" title="{{ cp.cheval.nom }}">{{ cp.cheval.nom }}</div>
+                <div style="font-size:0.78rem;color:var(--ink-muted);">{{ cp.cheval.race ?: '' }}</div>
+              </div>
+              <span class="tag tag-accent">{{ cp.pourcentage }}%</span>
+            </a>
           {% endfor %}
         </div>
       {% else %}

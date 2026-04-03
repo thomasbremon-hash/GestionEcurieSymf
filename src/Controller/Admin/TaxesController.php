@@ -69,21 +69,23 @@ final class TaxesController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/delete/{id}', name: 'app_admin_taxes_delete')]
-    public function adminChevauxRemove(?taxes $taxes)
+    #[Route('/delete/{id}', name: 'app_admin_taxes_delete', methods: ['POST'])]
+    public function adminChevauxRemove(?taxes $taxes, Request $request)
     {
         if (!$taxes) {
             $this->addFlash('danger', "taxes introuvable.");
             return $this->redirectToRoute('app_admin_taxes');
         }
 
-        $this->em->remove($taxes);
-        $this->em->flush();
+        if ($this->isCsrfTokenValid('delete'.$taxes->getId(), $request->request->get('_token'))) {
+            $this->em->remove($taxes);
+            $this->em->flush();
 
-        $this->addFlash(
-            'success',
-            "La taxe « " . $taxes->getLibelle() . " » a bien été supprimé !"
-        );
+            $this->addFlash(
+                'success',
+                "La taxe « " . $taxes->getLibelle() . " » a bien été supprimé !"
+            );
+        }
 
         return $this->redirectToRoute('app_admin_taxes');
     }

@@ -31,6 +31,7 @@
       </div>
 
       {{ form_start(formDistance, { attr: { novalidate: 'novalidate' } }) }}
+      {% include 'admin/_form_errors.html.twig' with { form: formDistance } %}
 
       <div class="form-body">
         {# ── Localisation ── #}

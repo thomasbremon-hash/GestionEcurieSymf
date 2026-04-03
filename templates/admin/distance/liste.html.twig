@@ -66,7 +66,20 @@
 					</tr>
 				</thead>
 				<tbody id="distance-tbody" data-noun="distance" data-noun-plural="distances">
+					{% set currentEntreprise = null %}
 					{% for item in distances %}
+						{% set entrepriseNom = item.entreprise ? item.entreprise.nom : 'Sans entreprise' %}
+						{% if currentEntreprise != entrepriseNom %}
+							<tr class="month-separator-row" data-separator="true">
+								<td colspan="{{ is_granted('ROLE_ADMIN') ? 4 : 3 }}">
+									<span class="month-separator-label">
+										<i class="mdi mdi-domain"></i>
+										{{ entrepriseNom }}
+									</span>
+								</td>
+							</tr>
+							{% set currentEntreprise = entrepriseNom %}
+						{% endif %}
 						<tr data-index="{{ loop.index0 }}">
 							<td>
 								<span class="pill tag-accent" style="font-family:'Sora',sans-serif;font-weight:700;">
@@ -146,9 +159,12 @@
 					</div>
 					<div class="modal-actions">
 						<button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
-						<a href="{{ path('app_admin_distance_delete', {id: item.id}) }}" class="btn-danger">
-							<i class="mdi mdi-trash-can"></i>
-							Supprimer</a>
+						<form method="post" action="{{ path('app_admin_distance_delete', {id: item.id}) }}" style="display:inline;">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
+								<button type="submit" class="btn-danger">
+									<i class="mdi mdi-trash-can"></i>
+									Supprimer</button>
+							</form>
 					</div>
 				</div>
 			</div>

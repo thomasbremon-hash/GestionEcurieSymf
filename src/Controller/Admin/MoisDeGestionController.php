@@ -147,8 +147,8 @@ final class MoisDeGestionController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_mois_gestion_delete')]
-    public function delete(?MoisDeGestion $moisDeGestion): Response
+    #[Route('/delete/{id}', name: 'app_admin_mois_gestion_delete', methods: ['POST'])]
+    public function delete(?MoisDeGestion $moisDeGestion, Request $request): Response
     {
         $this->requireAdminAccess();
 
@@ -157,9 +157,12 @@ final class MoisDeGestionController extends AbstractController
             return $this->redirectToRoute('app_admin_mois_gestion');
         }
 
-        $this->em->remove($moisDeGestion);
-        $this->em->flush();
-        $this->addFlash('success', 'Le mois de gestion a bien été supprimé !');
+        if ($this->isCsrfTokenValid('delete'.$moisDeGestion->getId(), $request->request->get('_token'))) {
+            $this->em->remove($moisDeGestion);
+            $this->em->flush();
+            $this->addFlash('success', 'Le mois de gestion a bien été supprimé !');
+        }
+
         return $this->redirectToRoute('app_admin_mois_gestion');
     }
 }

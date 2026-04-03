@@ -31,6 +31,7 @@
       </div>
 
       {{ form_start(formProduit, { attr: { novalidate: 'novalidate' } }) }}
+      {% include 'admin/_form_errors.html.twig' with { form: formProduit } %}
 
       <div class="form-body">
         {# ── Identité ── #}

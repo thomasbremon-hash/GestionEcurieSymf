@@ -57,8 +57,8 @@ final class CourseController extends AbstractController
         ]);
     }
 
-    #[Route('/course/delete/{id}', name: 'app_admin_course_delete')]
-    public function deleteCourse(?Course $course): Response
+    #[Route('/course/delete/{id}', name: 'app_admin_course_delete', methods: ['POST'])]
+    public function deleteCourse(?Course $course, Request $request): Response
     {
         $this->requireAdminAccess();
 
@@ -67,14 +67,17 @@ final class CourseController extends AbstractController
             return $this->redirectToRoute('app_admin_courses');
         }
 
-        if ($course->getParticipations() !== null) {
-            $this->addFlash('danger', "Impossible de supprimer « {$course->getNom()} » car elle est associée à une participation.");
-            return $this->redirectToRoute('app_admin_courses');
+        if ($this->isCsrfTokenValid('delete'.$course->getId(), $request->request->get('_token'))) {
+            if ($course->getParticipations() !== null) {
+                $this->addFlash('danger', "Impossible de supprimer « {$course->getNom()} » car elle est associée à une participation.");
+                return $this->redirectToRoute('app_admin_courses');
+            }
+
+            $this->em->remove($course);
+            $this->em->flush();
+            $this->addFlash('success', "La course « {$course->getNom()} » a bien été supprimée !");
         }
 
-        $this->em->remove($course);
-        $this->em->flush();
-        $this->addFlash('success', "La course « {$course->getNom()} » a bien été supprimée !");
         return $this->redirectToRoute('app_admin_courses');
     }
 
@@ -122,14 +125,17 @@ final class CourseController extends AbstractController
         ]);
     }
 
-    #[Route('/participation/delete/{id}', name: 'app_admin_participation_delete')]
-    public function deleteParticipation(Participation $participation): Response
+    #[Route('/participation/delete/{id}', name: 'app_admin_participation_delete', methods: ['POST'])]
+    public function deleteParticipation(Participation $participation, Request $request): Response
     {
         $this->requireAdminAccess();
 
-        $this->em->remove($participation);
-        $this->em->flush();
-        $this->addFlash('danger', 'La participation a été supprimée !');
+        if ($this->isCsrfTokenValid('delete'.$participation->getId(), $request->request->get('_token'))) {
+            $this->em->remove($participation);
+            $this->em->flush();
+            $this->addFlash('danger', 'La participation a été supprimée !');
+        }
+
         return $this->redirectToRoute('app_admin_participations');
     }
 }

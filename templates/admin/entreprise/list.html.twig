@@ -142,9 +142,12 @@
 						<strong>{{ item.nom }}</strong>.<br/>Cette action est irréversible.</div>
 					<div class="modal-actions">
 						<button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
-						<a href="{{ path('app_admin_entreprise_delete', {id: item.id}) }}" class="btn-danger">
-							<i class="mdi mdi-trash-can"></i>
-							Supprimer</a>
+						<form method="post" action="{{ path('app_admin_entreprise_delete', {id: item.id}) }}" style="display:inline;">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
+								<button type="submit" class="btn-danger">
+									<i class="mdi mdi-trash-can"></i>
+									Supprimer</button>
+							</form>
 					</div>
 				</div>
 			</div>

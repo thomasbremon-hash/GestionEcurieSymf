@@ -85,6 +85,15 @@ class Entreprise
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $bic = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $formeJuridique = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $capitalSocial = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $rcs = null;
+
     /**
      * @var Collection<int, FacturationUtilisateur>
      */
@@ -484,6 +493,42 @@ class Entreprise
     public function setBic(?string $bic): static
     {
         $this->bic = $bic;
+
+        return $this;
+    }
+
+    public function getFormeJuridique(): ?string
+    {
+        return $this->formeJuridique;
+    }
+
+    public function setFormeJuridique(?string $formeJuridique): static
+    {
+        $this->formeJuridique = $formeJuridique;
+
+        return $this;
+    }
+
+    public function getCapitalSocial(): ?string
+    {
+        return $this->capitalSocial;
+    }
+
+    public function setCapitalSocial(?string $capitalSocial): static
+    {
+        $this->capitalSocial = $capitalSocial;
+
+        return $this;
+    }
+
+    public function getRcs(): ?string
+    {
+        return $this->rcs;
+    }
+
+    public function setRcs(?string $rcs): static
+    {
+        $this->rcs = $rcs;
 
         return $this;
     }

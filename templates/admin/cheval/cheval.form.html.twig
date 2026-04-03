@@ -31,6 +31,7 @@
       </div>
 
       {{ form_start(formCheval, { attr: { novalidate: 'novalidate' } }) }}
+      {% include 'admin/_form_errors.html.twig' with { form: formCheval } %}
 
       <div class="form-body">
         {# ── Identité ── #}
@@ -60,6 +61,20 @@
               {{ form_label(formCheval.dateNaissance) }}
               {{ form_widget(formCheval.dateNaissance) }}
               <div class="field-error">{{ form_errors(formCheval.dateNaissance) }}</div>
+            </div>
+          </div>
+        </div>
+
+        {# ── Entreprise ── #}
+        <div class="form-group">
+          <div class="form-group-title">
+            <i class="mdi mdi-domain"></i> Entreprise
+          </div>
+          <div class="fields-row cols-2">
+            <div class="form-field">
+              {{ form_label(formCheval.entreprise) }}
+              {{ form_widget(formCheval.entreprise) }}
+              <div class="field-error">{{ form_errors(formCheval.entreprise) }}</div>
             </div>
           </div>
         </div>

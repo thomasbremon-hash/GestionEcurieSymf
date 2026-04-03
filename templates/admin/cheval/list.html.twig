@@ -71,10 +71,10 @@
 					{% for cheval in chevaux %}
 						<tr data-index="{{ loop.index0 }}">
 							<td>
-								<div class="user-cell">
+								<a href="{{ path('app_admin_cheval_show', {id: cheval.id}) }}" class="user-cell" style="text-decoration:none;color:inherit;">
 									<div class="user-avatar" style="background:var(--green);">{{ cheval.nom|slice(0,1)|upper }}</div>
 									<div class="user-name">{{ cheval.nom }}</div>
-								</div>
+								</a>
 							</td>
 							<td>
 								<span style="font-size:0.88rem;color:var(--ink-soft);">{{ cheval.race ?: '—' }}</span>
@@ -105,6 +105,9 @@
 							{% if is_granted('ROLE_ADMIN') %}
 								<td>
 									<div class="action-btns">
+										<a href="{{ path('app_admin_cheval_show', {id: cheval.id}) }}" class="action-btn" title="Voir">
+											<i class="mdi mdi-eye"></i>
+										</a>
 										<a href="{{ path('app_admin_cheval_update', {id: cheval.id}) }}" class="action-btn edit" title="Modifier">
 											<i class="mdi mdi-pencil"></i>
 										</a>
@@ -143,9 +146,12 @@
 						<strong>{{ cheval.nom }}</strong>.<br/>Cette action est irréversible.</div>
 					<div class="modal-actions">
 						<button class="btn-ghost" onclick="closeModal('modal-{{ cheval.id }}')">Annuler</button>
-						<a href="{{ path('app_admin_cheval_delete', {id: cheval.id}) }}" class="btn-danger">
-							<i class="mdi mdi-trash-can"></i>
-							Supprimer</a>
+						<form method="post" action="{{ path('app_admin_cheval_delete', {id: cheval.id}) }}" style="display:inline;">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cheval.id) }}">
+								<button type="submit" class="btn-danger">
+									<i class="mdi mdi-trash-can"></i>
+									Supprimer</button>
+							</form>
 					</div>
 				</div>
 			</div>

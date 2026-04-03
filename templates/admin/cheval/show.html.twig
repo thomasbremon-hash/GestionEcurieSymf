@@ -1,0 +1,200 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}
+  {{ cheval.nom }} | Admin
+{% endblock %}
+
+{% block body %}
+  <div class="admin-wrapper">
+    {# ── Breadcrumb ── #}
+    <div class="breadcrumb-row">
+      <a href="{{ path('app_admin_chevaux') }}">Chevaux</a>
+      <span class="sep">›</span>
+      <span class="current">{{ cheval.nom }}</span>
+    </div>
+
+    {# ── Hero Header ── #}
+    <div class="hero-header">
+      <div>
+        <h1 class="hero-title">{{ cheval.nom }}</h1>
+        <div class="hero-meta">
+          <span class="tag tag-neutral">ID #{{ cheval.id }}</span>
+          {% if cheval.sexe %}
+            <span class="tag tag-accent">
+              <i class="mdi mdi-gender-{{ cheval.sexe == 'Jument' ? 'female' : 'male' }}"></i>
+              {{ cheval.sexe }}
+            </span>
+          {% endif %}
+          {% if cheval.race %}
+            <span class="tag tag-green">{{ cheval.race }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="{{ path('app_admin_cheval_update', { id: cheval.id }) }}" class="btn-primary-custom"><i class="bi bi-pencil-fill"></i> Modifier</a>
+        <a href="{{ path('app_admin_chevaux') }}" class="btn-ghost"><i class="bi bi-arrow-left"></i> Retour</a>
+      </div>
+    </div>
+
+    {# ── KPIs ── #}
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-orange">
+          <i class="mdi mdi-account-multiple"></i>
+        </div>
+        <div>
+          <div class="kpi-label">Propriétaires</div>
+          <div class="kpi-value">{{ cheval.chevalProprietaires|length }}</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-green">
+          <i class="mdi mdi-domain"></i>
+        </div>
+        <div>
+          <div class="kpi-label">Entreprise</div>
+          <div class="kpi-value">{{ cheval.entreprise ? cheval.entreprise.nom : '—' }}</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:var(--blue-light);color:var(--blue);">
+          <i class="mdi mdi-trophy"></i>
+        </div>
+        <div>
+          <div class="kpi-label">Participations</div>
+          <div class="kpi-value">{{ cheval.participations|length }}</div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Informations générales ── #}
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="mdi mdi-horseshoe"></i>
+        </div>
+        <h4 class="section-title">Informations générales</h4>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-field">
+          <div class="info-label">Nom</div>
+          <div class="info-value">{{ cheval.nom }}</div>
+        </div>
+
+        <div class="info-field">
+          <div class="info-label">Race</div>
+          <div class="info-value">{{ cheval.race ?: 'Non renseignée' }}</div>
+        </div>
+
+        <div class="info-field">
+          <div class="info-label">Sexe</div>
+          <div class="info-value">{{ cheval.sexe ?: 'Non renseigné' }}</div>
+        </div>
+
+        <div class="info-field">
+          <div class="info-label">Date de naissance</div>
+          <div class="info-value">{{ cheval.dateNaissance ? cheval.dateNaissance|date('d/m/Y') : 'Non renseignée' }}</div>
+        </div>
+
+        <div class="info-divider"></div>
+
+        <div class="info-field">
+          <div class="info-label">Entreprise</div>
+          <div class="info-value">
+            {% if cheval.entreprise %}
+              <a href="{{ path('app_admin_entreprise_show', { id: cheval.entreprise.id }) }}" style="color:var(--sidebar-accent);text-decoration:none;font-weight:500;">
+                <i class="mdi mdi-domain" style="font-size:0.9rem;"></i> {{ cheval.entreprise.nom }}
+              </a>
+            {% else %}
+              Non affilié
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Propriétaires ── #}
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="mdi mdi-account-multiple"></i>
+        </div>
+        <h4 class="section-title">Propriétaires</h4>
+      </div>
+
+      {% if cheval.chevalProprietaires|length > 0 %}
+        <div class="users-grid">
+          {% for cp in cheval.chevalProprietaires %}
+            <div class="user-card">
+              <div class="user-avatar">{{ cp.proprietaire.prenom|slice(0, 1)|upper }}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:0.88rem;">{{ cp.proprietaire.prenom }} {{ cp.proprietaire.nom }}</div>
+                <div class="user-email" title="{{ cp.proprietaire.email }}">{{ cp.proprietaire.email }}</div>
+              </div>
+              <span class="tag tag-accent" style="margin-left:auto;">{{ cp.pourcentage }}%</span>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% set totalPct = 0 %}
+        {% for cp in cheval.chevalProprietaires %}
+          {% set totalPct = totalPct + cp.pourcentage %}
+        {% endfor %}
+        <div style="padding:0.75rem 1.5rem;border-top:1px solid var(--border);font-size:0.82rem;color:var(--ink-soft);">
+          Total des parts : <strong>{{ totalPct }}%</strong>
+          {% if totalPct < 100 %}
+            <span style="color:var(--gold);margin-left:0.5rem;"><i class="mdi mdi-alert"></i> {{ 100 - totalPct }}% non attribué</span>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="mdi mdi-account-off" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;opacity:0.4"></i>
+          Aucun propriétaire affilié.
+        </div>
+      {% endif %}
+    </div>
+
+    {# ── Déplacements récents ── #}
+    {% if cheval.deplacement|length > 0 %}
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="mdi mdi-truck-outline"></i>
+          </div>
+          <h4 class="section-title">Déplacements</h4>
+          <span class="count-badge" style="margin-left:auto;">{{ cheval.deplacement|length }}</span>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="data-table" style="margin:0;">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Nom</th>
+                <th>Structure</th>
+                <th>Distance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for dep in cheval.deplacement|slice(0, 10) %}
+                <tr>
+                  <td>{{ dep.date ? dep.date|date('d/m/Y') : '—' }}</td>
+                  <td>{{ dep.nom ?: '—' }}</td>
+                  <td>{{ dep.structure ? dep.structure.nom : '—' }}</td>
+                  <td>{{ dep.distance ? dep.distance ~ ' km' : '—' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if cheval.deplacement|length > 10 %}
+          <div style="padding:0.75rem 1.5rem;font-size:0.82rem;color:var(--ink-muted);border-top:1px solid var(--border);">
+            Affichage des 10 derniers sur {{ cheval.deplacement|length }} au total.
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

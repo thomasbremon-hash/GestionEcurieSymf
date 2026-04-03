@@ -104,7 +104,7 @@ Bande découpable en bas de page (bordure pointillée) contenant :
 |---------|--------|
 | `src/Entity/Entreprise.php` | Ajout de 4 champs |
 | Migration Doctrine | À générer |
-| `src/Form/EntrepriseType.php` (ou équivalent) | Ajout des 4 champs |
+| `src/Form/EntrepriseType.php` | Ajout des 4 champs |
 | `src/Controller/Admin/EntrepriseController.php` | Si nécessaire |
 | Template form entreprise | Ajout des champs dans l'UI |
 | `templates/admin/facturation/pdf.html.twig` | Refonte de la présentation |

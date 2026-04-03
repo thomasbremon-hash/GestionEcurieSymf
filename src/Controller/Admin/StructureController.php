@@ -54,8 +54,8 @@ final class StructureController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_structure_delete')]
-    public function delete(?Structure $structure): Response
+    #[Route('/delete/{id}', name: 'app_admin_structure_delete', methods: ['POST'])]
+    public function delete(?Structure $structure, Request $request): Response
     {
         $this->requireAdminAccess();
 
@@ -64,9 +64,12 @@ final class StructureController extends AbstractController
             return $this->redirectToRoute('app_admin_structures');
         }
 
-        $this->em->remove($structure);
-        $this->em->flush();
-        $this->addFlash('success', "La structure « {$structure->getNom()} » a bien été supprimée !");
+        if ($this->isCsrfTokenValid('delete'.$structure->getId(), $request->request->get('_token'))) {
+            $this->em->remove($structure);
+            $this->em->flush();
+            $this->addFlash('success', "La structure « {$structure->getNom()} » a bien été supprimée !");
+        }
+
         return $this->redirectToRoute('app_admin_structures');
     }
 }

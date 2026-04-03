@@ -30,6 +30,16 @@ final class ChevalController extends AbstractController
         ]);
     }
 
+    #[Route('/show/{id}', name: 'app_admin_cheval_show')]
+    public function show(Cheval $cheval): Response
+    {
+        $this->requireBackofficeAccess();
+
+        return $this->render('admin/cheval/show.html.twig', [
+            'cheval' => $cheval,
+        ]);
+    }
+
     #[Route('/new', name: 'app_admin_cheval_new')]
     #[Route('/edit/{id}', name: 'app_admin_cheval_update')]
     public function form(Request $request, EntityManagerInterface $em, ?Cheval $cheval = null): Response
@@ -61,8 +71,8 @@ final class ChevalController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_cheval_delete')]
-    public function delete(?Cheval $cheval): Response
+    #[Route('/delete/{id}', name: 'app_admin_cheval_delete', methods: ['POST'])]
+    public function delete(?Cheval $cheval, Request $request): Response
     {
         $this->requireAdminAccess();
 
@@ -71,14 +81,17 @@ final class ChevalController extends AbstractController
             return $this->redirectToRoute('app_admin_chevaux');
         }
 
-        if (!$cheval->getChevalProprietaires()->isEmpty()) {
-            $this->addFlash('danger', "Impossible de supprimer « {$cheval->getNom()} » car il est associé à un propriétaire.");
-            return $this->redirectToRoute('app_admin_chevaux');
+        if ($this->isCsrfTokenValid('delete'.$cheval->getId(), $request->request->get('_token'))) {
+            if (!$cheval->getChevalProprietaires()->isEmpty()) {
+                $this->addFlash('danger', "Impossible de supprimer « {$cheval->getNom()} » car il est associé à un propriétaire.");
+                return $this->redirectToRoute('app_admin_chevaux');
+            }
+
+            $this->em->remove($cheval);
+            $this->em->flush();
+            $this->addFlash('success', "Le cheval « {$cheval->getNom()} » a bien été supprimé !");
         }
 
-        $this->em->remove($cheval);
-        $this->em->flush();
-        $this->addFlash('success', "Le cheval « {$cheval->getNom()} » a bien été supprimé !");
         return $this->redirectToRoute('app_admin_chevaux');
     }
 }

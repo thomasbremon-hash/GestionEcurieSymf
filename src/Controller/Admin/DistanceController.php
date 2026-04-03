@@ -23,8 +23,14 @@ final class DistanceController extends AbstractController
     {
         $this->requireBackofficeAccess();
 
+        $distances = $distanceRepository->createQueryBuilder('d')
+            ->leftJoin('d.entreprise', 'e')
+            ->orderBy('e.nom', 'ASC')
+            ->addOrderBy('d.distance', 'ASC')
+            ->getQuery()->getResult();
+
         return $this->render('admin/distance/liste.html.twig', [
-            'distances' => $distanceRepository->findAll(),
+            'distances' => $distances,
         ]);
     }
 
@@ -53,8 +59,8 @@ final class DistanceController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_admin_distance_delete')]
-    public function delete(?DistanceStructure $distance): Response
+    #[Route('/delete/{id}', name: 'app_admin_distance_delete', methods: ['POST'])]
+    public function delete(?DistanceStructure $distance, Request $request): Response
     {
         $this->requireAdminAccess();
 
@@ -63,9 +69,12 @@ final class DistanceController extends AbstractController
             return $this->redirectToRoute('app_admin_distances');
         }
 
-        $this->em->remove($distance);
-        $this->em->flush();
-        $this->addFlash('success', 'La distance a bien été supprimée !');
+        if ($this->isCsrfTokenValid('delete'.$distance->getId(), $request->request->get('_token'))) {
+            $this->em->remove($distance);
+            $this->em->flush();
+            $this->addFlash('success', 'La distance a bien été supprimée !');
+        }
+
         return $this->redirectToRoute('app_admin_distances');
     }
 }

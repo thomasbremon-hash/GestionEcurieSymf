@@ -60,6 +60,21 @@ class EntrepriseType extends AbstractType
                 'required' => false,
                 'attr' => ['class' => 'input', 'placeholder' => 'Ex: 0143Z'],
             ])
+            ->add('formeJuridique', TextType::class, [
+                'label' => 'Forme juridique',
+                'required' => false,
+                'attr' => ['class' => 'input', 'placeholder' => 'Ex: SARL, SAS, EURL...'],
+            ])
+            ->add('capitalSocial', TextType::class, [
+                'label' => 'Capital social',
+                'required' => false,
+                'attr' => ['class' => 'input', 'placeholder' => 'Ex: 10 000 €'],
+            ])
+            ->add('rcs', TextType::class, [
+                'label' => 'RCS',
+                'required' => false,
+                'attr' => ['class' => 'input', 'placeholder' => 'Ex: RCS Rennes B 123 456 789'],
+            ])
             ->add('iban', TextType::class, [
                 'label' => 'IBAN',
                 'required' => false,

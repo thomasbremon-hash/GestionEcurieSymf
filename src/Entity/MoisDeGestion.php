@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MoisDeGestionRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_MOIS_ANNEE', columns: ['mois', 'annee'])]
 class MoisDeGestion
 {
     #[ORM\Id]
