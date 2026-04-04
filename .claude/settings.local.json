@@ -12,7 +12,11 @@
       "Bash(php bin/console doctrine:migrations:migrate --no-interaction)",
       "Bash(find /c/Code/Git_gestion_ecurie_symf/gestionEcurieSymf/templates/Layouts -type f -name *.html.twig)",
       "Bash(php bin/console doctrine:migrations:diff --no-interaction)",
-      "Bash(php bin/console doctrine:migrations:status)"
+      "Bash(php bin/console doctrine:migrations:status)",
+      "Bash(find B:CodeGestionEcurieGitGestionEcurieSymfGestionEcurieSymf/templates/admin -type f -name *.twig)",
+      "Bash(find B:CodeGestionEcurieGitGestionEcurieSymfGestionEcurieSymf/templates/Layouts -type f -name *.twig)",
+      "Bash(find B:CodeGestionEcurieGitGestionEcurieSymfGestionEcurieSymf/public/assets -type f \\\\\\(-name *.css -o -name *.js \\\\\\))",
+      "Bash(ls -la /b/Code/GestionEcurieGit/GestionEcurieSymf/GestionEcurieSymf/src/Form/*.php)"
     ]
   }
 }

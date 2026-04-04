@@ -90,18 +90,45 @@ AdminController, UserController, ChevalController, StructureController, CourseCo
 - **Migration** : `Version20260403123542.php` — verification conditionnelle des colonnes/index existants avant creation
 - **Format numero facture** : `YYYY-MM-NNNN` (deja en place : `sprintf('%d-%02d-%04d', ...)`)
 
+### Copyright dynamique
+- **`base.html.twig`** et **`base.admin.html.twig`** : `© 2025` remplace par `© {{ 'now'|date('Y') }}`
+
+### Sidebar — Plusieurs sous-menus ouverts simultanement
+- **`base.admin.html.twig`** (JS) : Suppression du pattern "close all before open" — chaque sous-menu s'ouvre/ferme independamment via `classList.toggle()`
+
+### Tooltips CSS sur boutons d'action
+- **`admin.css`** : Tooltips pure CSS via `::after` + `attr(title)` sur `.action-btn[title]` — apparaissent au hover au-dessus du bouton avec fleche
+- Les boutons utilisent deja l'attribut `title` dans les templates (Voir, Modifier, Supprimer)
+
+### Indicateur champs obligatoires
+- **`admin.css`** : Asterisque rouge `*` ajoute via CSS `::after` sur `.form-field label.required` — Symfony ajoute automatiquement la classe `required` sur les labels des champs obligatoires
+
+### Spinner anti double-clic
+- **`admin.css`** : Classes `.is-loading` sur `.btn-primary-custom` et `.btn-danger` — desactive le bouton, masque le label, affiche un spinner CSS anime
+- **`base.admin.html.twig`** (JS) : Au `submit` de chaque `<form>`, le bouton submit recoit automatiquement la classe `is-loading`
+
+### Breadcrumbs sur les pages liste admin
+- **9 templates liste** : `page-eyebrow` transforme en breadcrumb cliquable `<a href="{{ path('app_admin') }}">Dashboard</a> › <span>NomPage</span>`
+- Templates modifies : cheval/list, user/list, entreprise/list, structure/liste, deplacement/liste, distance/liste, produit/liste, facturation/liste, mois_gestion/liste
+- **`admin.css`** : Styles `.page-eyebrow a` avec hover accent bleu
+
+### Liens placeholder footer front
+- **`base.html.twig`** : Liens sociaux `href="#"` remplaces par liens generiques (`https://facebook.com`, etc.) avec `target="_blank" rel="noopener"`
+- **`base.html.twig`** : Liens legaux (Mentions legales, Confidentialite, CGU) transformes en `<span class="footer-link-disabled">` en attendant la creation des pages
+- **`front.css`** : Style `.footer-link-disabled` (texte grise, cursor default)
+
 ---
 
 ## A faire — Problemes et ameliorations identifies
 
 ### Problemes importants (UX)
 
-- [ ] **Boutons d'action = icones seules** — Modifier, supprimer, voir... icones sans label. Ajouter des tooltips ou labels texte pour les nouveaux utilisateurs.
+- [x] **Boutons d'action = icones seules** — Tooltips CSS ajoutees via `::after` + `attr(title)` sur `.action-btn`
 - [ ] **Aucune action en masse** — Impossible de selectionner plusieurs elements pour supprimer, exporter ou envoyer des factures en lot. Ajouter des checkboxes + barre d'actions groupees.
 - [ ] **Pas de tri sur les colonnes des tableaux** — On ne peut pas trier par nom, date, montant, etc. Implementer un tri JS ou cote serveur.
-- [ ] **Breadcrumbs absents sur ~90% des pages admin** — Seuls les formulaires et pages detail en ont. Ajouter sur toutes les pages liste.
-- [ ] **Pas de bouton de chargement** — Aucune indication de soumission en cours -> double-clic possible. Ajouter un spinner/disable au submit.
-- [ ] **Sous-menu sidebar : une seule section ouverte a la fois** — Si j'ouvre "Chevaux", "Utilisateurs" se referme. Permettre plusieurs sections ouvertes simultanement.
+- [x] **Breadcrumbs absents sur ~90% des pages admin** — Breadcrumbs cliquables ajoutes sur les 9 pages liste avec lien Dashboard
+- [x] **Pas de bouton de chargement** — Spinner CSS + disable automatique au submit sur tous les formulaires
+- [x] **Sous-menu sidebar : une seule section ouverte a la fois** — Sous-menus independants, plusieurs ouverts simultanement
 
 ### Ameliorations de praticite
 
@@ -110,15 +137,15 @@ AdminController, UserController, ChevalController, StructureController, CourseCo
 - [ ] **Texte d'aide absent sur les champs de formulaire** — Pas de placeholders ni indications sous les champs. Ajouter des `attr.placeholder` et `help` dans les FormTypes.
 - [ ] **Confirmations de suppression basiques** — Le modal ne previent pas des donnees liees (ex: "Ce cheval a 3 courses associees"). Enrichir avec un comptage des relations.
 - [ ] **Filtres espace client perdus au rechargement** — Les filtres factures (Toutes/Payees/Impayees) sont en JS pur, pas dans l'URL. Utiliser des query params.
-- [ ] **Pas d'indicateur de champs obligatoires** — Aucun asterisque (*) visible sur les labels des champs requis. Ajouter via CSS sur les `required`.
+- [x] **Pas d'indicateur de champs obligatoires** — Asterisque rouge `*` via CSS `::after` sur `label.required`
 
 ### Problemes de design / coherence
 
 - [ ] **Valeurs en dur dans les templates** — Numero de telephone, email, adresse "A completer" dans le footer front. Devrait venir de l'entite Entreprise.
 - [ ] **Styles de boutons incoherents** — `.btn-primary-custom` en admin, `.nav-btn` en front, `.login-submit` pour le login. Pas de systeme unifie.
 - [ ] **Formatage des dates variable** — Tantot `d/m/Y`, tantot `format_datetime(locale='fr')`. Uniformiser.
-- [ ] **Copyright "2025" en dur** — Devrait etre `{{ 'now'|date('Y') }}`.
-- [ ] **Liens sociaux et footer en placeholder (`href="#"`)** — Liens morts a remplacer par les vrais liens ou retirer.
+- [x] **Copyright "2025" en dur** — Remplace par `{{ 'now'|date('Y') }}` dans les 2 templates base
+- [x] **Liens sociaux et footer en placeholder (`href="#"`)** — Sociaux: liens generiques avec target=_blank / Legaux: transformes en `<span>` desactives
 
 ### Conformite legale (restant)
 

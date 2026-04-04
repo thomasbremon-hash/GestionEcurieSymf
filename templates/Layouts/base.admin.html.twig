@@ -556,7 +556,7 @@
           {% endblock %}
         </main>
 
-        <footer class="site-footer">© 2025–2026 — Logiciel pour tous</footer>
+        <footer class="site-footer">© {{ 'now'|date('Y') }} — Logiciel pour tous</footer>
       </div>
     </div>
 
@@ -568,21 +568,14 @@
     <script src="{{ asset('assets/js/admin.js') }}"></script>
 
     <script>
-      // Submenu toggles
+      // Submenu toggles — plusieurs sections ouvertes simultanément
       document.querySelectorAll('.toggle-nav').forEach(function (trigger) {
         trigger.addEventListener('click', function () {
           const targetId = this.getAttribute('data-target')
           const sub = document.getElementById(targetId)
-          const isOpen = sub.classList.contains('open')
-      
-          // Close all
-          document.querySelectorAll('.submenu.open').forEach((s) => s.classList.remove('open'))
-          document.querySelectorAll('.toggle-nav.open').forEach((t) => t.classList.remove('open'))
-      
-          if (!isOpen) {
-            sub.classList.add('open')
-            this.classList.add('open')
-          }
+
+          sub.classList.toggle('open')
+          this.classList.toggle('open')
         })
       })
       
@@ -606,6 +599,16 @@
           language: { url: 'https://cdn.datatables.net/plug-ins/2.3.5/i18n/fr-FR.json' }
         })
       }
+
+      // Anti double-clic — spinner sur les boutons submit
+      document.querySelectorAll('form').forEach(function (form) {
+        form.addEventListener('submit', function () {
+          var btn = form.querySelector('button[type="submit"], input[type="submit"]');
+          if (btn && !btn.classList.contains('is-loading')) {
+            btn.classList.add('is-loading');
+          }
+        });
+      });
 
       // Field error highlighting
       document.querySelectorAll('.field-error').forEach(function(el) {

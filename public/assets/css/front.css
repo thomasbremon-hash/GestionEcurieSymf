@@ -1030,6 +1030,25 @@ img {
     color: rgba(255, 255, 255, 0.7);
 }
 
+/* Liens légaux désactivés (pages non encore créées) */
+.footer-link-disabled {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: default;
+}
+.footer-link-disabled i {
+    font-size: 0.7rem;
+    opacity: 0.35;
+}
+.footer-legal .footer-link-disabled {
+    font-family: "Sora", sans-serif;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.2);
+}
+
 /* ══════════════════════════════════════
    13. ANIMATIONS
 ══════════════════════════════════════ */

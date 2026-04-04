@@ -171,17 +171,18 @@
 						<div>
 							<div class="footer-brand-name">Gestion Écurie</div>
 							<p class="footer-brand-desc">L'outil digital conçu pour faciliter le quotidien des écuries et offrir un suivi professionnel de vos chevaux et propriétaires.</p>
+							{# TODO: remplacer par les vrais liens sociaux de l'entreprise #}
 							<div class="footer-socials">
-								<a href="#" class="footer-social-btn" aria-label="Facebook">
+								<a href="https://facebook.com" target="_blank" rel="noopener" class="footer-social-btn" aria-label="Facebook">
 									<i class="mdi mdi-facebook"></i>
 								</a>
-								<a href="#" class="footer-social-btn" aria-label="Instagram">
+								<a href="https://instagram.com" target="_blank" rel="noopener" class="footer-social-btn" aria-label="Instagram">
 									<i class="mdi mdi-instagram"></i>
 								</a>
-								<a href="#" class="footer-social-btn" aria-label="LinkedIn">
+								<a href="https://linkedin.com" target="_blank" rel="noopener" class="footer-social-btn" aria-label="LinkedIn">
 									<i class="mdi mdi-linkedin"></i>
 								</a>
-								<a href="#" class="footer-social-btn" aria-label="Twitter">
+								<a href="https://twitter.com" target="_blank" rel="noopener" class="footer-social-btn" aria-label="Twitter">
 									<i class="mdi mdi-twitter"></i>
 								</a>
 							</div>
@@ -213,22 +214,23 @@
 						</div>
 
 						<div>
+							{# TODO: créer les pages légales et remplacer les routes #}
 							<div class="footer-col-title">Informations</div>
 							<ul class="footer-links">
 								<li>
-									<a href="#">
+									<span class="footer-link-disabled">
 										<i class="mdi mdi-chevron-right"></i>
-										Mentions légales</a>
+										Mentions légales</span>
 								</li>
 								<li>
-									<a href="#">
+									<span class="footer-link-disabled">
 										<i class="mdi mdi-chevron-right"></i>
-										Confidentialité</a>
+										Confidentialité</span>
 								</li>
 								<li>
-									<a href="#">
+									<span class="footer-link-disabled">
 										<i class="mdi mdi-chevron-right"></i>
-										CGU</a>
+										CGU</span>
 								</li>
 							</ul>
 						</div>
@@ -267,10 +269,10 @@
 					</div>
 
 					<div class="footer-bottom">
-						<p class="footer-copy">© 2025 Tous droits réservés — Logiciel pour tous</p>
+						<p class="footer-copy">© {{ 'now'|date('Y') }} Tous droits réservés — Logiciel pour tous</p>
 						<div class="footer-legal">
-							<a href="#">Mentions légales</a>
-							<a href="#">Confidentialité</a>
+							<span class="footer-link-disabled">Mentions légales</span>
+							<span class="footer-link-disabled">Confidentialité</span>
 						</div>
 					</div>
 				</footer>
