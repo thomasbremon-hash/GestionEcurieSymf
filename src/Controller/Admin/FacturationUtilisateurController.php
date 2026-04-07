@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\FacturationUtilisateur;
 use App\Entity\MoisDeGestion;
 use App\Form\FacturationGenerationType;
+use App\Form\FacturationUtilisateurType;
 use App\Repository\FacturationUtilisateurRepository;
 use App\Repository\MoisDeGestionRepository;
 use App\Security\BackofficeAccessTrait;
@@ -118,6 +119,35 @@ class FacturationUtilisateurController extends AbstractController
         $this->em->flush();
         $this->addFlash('success', 'Facture marquée comme payée.');
         return $this->redirectToRoute('app_admin_facturation_utilisateur');
+    }
+
+    #[Route('/edit/{id}', name: 'app_admin_facturation_edit', methods: ['GET', 'POST'])]
+    public function edit(FacturationUtilisateur $facture, Request $request, FactureCalculator $calculator): Response
+    {
+        $this->requireAdminAccess();
+
+        if ($facture->isMailEnvoye() || $facture->getType() !== 'facture') {
+            $this->addFlash('danger', 'Cette facture ne peut pas être modifiée directement.');
+            return $this->redirectToRoute('app_admin_facturation_utilisateur');
+        }
+
+        $form = $this->createForm(FacturationUtilisateurType::class, $facture);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $calculator->calculerFactureUtilisateur($facture->getUtilisateur(), $facture->getMoisDeGestion());
+            $facture->setTotal($data['totalTTC']);
+            $facture->setDateEmission(new \DateTimeImmutable());
+            $this->em->flush();
+
+            $this->addFlash('success', 'Facture modifiée avec succès.');
+            return $this->redirectToRoute('app_admin_facturation_utilisateur');
+        }
+
+        return $this->render('admin/facturation/facturation.edit.html.twig', [
+            'form'    => $form,
+            'facture' => $facture,
+        ]);
     }
 
     #[Route('/generer-utilisateur', name: 'app_admin_facturation_generer_utilisateur')]
