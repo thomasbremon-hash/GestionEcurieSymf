@@ -150,6 +150,95 @@ class FacturationUtilisateurController extends AbstractController
         ]);
     }
 
+    #[Route('/corriger/{id}', name: 'app_admin_facturation_corriger', methods: ['GET', 'POST'])]
+    public function corriger(
+        FacturationUtilisateur $facture,
+        Request $request,
+        FactureCalculator $calculator,
+        FacturationUtilisateurRepository $factureRepo
+    ): Response {
+        $this->requireAdminAccess();
+
+        if (!$facture->isMailEnvoye() || $facture->getType() !== 'facture' || $facture->getStatut() === 'annulee') {
+            $this->addFlash('danger', 'Cette facture ne peut pas être corrigée via un avoir.');
+            return $this->redirectToRoute('app_admin_facturation_utilisateur');
+        }
+
+        $form = $this->createForm(FacturationUtilisateurType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $now = new \DateTimeImmutable();
+
+            // 1. Créer l'avoir d'annulation
+            $avoir = new FacturationUtilisateur();
+            $avoir->setType('avoir');
+            $avoir->setTotal(-$facture->getTotal());
+            $avoir->setUtilisateur($facture->getUtilisateur());
+            $avoir->setMoisDeGestion($facture->getMoisDeGestion());
+            $avoir->setEntreprise($facture->getEntreprise());
+            $avoir->setNumFacture('AV-' . $facture->getNumFacture());
+            $avoir->setStatut('impayee');
+            $avoir->setDateEmission($now);
+            $avoir->setCreatedAt($now);
+            $avoir->setMailEnvoye(false);
+            $avoir->setFactureOrigine($facture);
+            $this->em->persist($avoir);
+
+            // 2. Marquer la facture originale comme annulée
+            $facture->setStatut('annulee');
+
+            // 3. Créer la nouvelle facture corrigée
+            $dernierFacture = $factureRepo->createQueryBuilder('f')
+                ->select('f.numFacture')
+                ->where('f.type = :type')
+                ->setParameter('type', 'facture')
+                ->orderBy('f.id', 'DESC')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+            $dernierNumero = 0;
+            if ($dernierFacture && isset($dernierFacture['numFacture'])) {
+                preg_match('/\d{4}$/', $dernierFacture['numFacture'], $matches);
+                if (!empty($matches[0])) $dernierNumero = (int)$matches[0];
+            }
+            $nouveauNumero = $dernierNumero + 1;
+
+            $nouvelleFacture = new FacturationUtilisateur();
+            $nouvelleFacture->setType('facture');
+            $nouvelleFacture->setUtilisateur($form->get('utilisateur')->getData());
+            $nouvelleFacture->setMoisDeGestion($form->get('moisDeGestion')->getData());
+            $nouvelleFacture->setEntreprise($form->get('entreprise')->getData());
+
+            $moisCorrige = $form->get('moisDeGestion')->getData();
+            $data = $calculator->calculerFactureUtilisateur(
+                $form->get('utilisateur')->getData(),
+                $moisCorrige
+            );
+            $nouvelleFacture->setTotal($data['totalTTC']);
+            $nouvelleFacture->setNumFacture(sprintf('%d-%02d-%04d', $moisCorrige->getAnnee(), $moisCorrige->getMois(), $nouveauNumero));
+            $nouvelleFacture->setStatut('impayee');
+            $nouvelleFacture->setDateEmission($now);
+            $nouvelleFacture->setCreatedAt($now);
+            $nouvelleFacture->setMailEnvoye(false);
+            $this->em->persist($nouvelleFacture);
+
+            $this->em->flush();
+
+            $this->addFlash('success', sprintf(
+                'Avoir %s créé. Facture originale annulée. Nouvelle facture %s créée.',
+                $avoir->getNumFacture(),
+                $nouvelleFacture->getNumFacture()
+            ));
+            return $this->redirectToRoute('app_admin_facturation_utilisateur');
+        }
+
+        return $this->render('admin/facturation/facturation.corriger.html.twig', [
+            'form'    => $form,
+            'facture' => $facture,
+        ]);
+    }
+
     #[Route('/generer-utilisateur', name: 'app_admin_facturation_generer_utilisateur')]
     public function genererUtilisateur(Request $request, MoisDeGestionRepository $moisRepo, DeplacementToChevalProduitService $deplacementService, FacturationUtilisateurRepository $factureRepo): Response
     {
