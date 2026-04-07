@@ -2064,10 +2064,12 @@ th.th-sorted .sort-icon {
     transition: transform 0.25s ease, opacity 0.25s ease;
     opacity: 0;
     white-space: nowrap;
+    pointer-events: none;
 }
 .bulk-action-bar.visible {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
+    pointer-events: auto;
 }
 .bulk-count {
     font-size: 0.85rem;
