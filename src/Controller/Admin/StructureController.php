@@ -72,4 +72,31 @@ final class StructureController extends AbstractController
 
         return $this->redirectToRoute('app_admin_structures');
     }
+
+    #[Route('/delete-bulk', name: 'app_admin_structure_delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        $this->requireAdminAccess();
+
+        if (!$this->isCsrfTokenValid('bulk-delete', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
+        $ids = $request->request->all('ids');
+        $deleted = 0;
+
+        foreach ($ids as $id) {
+            $structure = $this->em->find(\App\Entity\Structure::class, (int) $id);
+            if (!$structure) { continue; }
+            $this->em->remove($structure);
+            $deleted++;
+        }
+        $this->em->flush();
+
+        if ($deleted > 0) {
+            $this->addFlash('success', "$deleted structure(s) supprimée(s).");
+        }
+
+        return $this->redirectToRoute('app_admin_structures');
+    }
 }
