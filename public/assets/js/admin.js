@@ -120,7 +120,7 @@ function initBulkDelete(table) {
   // --- Ajuster colspan des séparateurs ---
   tbody.querySelectorAll('tr[data-separator]').forEach(function (tr) {
     var td = tr.querySelector('td[colspan]')
-    if (td) td.setAttribute('colspan', parseInt(td.getAttribute('colspan')) + 1)
+    if (td) td.setAttribute('colspan', parseInt(td.getAttribute('colspan'), 10) + 1)
   })
 
   // --- Barre d'actions flottante ---
@@ -192,11 +192,13 @@ function initBulkDelete(table) {
   clearBtn.addEventListener('click', function () {
     table.querySelectorAll('.bulk-row-check').forEach(function (cb) { cb.checked = false })
     checkAll.checked = false
-    bar.classList.remove('visible')
+    checkAll.indeterminate = false
+    updateBar()
   })
 
   deleteBtn.addEventListener('click', function () {
     var n = getChecked().length
+    if (n === 0) return
     modalTitle.textContent = 'Supprimer ' + n + ' élément' + (n > 1 ? 's' : '') + ' ?'
     modal.classList.add('open')
   })
