@@ -54,20 +54,24 @@
 				</div>
 			</div>
 
-			<table class="data-table" id="user-table">
+			<table class="data-table" id="user-table"
+				    data-sortable="true"
+				    data-bulk-delete="true"
+				    data-bulk-delete-url="{{ path('app_admin_user_delete_bulk') }}"
+				    data-bulk-csrf-token="{{ csrf_token('bulk-delete') }}">
 				<thead>
 					<tr>
-						<th>Utilisateur</th>
+						<th data-sort="string">Utilisateur</th>
 						<th>Adresse</th>
 						<th>Rôles</th>
-						<th>Statut</th>
-            <th style="text-align:right">Actions</th>
+						<th data-sort="string">Statut</th>
+						<th style="text-align:right">Actions</th>
 
 					</tr>
 				</thead>
 				<tbody id="user-tbody" data-noun="utilisateur" data-noun-plural="utilisateurs">
 					{% for item in users %}
-						<tr data-index="{{ loop.index0 }}">
+						<tr data-index="{{ loop.index0 }}" data-id="{{ item.id }}">
 							<td>
 								<div class="user-cell">
 									<div class="user-avatar">{{ item.prenom|slice(0,1)|upper }}{{ item.nom|slice(0,1)|upper }}</div>
@@ -126,7 +130,7 @@
 						</tr>
 					{% else %}
 						<tr class="empty-row">
-							<td colspan="{{ is_granted('ROLE_ADMIN') ? 5 : 4 }}">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 6 : 5 }}">
 								<i class="mdi mdi-account-off" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun utilisateur.
 							</td>
 						</tr>
