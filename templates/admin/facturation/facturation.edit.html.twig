@@ -1,0 +1,64 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}BackOffice | Modifier la facture {{ facture.numFacture }}{% endblock %}
+
+{% block body %}
+<div class="form-wrapper">
+  <div class="breadcrumb-row">
+    <a href="{{ path('app_admin_facturation_utilisateur') }}">Facturation</a>
+    <span class="sep">›</span>
+    <span class="current">Modifier {{ facture.numFacture }}</span>
+  </div>
+
+  <div class="page-top" style="margin-bottom:1.5rem;">
+    <div>
+      <div class="page-eyebrow">Admin › Gestion financière</div>
+      <h1 class="page-title">Modifier la facture <span class="subtitle">{{ facture.numFacture }}</span></h1>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="section-icon"><i class="mdi mdi-pencil"></i></div>
+      <h2 class="form-card-title">Modification directe</h2>
+    </div>
+
+    {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+    {% include 'admin/_form_errors.html.twig' with { form: form } %}
+
+    <div class="form-body">
+      <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group-title"><i class="mdi mdi-tune"></i> Données de la facture</div>
+        <div class="fields-row cols-3">
+          <div class="form-field">
+            {{ form_label(form.utilisateur) }}
+            {{ form_widget(form.utilisateur) }}
+            <div class="field-error">{{ form_errors(form.utilisateur) }}</div>
+          </div>
+          <div class="form-field">
+            {{ form_label(form.moisDeGestion) }}
+            {{ form_widget(form.moisDeGestion) }}
+            <div class="field-error">{{ form_errors(form.moisDeGestion) }}</div>
+          </div>
+          <div class="form-field">
+            {{ form_label(form.entreprise) }}
+            {{ form_widget(form.entreprise) }}
+            <div class="field-error">{{ form_errors(form.entreprise) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <a href="{{ path('app_admin_facturation_utilisateur') }}" class="btn-ghost">
+        <i class="mdi mdi-arrow-left"></i> Annuler
+      </a>
+      <button type="submit" class="btn-primary-custom">
+        <i class="mdi mdi-content-save"></i> Enregistrer les modifications
+      </button>
+    </div>
+
+    {{ form_end(form) }}
+  </div>
+</div>
+{% endblock %}
