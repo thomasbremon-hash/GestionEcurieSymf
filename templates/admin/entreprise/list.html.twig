@@ -54,12 +54,16 @@
 				</div>
 			</div>
 
-			<table class="data-table">
+			<table class="data-table"
+				    data-sortable="true"
+				    data-bulk-delete="true"
+				    data-bulk-delete-url="{{ path('app_admin_entreprise_delete_bulk') }}"
+				    data-bulk-csrf-token="{{ csrf_token('bulk-delete') }}">
 				<thead>
 					<tr>
-						<th>Entreprise</th>
+						<th data-sort="string">Entreprise</th>
 						<th>Adresse</th>
-						<th>Pays</th>
+						<th data-sort="string">Pays</th>
 						<th>Utilisateurs</th>
 						<th>Chevaux</th>
 						<th style="text-align:right">Actions</th>
@@ -68,7 +72,7 @@
 				</thead>
 				<tbody id="entreprise-tbody" data-noun="entreprise" data-noun-plural="entreprises">
 					{% for item in entreprises %}
-						<tr data-index="{{ loop.index0 }}">
+						<tr data-index="{{ loop.index0 }}" data-id="{{ item.id }}">
 							<td>
 								<div class="user-cell">
 									<div class="user-avatar">{{ item.nom|slice(0,1)|upper }}</div>
@@ -116,7 +120,7 @@
 						</tr>
 					{% else %}
 						<tr class="empty-row">
-							<td colspan="{{ is_granted('ROLE_ADMIN') ? 6 : 5 }}">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 7 : 6 }}">
 								<i class="mdi mdi-domain-off" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucune entreprise trouvée.
 							</td>
 						</tr>
