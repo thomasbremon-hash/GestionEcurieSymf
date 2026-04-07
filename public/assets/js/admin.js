@@ -95,6 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => btn.parentElement.remove())
   })
 
+  // Init bulk delete AVANT sorting (le bulk ajoute une colonne qui décale les cellIndex)
+  if (typeof initBulkDelete === 'function') {
+    var bulkTables = document.querySelectorAll('table[data-bulk-delete]')
+    bulkTables.forEach(function (table) { initBulkDelete(table) })
+  }
+
+  var sortableTables = document.querySelectorAll('table[data-sortable]')
+  sortableTables.forEach(function (table) { initSorting(table) })
+
   // ══════════════════════════════════════
   // 3. PAGINATION & RECHERCHE
   // Utilisée sur les pages de liste.
@@ -198,13 +207,4 @@ document.addEventListener('DOMContentLoaded', () => {
   perPageSel.addEventListener('change', () => { perPg = parseInt(perPageSel.value); page = 1; render() })
 
   render()
-
-  // Init bulk delete AVANT sorting (le bulk ajoute une colonne qui décale les cellIndex)
-  if (typeof initBulkDelete === 'function') {
-    var bulkTables = document.querySelectorAll('table[data-bulk-delete]')
-    bulkTables.forEach(function (table) { initBulkDelete(table) })
-  }
-
-  var sortableTables = document.querySelectorAll('table[data-sortable]')
-  sortableTables.forEach(function (table) { initSorting(table) })
 })
