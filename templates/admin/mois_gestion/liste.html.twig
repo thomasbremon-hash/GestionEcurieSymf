@@ -54,10 +54,14 @@
 				</div>
 			</div>
 
-			<table class="data-table">
+			<table class="data-table"
+				    data-sortable="true"
+				    data-bulk-delete="true"
+				    data-bulk-delete-url="{{ path('app_admin_mois_gestion_delete_bulk') }}"
+				    data-bulk-csrf-token="{{ csrf_token('bulk-delete') }}">
 				<thead>
 					<tr>
-						<th>Période</th>
+						<th data-sort="string">Période</th>
 						<th>Chevaux suivis</th>
 						<th>Total général</th>
 						<th style="text-align:right">Actions</th>
@@ -76,7 +80,7 @@
 						{% for cp in item.chevalProduits %}
 							{% set total = total + cp.total %}
 						{% endfor %}
-						<tr data-index="{{ loop.index0 }}">
+						<tr data-index="{{ loop.index0 }}" data-id="{{ item.id }}">
 							<td>
 								<div class="user-cell">
 									<div class="user-avatar" style="background:var(--blue);border-radius:var(--radius-sm);">
@@ -120,7 +124,7 @@
 						</tr>
 					{% else %}
 						<tr class="empty-row">
-							<td colspan="{{ is_granted('ROLE_ADMIN') ? 4 : 3 }}">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 5 : 4 }}">
 								<i class="mdi mdi-calendar-remove" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun mois de gestion trouvé.
 							</td>
 						</tr>
