@@ -54,10 +54,14 @@
 				</div>
 			</div>
 
-			<table class="data-table">
+			<table class="data-table"
+				    data-sortable="true"
+				    data-bulk-delete="true"
+				    data-bulk-delete-url="{{ path('app_admin_produit_delete_bulk') }}"
+				    data-bulk-csrf-token="{{ csrf_token('bulk-delete') }}">
 				<thead>
 					<tr>
-						<th>Nom</th>
+						<th data-sort="string">Nom</th>
 						<th>Description</th>
 						<th>Prix</th>
 						<th>Taux TVA</th>
@@ -68,7 +72,7 @@
 				</thead>
 				<tbody id="produit-tbody" data-noun="produit" data-noun-plural="produits">
 					{% for item in produits %}
-						<tr data-index="{{ loop.index0 }}">
+						<tr data-index="{{ loop.index0 }}" data-id="{{ item.id }}">
 							<td>
 								<div class="user-cell">
 									<div class="user-avatar" style="background:var(--green);">{{ item.nom|slice(0,1)|upper }}</div>
@@ -101,7 +105,7 @@
 						</tr>
 					{% else %}
 						<tr class="empty-row">
-							<td colspan="{{ is_granted('ROLE_ADMIN') ? 5 : 4 }}">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 6 : 5 }}">
 								<i class="mdi mdi-shopping-outline" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun produit trouvé.
 							</td>
 						</tr>
