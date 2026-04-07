@@ -54,13 +54,17 @@
 				</div>
 			</div>
 
-			<table class="data-table">
+			<table class="data-table"
+				data-sortable="true"
+				data-bulk-delete="true"
+				data-bulk-delete-url="{{ path('app_admin_cheval_delete_bulk') }}"
+				data-bulk-csrf-token="{{ csrf_token('bulk-delete') }}">
 				<thead>
 					<tr>
-						<th>Cheval</th>
-						<th>Race</th>
+						<th data-sort="string">Cheval</th>
+						<th data-sort="string">Race</th>
 						<th>Sexe</th>
-						<th>Date de naissance</th>
+						<th data-sort="date">Date de naissance</th>
 						<th>Propriétaires</th>
 						{% if is_granted('ROLE_ADMIN') %}
 							<th style="text-align:right">Actions</th>
@@ -69,7 +73,7 @@
 				</thead>
 				<tbody id="cheval-tbody" data-noun="cheval" data-noun-plural="chevaux">
 					{% for cheval in chevaux %}
-						<tr data-index="{{ loop.index0 }}">
+						<tr data-index="{{ loop.index0 }}" data-id="{{ cheval.id }}">
 							<td>
 								<a href="{{ path('app_admin_cheval_show', {id: cheval.id}) }}" class="user-cell" style="text-decoration:none;color:inherit;">
 									<div class="user-avatar" style="background:var(--green);">{{ cheval.nom|slice(0,1)|upper }}</div>
@@ -120,7 +124,7 @@
 						</tr>
 					{% else %}
 						<tr class="empty-row">
-							<td colspan="{{ is_granted('ROLE_ADMIN') ? 6 : 5 }}">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 7 : 6 }}">
 								<i class="mdi mdi-horse" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun cheval trouvé.
 							</td>
 						</tr>
