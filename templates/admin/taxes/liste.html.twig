@@ -1,113 +1,136 @@
 {% extends 'layouts/base.admin.html.twig' %}
-{% block title %}
-	BackOffice | Liste taxes
+{% block title %}BackOffice | Liste taxes
 {% endblock %}
-
 {% block body %}
-	<section class="section is-title-bar">
-		<div class="level">
-			<div class="level-left">
-				<div class="level-item">
-					<ul>
-						<li>Admin</li>
-						<li>Taxes</li>
-					</ul>
-				</div>
-			</div>
-			<div class="level-right">
-				<a href="{{ path('app_admin_taxes_new') }}" class="button is-small is-primary">
-					<span>Ajouter</span>
-					<span class="icon">
-						<i class="mdi mdi-plus"></i>
-					</span>
-				</a>
-			</div>
-		</div>
-	</section>
-	<section class="section is-main-section">
+	<div class="admin-wrapper--wide">
 		{% for label, messages in app.flashes(['success', 'danger']) %}
 			{% for message in messages %}
-				<div class="notification is-{{ label }}">
-					<button class="delete"></button>
-					{{ message }}
+				<div class="flash {{ label }}">
+					<span>
+						<i class="mdi mdi-{{ label == 'success' ? 'check-circle' : 'alert-circle' }}"></i>
+						{{ message }}</span>
+					<button class="flash-close" onclick="this.parentElement.remove()">
+						<i class="mdi mdi-close"></i>
+					</button>
 				</div>
 			{% endfor %}
 		{% endfor %}
 
-		<div class="card has-table">
-			<header class="card-header">
-				<p class="card-header-title">
-					<span class="icon">
-						<span class="mdi mdi-shopping-outline"></span>
-					</span>
-					{{ taxes|length }}
-					taxes
-				</p>
-				<a href="#" class="card-header-icon">
-					<span class="icon">
-						<i class="mdi mdi-reload"></i>
-					</span>
-				</a>
-			</header>
-			<div class="card-content">
-				<div class="b-table has-pagination">
-					<div class="table-wrapper has-mobile-cards">
-						<table class="table is-fullwidth is-striped is-hoverable is-fullwidth" id="table">
-							<thead>
-								<tr>
-									<th>Libelle</th>
-									<th>Pourcentage</th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for item in taxes %}
-									<tr>
-										<td data-label="Description">{{ item.libelle }}</td>
-										<td data-label="Description">{{ item.pourcentage }}%</td>
+		<div class="page-top">
+			<div>
+				<div class="page-eyebrow"><a href="{{ path('app_admin') }}">Dashboard</a> › <span>Taxes</span></div>
+				<h1 class="page-title">Taxes
+					<span class="subtitle">{{ taxes|length }}
+						au total</span>
+				</h1>
+			</div>
+			{% if is_granted('ROLE_ADMIN') %}
+				<a href="{{ path('app_admin_taxes_new') }}" class="btn-primary-custom">
+					<i class="mdi mdi-plus"></i>
+					Ajouter une taxe</a>
+			{% endif %}
+		</div>
 
+		<div class="table-card">
+			<div class="table-card-header">
+				<div class="table-card-header-left">
+					<div class="table-card-title">
+						<i class="mdi mdi-percent" style="color:var(--accent)"></i>
+						Liste des taxes
+						<span class="count-badge">{{ taxes|length }}</span>
+					</div>
+					<div class="per-page-wrap">
+						Afficher<select id="per-page-select">
+							<option value="10">10</option>
+							<option value="25" selected>25</option>
+							<option value="50">50</option>
+							<option value="100">100</option>
+						</select>par page
+					</div>
+				</div>
+				<div class="search-wrap">
+					<i class="mdi mdi-magnify search-icon"></i>
+					<input type="text" id="search-input" placeholder="Rechercher…"/>
+				</div>
+			</div>
 
-										<td class="is-actions-cell">
-											<div class="buttons is-right">
-												<a href="{{ path('app_admin_taxes_update', { id: item.id }) }}" class="button is-small is-primary" type="button">
-													<span class="icon">
-														<i class="mdi mdi-pencil"></i>
-													</span>
-												</a>
-												<button class="button is-small is-danger jb-modal" data-target="sample-modal-{{ item.id }}" type="button">
-													<span class="icon">
-														<i class="mdi mdi-trash-can"></i>
-													</span>
-												</button>
-											</div>
-										</td>
-									</tr>
-									<div id="sample-modal-{{ item.id }}" class="modal">
-										<div class="modal-background jb-modal-close"></div>
-										<div class="modal-card">
-											<header class="modal-card-head">
-												<p class="modal-card-title">Confirmer la suppression</p>
-												<button class="delete jb-modal-close" aria-label="close"></button>
-											</header>
-											<section class="modal-card-body">
-												<p>Voulez-vous vraiment supprimer le taxes ?</p>
-											</section>
-											<footer class="modal-card-foot">
-												<button class="button jb-modal-close">Annuler</button>
-												<form method="post" action="{{ path('app_admin_taxes_delete', { id: item.id }) }}" style="display:inline;">
-									<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
-									<button type="submit" class="button is-danger jb-modal-close">Supprimer</button>
-								</form>
-											</footer>
-										</div>
-										<button class="modal-close is-large jb-modal-close" aria-label="close"></button>
+			<table class="data-table"
+			    data-sortable="true"
+			    data-bulk-delete="true"
+			    data-bulk-delete-url="{{ path('app_admin_taxes_delete_bulk') }}"
+			    data-bulk-csrf-token="{{ csrf_token('bulk-delete') }}">
+				<thead>
+					<tr>
+						<th data-sort="string">Libellé</th>
+						<th>Pourcentage</th>
+						{% if is_granted('ROLE_ADMIN') %}
+							<th style="text-align:right">Actions</th>
+						{% endif %}
+					</tr>
+				</thead>
+				<tbody id="taxes-tbody" data-noun="taxe" data-noun-plural="taxes">
+					{% for item in taxes %}
+						<tr data-index="{{ loop.index0 }}" data-id="{{ item.id }}">
+							<td>
+								<div class="user-cell">
+									<div class="user-avatar" style="background:var(--accent);">{{ item.libelle|slice(0,1)|upper }}</div>
+									<div class="user-name">{{ item.libelle }}</div>
+								</div>
+							</td>
+							<td>
+								<span class="pill tag-neutral" style="font-family:'Sora',sans-serif;font-weight:700;">{{ item.pourcentage }}
+									%</span>
+							</td>
+							{% if is_granted('ROLE_ADMIN') %}
+								<td>
+									<div class="action-btns">
+										<a href="{{ path('app_admin_taxes_update', {id: item.id}) }}" class="action-btn edit" title="Modifier">
+											<i class="mdi mdi-pencil"></i>
+										</a>
+										<button class="action-btn del" onclick="openModal('modal-{{ item.id }}')" title="Supprimer">
+											<i class="mdi mdi-trash-can"></i>
+										</button>
 									</div>
-								{% endfor %}
-							</tbody>
-						</table>
+								</td>
+							{% endif %}
+						</tr>
+					{% else %}
+						<tr class="empty-row">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 4 : 3 }}">
+								<i class="mdi mdi-percent" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucune taxe trouvée.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<div class="table-footer">
+				<div class="pagination-info" id="pagination-info">—</div>
+				<div class="pagination-controls" id="pagination-controls"></div>
+			</div>
+		</div>
+	</div>
+
+	{% if is_granted('ROLE_ADMIN') %}
+		{% for item in taxes %}
+			<div class="modal-overlay" id="modal-{{ item.id }}">
+				<div class="modal-box">
+					<div class="modal-icon">
+						<i class="mdi mdi-trash-can-outline"></i>
+					</div>
+					<div class="modal-title">Supprimer cette taxe ?</div>
+					<div class="modal-text">Vous êtes sur le point de supprimer
+						<strong>{{ item.libelle }}</strong>.<br/>Cette action est irréversible.</div>
+					<div class="modal-actions">
+						<button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
+						<form method="post" action="{{ path('app_admin_taxes_delete', {id: item.id}) }}" style="display:inline;">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
+								<button type="submit" class="btn-danger">
+									<i class="mdi mdi-trash-can"></i>
+									Supprimer</button>
+							</form>
 					</div>
 				</div>
 			</div>
-		</div>
-	</section>
+		{% endfor %}
+	{% endif %}
 {% endblock %}
