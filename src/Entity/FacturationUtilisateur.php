@@ -44,6 +44,13 @@ class FacturationUtilisateur
     #[ORM\Column(type: 'boolean')]
     private bool $mailEnvoye = false;
 
+    #[ORM\Column(length: 20, options: ['default' => 'facture'])]
+    private string $type = 'facture';
+
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?FacturationUtilisateur $factureOrigine = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -165,6 +172,28 @@ class FacturationUtilisateur
     {
         $this->createdAt = $createdAt;
 
+        return $this;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function getFactureOrigine(): ?self
+    {
+        return $this->factureOrigine;
+    }
+
+    public function setFactureOrigine(?self $factureOrigine): static
+    {
+        $this->factureOrigine = $factureOrigine;
         return $this;
     }
 }
