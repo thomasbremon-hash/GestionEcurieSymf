@@ -94,4 +94,36 @@ final class ChevalController extends AbstractController
 
         return $this->redirectToRoute('app_admin_chevaux');
     }
+
+    #[Route('/delete-bulk', name: 'app_admin_cheval_delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        $this->requireAdminAccess();
+
+        if (!$this->isCsrfTokenValid('bulk-delete', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
+        $ids = $request->request->all('ids');
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach ($ids as $id) {
+            $cheval = $this->em->find(Cheval::class, (int) $id);
+            if (!$cheval) { continue; }
+            if (!$cheval->getChevalProprietaires()->isEmpty()) { $skipped++; continue; }
+            $this->em->remove($cheval);
+            $deleted++;
+        }
+        $this->em->flush();
+
+        if ($deleted > 0) {
+            $this->addFlash('success', "$deleted cheval(x) supprimé(s).");
+        }
+        if ($skipped > 0) {
+            $this->addFlash('danger', "$skipped cheval(x) non supprimé(s) car associé(s) à un propriétaire.");
+        }
+
+        return $this->redirectToRoute('app_admin_chevaux');
+    }
 }
