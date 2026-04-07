@@ -15,6 +15,70 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('open')
 }
 
+// ══════════════════════════════════════
+// 4. TRI DES COLONNES
+// Activé sur <table data-sortable="true">
+// Chaque <th data-sort="string|number|date"> devient triable.
+// ══════════════════════════════════════
+
+function parseDateFr(str) {
+  var p = str.trim().split('/')
+  if (p.length === 3) return new Date(p[2], p[1] - 1, p[0])
+  return new Date(0)
+}
+
+function sortTableByCol(tbody, colIndex, type, dir) {
+  var rows = Array.from(tbody.querySelectorAll('tr[data-index]'))
+  rows.sort(function (a, b) {
+    var aCell = a.cells[colIndex]
+    var bCell = b.cells[colIndex]
+    var aVal = aCell ? aCell.textContent.trim() : ''
+    var bVal = bCell ? bCell.textContent.trim() : ''
+    var cmp = 0
+    if (type === 'number') {
+      cmp = (parseFloat(aVal) || 0) - (parseFloat(bVal) || 0)
+    } else if (type === 'date') {
+      cmp = parseDateFr(aVal) - parseDateFr(bVal)
+    } else {
+      cmp = aVal.localeCompare(bVal, 'fr', { sensitivity: 'base' })
+    }
+    return dir === 'asc' ? cmp : -cmp
+  })
+  rows.forEach(function (r) { tbody.appendChild(r) })
+}
+
+function initSorting(table) {
+  if (!table || table.dataset.sortable !== 'true') return
+  var tbody = table.querySelector('tbody')
+  if (!tbody) return
+
+  table.querySelectorAll('th[data-sort]').forEach(function (th) {
+    var icon = document.createElement('i')
+    icon.className = 'mdi mdi-unfold-more-horizontal sort-icon'
+    th.appendChild(icon)
+    th.dataset.sortDir = 'none'
+
+    th.addEventListener('click', function () {
+      var dir = th.dataset.sortDir === 'asc' ? 'desc' : 'asc'
+
+      // Reset tous les autres th
+      table.querySelectorAll('th[data-sort]').forEach(function (other) {
+        other.dataset.sortDir = 'none'
+        other.classList.remove('th-sorted')
+        var ico = other.querySelector('.sort-icon')
+        if (ico) ico.className = 'mdi mdi-unfold-more-horizontal sort-icon'
+      })
+
+      th.dataset.sortDir = dir
+      th.classList.add('th-sorted')
+      var ico = th.querySelector('.sort-icon')
+      if (ico) ico.className = 'mdi mdi-arrow-' + (dir === 'asc' ? 'up' : 'down') + ' sort-icon'
+
+      sortTableByCol(tbody, th.cellIndex, th.dataset.sort, dir)
+    })
+  })
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Fermeture des modals en cliquant sur l'overlay
   document.querySelectorAll('.modal-overlay').forEach((overlay) => {
@@ -134,4 +198,13 @@ document.addEventListener('DOMContentLoaded', () => {
   perPageSel.addEventListener('change', () => { perPg = parseInt(perPageSel.value); page = 1; render() })
 
   render()
+
+  // Init bulk delete AVANT sorting (le bulk ajoute une colonne qui décale les cellIndex)
+  if (typeof initBulkDelete === 'function') {
+    var bulkTables = document.querySelectorAll('table[data-bulk-delete]')
+    bulkTables.forEach(function (table) { initBulkDelete(table) })
+  }
+
+  var sortableTables = document.querySelectorAll('table[data-sortable]')
+  sortableTables.forEach(function (table) { initSorting(table) })
 })
