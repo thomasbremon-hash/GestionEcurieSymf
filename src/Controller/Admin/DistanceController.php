@@ -77,4 +77,31 @@ final class DistanceController extends AbstractController
 
         return $this->redirectToRoute('app_admin_distances');
     }
+
+    #[Route('/admin/distance/delete-bulk', name: 'app_admin_distance_delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        $this->requireAdminAccess();
+
+        if (!$this->isCsrfTokenValid('bulk-delete', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
+        $ids = $request->request->all('ids');
+        $deleted = 0;
+
+        foreach ($ids as $id) {
+            $distance = $this->em->find(\App\Entity\DistanceStructure::class, (int) $id);
+            if (!$distance) { continue; }
+            $this->em->remove($distance);
+            $deleted++;
+        }
+        $this->em->flush();
+
+        if ($deleted > 0) {
+            $this->addFlash('success', "$deleted distance(s) supprimée(s).");
+        }
+
+        return $this->redirectToRoute('app_admin_distances');
+    }
 }
