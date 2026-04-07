@@ -79,6 +79,159 @@ function initSorting(table) {
   })
 }
 
+// ══════════════════════════════════════
+// 5. SUPPRESSION EN MASSE
+// Activé sur <table data-bulk-delete="true"
+//   data-bulk-delete-url="/admin/.../delete-bulk"
+//   data-bulk-csrf-token="...">
+// Chaque <tr data-index="N" data-id="X"> reçoit une checkbox.
+// ══════════════════════════════════════
+
+function initBulkDelete(table) {
+  if (!table || table.dataset.bulkDelete !== 'true') return
+  var deleteUrl = table.dataset.bulkDeleteUrl
+  var csrfToken = table.dataset.bulkCsrfToken
+  var tbody = table.querySelector('tbody')
+  var theadRow = table.querySelector('thead tr')
+  if (!tbody || !theadRow || !deleteUrl) return
+
+  // --- Checkbox "tout sélectionner" dans le thead ---
+  var thCheck = document.createElement('th')
+  thCheck.style.cssText = 'width:40px;padding-right:0;'
+  var checkAll = document.createElement('input')
+  checkAll.type = 'checkbox'
+  checkAll.className = 'bulk-checkbox'
+  checkAll.title = 'Tout sélectionner'
+  thCheck.appendChild(checkAll)
+  theadRow.insertBefore(thCheck, theadRow.firstChild)
+
+  // --- Checkbox par ligne de données ---
+  tbody.querySelectorAll('tr[data-index]').forEach(function (tr) {
+    var td = document.createElement('td')
+    td.style.cssText = 'width:40px;padding-right:0;'
+    var cb = document.createElement('input')
+    cb.type = 'checkbox'
+    cb.className = 'bulk-row-check bulk-checkbox'
+    cb.dataset.id = tr.dataset.id || ''
+    td.appendChild(cb)
+    tr.insertBefore(td, tr.firstChild)
+  })
+
+  // --- Ajuster colspan des séparateurs ---
+  tbody.querySelectorAll('tr[data-separator]').forEach(function (tr) {
+    var td = tr.querySelector('td[colspan]')
+    if (td) td.setAttribute('colspan', parseInt(td.getAttribute('colspan')) + 1)
+  })
+
+  // --- Barre d'actions flottante ---
+  var bar = document.createElement('div')
+  bar.className = 'bulk-action-bar'
+  bar.innerHTML =
+    '<span class="bulk-count"></span>' +
+    '<button type="button" class="bulk-clear-btn">Désélectionner tout</button>' +
+    '<button type="button" class="btn-danger bulk-delete-submit-btn">' +
+      '<i class="mdi mdi-trash-can"></i> Supprimer la sélection' +
+    '</button>'
+  document.body.appendChild(bar)
+
+  var countEl = bar.querySelector('.bulk-count')
+  var clearBtn = bar.querySelector('.bulk-clear-btn')
+  var deleteBtn = bar.querySelector('.bulk-delete-submit-btn')
+
+  // --- Modal de confirmation générique ---
+  var modal = document.createElement('div')
+  modal.className = 'modal-overlay'
+  modal.innerHTML =
+    '<div class="modal-box">' +
+      '<div class="modal-icon"><i class="mdi mdi-trash-can-outline"></i></div>' +
+      '<div class="modal-title bulk-modal-title"></div>' +
+      '<div class="modal-text">Cette action est irréversible.</div>' +
+      '<div class="modal-actions">' +
+        '<button type="button" class="btn-ghost bulk-modal-cancel">Annuler</button>' +
+        '<button type="button" class="btn-danger bulk-modal-confirm">' +
+          '<i class="mdi mdi-trash-can"></i> Supprimer' +
+        '</button>' +
+      '</div>' +
+    '</div>'
+  document.body.appendChild(modal)
+
+  var modalTitle = modal.querySelector('.bulk-modal-title')
+  var modalCancel = modal.querySelector('.bulk-modal-cancel')
+  var modalConfirm = modal.querySelector('.bulk-modal-confirm')
+
+  function getChecked() {
+    return Array.from(table.querySelectorAll('.bulk-row-check:checked'))
+  }
+
+  function updateBar() {
+    var checked = getChecked()
+    var n = checked.length
+    if (n > 0) {
+      countEl.textContent = n + ' élément' + (n > 1 ? 's' : '') + ' sélectionné' + (n > 1 ? 's' : '')
+      bar.classList.add('visible')
+    } else {
+      bar.classList.remove('visible')
+    }
+    // Sync checkAll
+    var allVisible = Array.from(table.querySelectorAll('tr[data-index]:not(.page-hidden) .bulk-row-check'))
+    checkAll.indeterminate = n > 0 && n < allVisible.length
+    checkAll.checked = n > 0 && n === allVisible.length
+  }
+
+  // Écouter les changements de checkbox
+  tbody.addEventListener('change', function (e) {
+    if (e.target.classList.contains('bulk-row-check')) updateBar()
+  })
+
+  checkAll.addEventListener('change', function () {
+    var visible = table.querySelectorAll('tr[data-index]:not(.page-hidden) .bulk-row-check')
+    visible.forEach(function (cb) { cb.checked = checkAll.checked })
+    updateBar()
+  })
+
+  clearBtn.addEventListener('click', function () {
+    table.querySelectorAll('.bulk-row-check').forEach(function (cb) { cb.checked = false })
+    checkAll.checked = false
+    bar.classList.remove('visible')
+  })
+
+  deleteBtn.addEventListener('click', function () {
+    var n = getChecked().length
+    modalTitle.textContent = 'Supprimer ' + n + ' élément' + (n > 1 ? 's' : '') + ' ?'
+    modal.classList.add('open')
+  })
+
+  modalCancel.addEventListener('click', function () { modal.classList.remove('open') })
+  modal.addEventListener('click', function (e) { if (e.target === modal) modal.classList.remove('open') })
+
+  modalConfirm.addEventListener('click', function () {
+    modal.classList.remove('open')
+    var ids = getChecked().map(function (cb) { return cb.dataset.id })
+
+    var form = document.createElement('form')
+    form.method = 'POST'
+    form.action = deleteUrl
+    form.style.display = 'none'
+
+    var tokenInput = document.createElement('input')
+    tokenInput.type = 'hidden'
+    tokenInput.name = '_token'
+    tokenInput.value = csrfToken
+    form.appendChild(tokenInput)
+
+    ids.forEach(function (id) {
+      var input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = 'ids[]'
+      input.value = id
+      form.appendChild(input)
+    })
+
+    document.body.appendChild(form)
+    form.submit()
+  })
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Fermeture des modals en cliquant sur l'overlay
   document.querySelectorAll('.modal-overlay').forEach((overlay) => {
@@ -96,10 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   // Init bulk delete AVANT sorting (le bulk ajoute une colonne qui décale les cellIndex)
-  if (typeof initBulkDelete === 'function') {
-    var bulkTables = document.querySelectorAll('table[data-bulk-delete]')
-    bulkTables.forEach(function (table) { initBulkDelete(table) })
-  }
+  var bulkTables = document.querySelectorAll('table[data-bulk-delete]')
+  bulkTables.forEach(function (table) { initBulkDelete(table) })
 
   var sortableTables = document.querySelectorAll('table[data-sortable]')
   sortableTables.forEach(function (table) { initSorting(table) })
