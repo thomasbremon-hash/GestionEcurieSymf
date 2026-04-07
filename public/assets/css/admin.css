@@ -2017,3 +2017,80 @@ body {
 @keyframes btn-spin {
     to { transform: rotate(360deg); }
 }
+
+/* ══════════════════════════════════════
+   TRI DES COLONNES
+══════════════════════════════════════ */
+th[data-sort] {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+th[data-sort]:hover {
+    color: var(--sidebar-accent, #4f80c4);
+}
+th.th-sorted {
+    color: var(--sidebar-accent, #4f80c4);
+}
+.sort-icon {
+    font-size: 0.85rem;
+    margin-left: 0.3rem;
+    opacity: 0.5;
+    vertical-align: middle;
+    pointer-events: none;
+}
+th.th-sorted .sort-icon {
+    opacity: 1;
+    color: var(--sidebar-accent, #4f80c4);
+}
+
+/* ══════════════════════════════════════
+   BARRE D'ACTIONS EN MASSE
+══════════════════════════════════════ */
+.bulk-action-bar {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(160%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1.25rem;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    opacity: 0;
+    white-space: nowrap;
+}
+.bulk-action-bar.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+.bulk-count {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+.bulk-clear-btn {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    cursor: pointer;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    padding: 0;
+    font-family: inherit;
+}
+.bulk-clear-btn:hover {
+    color: var(--ink);
+}
+.bulk-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--sidebar-accent, #4f80c4);
+    flex-shrink: 0;
+}
