@@ -87,4 +87,31 @@ final class DeplacementController extends AbstractController
 
         return $this->redirectToRoute('app_admin_deplacements');
     }
+
+    #[Route('/delete-bulk', name: 'app_admin_deplacement_delete_bulk', methods: ['POST'])]
+    public function deleteBulk(Request $request): Response
+    {
+        $this->requireAdminAccess();
+
+        if (!$this->isCsrfTokenValid('bulk-delete', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
+        $ids = $request->request->all('ids');
+        $deleted = 0;
+
+        foreach ($ids as $id) {
+            $deplacement = $this->em->find(\App\Entity\Deplacement::class, (int) $id);
+            if (!$deplacement) { continue; }
+            $this->em->remove($deplacement);
+            $deleted++;
+        }
+        $this->em->flush();
+
+        if ($deleted > 0) {
+            $this->addFlash('success', "$deleted déplacement(s) supprimé(s).");
+        }
+
+        return $this->redirectToRoute('app_admin_deplacements');
+    }
 }
