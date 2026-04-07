@@ -54,11 +54,15 @@
 				</div>
 			</div>
 
-			<table class="data-table">
+			<table class="data-table"
+					data-sortable="true"
+					data-bulk-delete="true"
+					data-bulk-delete-url="{{ path('app_admin_deplacement_delete_bulk') }}"
+					data-bulk-csrf-token="{{ csrf_token('bulk-delete') }}">
 				<thead>
 					<tr>
-						<th>Nom</th>
-						<th>Date</th>
+						<th data-sort="string">Nom</th>
+						<th data-sort="date">Date</th>
 						<th>Chevaux</th>
 						<th>Structure</th>
 						<th>Entreprise</th>
@@ -97,7 +101,7 @@
 							</tr>
 							{% set moisActuel = moisDeplacement %}
 						{% endif %}
-						<tr data-index="{{ loop.index0 }}" data-month="{{ moisDeplacement }}">
+						<tr data-index="{{ loop.index0 }}" data-month="{{ moisDeplacement }}" data-id="{{ deplacement.id }}">
 							<td>
 								<div class="user-cell">
 									<div class="user-avatar" style="background:var(--blue);">{{ deplacement.nom|slice(0,1)|upper }}</div>
@@ -163,7 +167,7 @@
 						</tr>
 					{% else %}
 						<tr class="empty-row">
-							<td colspan="{{ is_granted('ROLE_ADMIN') ? 7 : 6 }}">
+							<td colspan="{{ is_granted('ROLE_ADMIN') ? 8 : 7 }}">
 								<i class="mdi mdi-map-marker-off-outline" style="font-size:1.5rem;display:block;margin-bottom:.5rem;opacity:.35"></i>Aucun déplacement trouvé.
 							</td>
 						</tr>
