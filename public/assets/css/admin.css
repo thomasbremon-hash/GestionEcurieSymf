@@ -406,6 +406,16 @@ body {
     color: var(--gold);
     border: 1px solid rgba(160, 124, 48, 0.2);
 }
+.pill-annulee {
+    background: var(--surface-2);
+    color: var(--ink-muted);
+    border: 1px solid var(--border);
+}
+.pill-avoir {
+    background: var(--red-light);
+    color: var(--red);
+    border: 1px solid rgba(185, 28, 28, 0.2);
+}
 
 /* Badge de rôle (fiche utilisateur) */
 .role-badge {
