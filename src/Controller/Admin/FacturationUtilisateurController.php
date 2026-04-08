@@ -11,6 +11,7 @@ use App\Repository\MoisDeGestionRepository;
 use App\Security\BackofficeAccessTrait;
 use App\Service\DeplacementToChevalProduitService;
 use App\Service\FactureCalculator;
+use App\Service\InvoiceNumberService;
 use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -25,7 +26,10 @@ class FacturationUtilisateurController extends AbstractController
 {
     use BackofficeAccessTrait;
 
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(
+        private EntityManagerInterface $em,
+        private InvoiceNumberService $invoiceNumberService,
+    ) {}
 
     #[Route('/liste', name: 'app_admin_facturation_utilisateur')]
     public function index(FacturationUtilisateurRepository $repo, FactureCalculator $calculator): Response
@@ -159,7 +163,6 @@ class FacturationUtilisateurController extends AbstractController
         FacturationUtilisateur $facture,
         Request $request,
         FactureCalculator $calculator,
-        FacturationUtilisateurRepository $factureRepo
     ): Response {
         $this->requireAdminAccess();
 
@@ -193,20 +196,7 @@ class FacturationUtilisateurController extends AbstractController
             $facture->setStatut('annulee');
 
             // 3. Créer la nouvelle facture corrigée
-            $dernierFacture = $factureRepo->createQueryBuilder('f')
-                ->select('f.numFacture')
-                ->where('f.type = :type')
-                ->setParameter('type', 'facture')
-                ->orderBy('f.id', 'DESC')
-                ->setMaxResults(1)
-                ->getQuery()
-                ->getOneOrNullResult();
-            $dernierNumero = 0;
-            if ($dernierFacture && isset($dernierFacture['numFacture'])) {
-                preg_match('/\d{4}$/', $dernierFacture['numFacture'], $matches);
-                if (!empty($matches[0])) $dernierNumero = (int)$matches[0];
-            }
-            $nouveauNumero = $dernierNumero + 1;
+            $nouveauNumero = $this->invoiceNumberService->reserveNumbers(1);
 
             $nouvelleFacture = new FacturationUtilisateur();
             $nouvelleFacture->setType('facture');
@@ -244,7 +234,7 @@ class FacturationUtilisateurController extends AbstractController
     }
 
     #[Route('/generer-utilisateur', name: 'app_admin_facturation_generer_utilisateur')]
-    public function genererUtilisateur(Request $request, MoisDeGestionRepository $moisRepo, DeplacementToChevalProduitService $deplacementService, FacturationUtilisateurRepository $factureRepo): Response
+    public function genererUtilisateur(Request $request, MoisDeGestionRepository $moisRepo, DeplacementToChevalProduitService $deplacementService): Response
     {
         $this->requireAdminAccess();
 
@@ -265,14 +255,8 @@ class FacturationUtilisateurController extends AbstractController
                 }
             }
 
-            $dernierFacture = $factureRepo->createQueryBuilder('f')->select('f.numFacture')->orderBy('f.id', 'DESC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
-            $dernierNumero = 0;
-            if ($dernierFacture && isset($dernierFacture['numFacture'])) {
-                preg_match('/\d{4}$/', $dernierFacture['numFacture'], $matches);
-                if (!empty($matches[0])) $dernierNumero = (int)$matches[0];
-            }
-
-            $compteur = $dernierNumero;
+            $count    = count($proprietaires);
+            $compteur = $count > 0 ? $this->invoiceNumberService->reserveNumbers($count) - 1 : 0;
             foreach ($proprietaires as $user) {
                 $compteur++;
                 $facture = new FacturationUtilisateur();
