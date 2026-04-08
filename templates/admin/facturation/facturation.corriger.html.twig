@@ -1,0 +1,102 @@
+{% extends 'layouts/base.admin.html.twig' %}
+
+{% block title %}BackOffice | Corriger la facture {{ facture.numFacture }}{% endblock %}
+
+{% block body %}
+<div class="form-wrapper">
+  <div class="breadcrumb-row">
+    <a href="{{ path('app_admin_facturation_utilisateur') }}">Facturation</a>
+    <span class="sep">›</span>
+    <span class="current">Corriger {{ facture.numFacture }}</span>
+  </div>
+
+  <div class="page-top" style="margin-bottom:1.5rem;">
+    <div>
+      <div class="page-eyebrow">Admin › Gestion financière</div>
+      <h1 class="page-title">Corriger la facture <span class="subtitle">{{ facture.numFacture }}</span></h1>
+    </div>
+  </div>
+
+  {# Résumé de la facture originale #}
+  <div class="form-card" style="margin-bottom:1.25rem;border-left:3px solid var(--red);">
+    <div class="form-card-header">
+      <div class="section-icon" style="background:var(--red-light);color:var(--red);"><i class="mdi mdi-file-document-alert"></i></div>
+      <h2 class="form-card-title">Facture originale</h2>
+    </div>
+    <div class="form-body">
+      <div class="fields-row cols-4" style="gap:1rem;">
+        <div>
+          <div style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:0.25rem;">N° Facture</div>
+          <div style="font-weight:600;">{{ facture.numFacture }}</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:0.25rem;">Client</div>
+          <div style="font-weight:600;">{{ facture.utilisateur.nom }} {{ facture.utilisateur.prenom }}</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:0.25rem;">Mois</div>
+          <div style="font-weight:600;">{{ '%02d'|format(facture.moisDeGestion.mois) }}/{{ facture.moisDeGestion.annee }}</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem;color:var(--ink-muted);margin-bottom:0.25rem;">Total TTC</div>
+          <div style="font-weight:600;">{{ facture.total|number_format(2, ',', ' ') }} €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Avertissement #}
+  <div style="background:var(--red-light);border:1px solid rgba(185,28,28,0.2);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.25rem;color:var(--red);display:flex;gap:0.75rem;align-items:flex-start;">
+    <i class="mdi mdi-alert" style="font-size:1.25rem;margin-top:0.1rem;flex-shrink:0;"></i>
+    <div>
+      <strong>Cette facture a déjà été envoyée au client.</strong><br>
+      La validation créera un avoir d'annulation (montant négatif) et une nouvelle facture corrigée prête à être renvoyée.
+    </div>
+  </div>
+
+  {# Formulaire de correction #}
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="section-icon" style="background:var(--red-light);color:var(--red);"><i class="mdi mdi-file-replace-outline"></i></div>
+      <h2 class="form-card-title">Données corrigées</h2>
+    </div>
+
+    {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+    {% include 'admin/_form_errors.html.twig' with { form: form } %}
+
+    <div class="form-body">
+      <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group-title"><i class="mdi mdi-tune"></i> Nouvelles données</div>
+        <div class="fields-row cols-3">
+          <div class="form-field">
+            {{ form_label(form.utilisateur) }}
+            {{ form_widget(form.utilisateur) }}
+            <div class="field-error">{{ form_errors(form.utilisateur) }}</div>
+          </div>
+          <div class="form-field">
+            {{ form_label(form.moisDeGestion) }}
+            {{ form_widget(form.moisDeGestion) }}
+            <div class="field-error">{{ form_errors(form.moisDeGestion) }}</div>
+          </div>
+          <div class="form-field">
+            {{ form_label(form.entreprise) }}
+            {{ form_widget(form.entreprise) }}
+            <div class="field-error">{{ form_errors(form.entreprise) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <a href="{{ path('app_admin_facturation_utilisateur') }}" class="btn-ghost">
+        <i class="mdi mdi-arrow-left"></i> Annuler
+      </a>
+      <button type="submit" class="btn-danger" onclick="return confirm('Confirmer la création de l\'avoir et de la nouvelle facture ?')">
+        <i class="mdi mdi-file-replace-outline"></i> Valider la correction
+      </button>
+    </div>
+
+    {{ form_end(form) }}
+  </div>
+</div>
+{% endblock %}
