@@ -167,6 +167,11 @@
 					<a href="{{ path('app_admin_facturation_pdf_utilisateur', {id: facture.id}) }}" class="action-btn" style="color:var(--red);border-color:rgba(185,28,28,0.3);background:var(--red-light);" title="Télécharger PDF">
 						<i class="mdi mdi-file-pdf-box"></i>
 					</a>
+					{% if facture.type == 'facture' %}
+						<a href="{{ path('app_admin_facturation_facturx', {id: facture.id}) }}" class="action-btn" style="color:#16a34a;border-color:rgba(22,163,74,0.3);background:rgba(22,163,74,0.08);" title="Télécharger Factur-X (XML)">
+							<i class="mdi mdi-xml"></i>
+						</a>
+					{% endif %}
 
 					{% if is_granted('ROLE_ADMIN') %}
 						{% if facture.type == 'facture' and not facture.mailEnvoye and facture.statut != 'annulee' %}

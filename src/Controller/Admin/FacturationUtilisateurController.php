@@ -11,6 +11,7 @@ use App\Repository\MoisDeGestionRepository;
 use App\Security\BackofficeAccessTrait;
 use App\Service\DeplacementToChevalProduitService;
 use App\Service\FactureCalculator;
+use App\Service\FacturXService;
 use App\Service\InvoiceNumberService;
 use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
@@ -74,6 +75,25 @@ class FacturationUtilisateurController extends AbstractController
     public function voir(FacturationUtilisateur $facture, FactureCalculator $calculator): Response
     {
         return $this->generatePdf($facture, $calculator, 'inline');
+    }
+
+    #[Route('/facturx/{id}', name: 'app_admin_facturation_facturx')]
+    public function facturx(FacturationUtilisateur $facture, FacturXService $facturXService): Response
+    {
+        $this->requireBackofficeAccess();
+
+        if ($facture->getType() !== 'facture') {
+            $this->addFlash('danger', 'Le format Factur-X n\'est disponible que pour les factures (pas les avoirs).');
+            return $this->redirectToRoute('app_admin_facturation_utilisateur');
+        }
+
+        $xml      = $facturXService->generateXml($facture);
+        $filename = sprintf('facturx_%s.xml', $facture->getNumFacture());
+
+        return new Response($xml, Response::HTTP_OK, [
+            'Content-Type'        => 'application/xml; charset=UTF-8',
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+        ]);
     }
 
     private function generatePdf(FacturationUtilisateur $facture, FactureCalculator $calculator, string $disposition): Response
