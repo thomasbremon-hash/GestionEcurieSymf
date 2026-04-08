@@ -110,7 +110,7 @@
 
         <div class="info-field">
           <div class="info-label">Date de création</div>
-          <div class="info-value {% if not user.createdAt %}{% endif %}">{{ user.createdAt ? user.createdAt|date('d M Y') : 'Non renseigné' }}</div>
+          <div class="info-value {% if not user.createdAt %}{% endif %}">{{ user.createdAt ? user.createdAt|date('d/m/Y') : 'Non renseigné' }}</div>
         </div>
       </div>
     </div>

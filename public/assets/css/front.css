@@ -2097,28 +2097,18 @@ img {
     box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.08);
 }
 
+/* Étend .nav-btn : seules les propriétés différentes sont redéfinies */
 .login-submit {
     width: 100%;
-    padding: 0.9rem;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 100px;
-    font-family: "Sora", sans-serif;
-    font-size: 0.92rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 16px rgba(31, 41, 55, 0.25);
-    margin-top: 0.5rem;
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    padding: 0.9rem;
+    margin-top: 0.5rem;
+    margin-left: 0;
+    font-weight: 700;
 }
 
 .login-submit:hover {
-    background: #111827;
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(31, 41, 55, 0.4);
 }
