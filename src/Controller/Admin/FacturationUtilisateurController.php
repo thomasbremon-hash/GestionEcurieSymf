@@ -33,11 +33,18 @@ class FacturationUtilisateurController extends AbstractController
     ) {}
 
     #[Route('/liste', name: 'app_admin_facturation_utilisateur')]
-    public function index(FacturationUtilisateurRepository $repo, FactureCalculator $calculator): Response
+    public function index(FacturationUtilisateurRepository $repo, FactureCalculator $calculator, Request $request): Response
     {
         $this->requireBackofficeAccess();
 
-        $factures = $repo->findAll();
+        $statut = $request->query->get('statut'); // null | 'payee' | 'impayee' | 'annulee'
+        $type   = $request->query->get('type');   // null | 'facture' | 'avoir'
+
+        $criteria = [];
+        if ($statut) $criteria['statut'] = $statut;
+        if ($type)   $criteria['type']   = $type;
+
+        $factures = $criteria ? $repo->findBy($criteria) : $repo->findAll();
 
         usort($factures, function ($a, $b) {
             $cmp = strcmp($a->getEntreprise()->getNom(), $b->getEntreprise()->getNom());
@@ -60,8 +67,10 @@ class FacturationUtilisateurController extends AbstractController
         }
 
         return $this->render('admin/facturation/liste.html.twig', [
-            'factures'  => $factures,
-            'totauxTtc' => $totauxTtc,
+            'factures'       => $factures,
+            'totauxTtc'      => $totauxTtc,
+            'filtreStatut'   => $statut,
+            'filtreType'     => $type,
         ]);
     }
 

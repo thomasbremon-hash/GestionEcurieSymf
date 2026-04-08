@@ -32,6 +32,30 @@
 		{% endif %}
 	</div>
 
+	{# ── Barre de filtres ── #}
+	<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;align-items:center;">
+		<a href="{{ path('app_admin_facturation_utilisateur') }}"
+		   style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.4rem 1rem;border-radius:100px;font-size:0.82rem;font-weight:600;text-decoration:none;border:1.5px solid {{ (filtreStatut is null and filtreType is null) ? 'var(--accent)' : 'var(--border)' }};background:{{ (filtreStatut is null and filtreType is null) ? 'var(--accent)' : 'transparent' }};color:{{ (filtreStatut is null and filtreType is null) ? '#fff' : 'var(--ink-soft)' }};">
+			<i class="mdi mdi-format-list-bulleted"></i> Tous
+		</a>
+		<a href="{{ path('app_admin_facturation_utilisateur', {statut: 'impayee', type: 'facture'}) }}"
+		   style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.4rem 1rem;border-radius:100px;font-size:0.82rem;font-weight:600;text-decoration:none;border:1.5px solid {{ (filtreStatut == 'impayee' and filtreType == 'facture') ? 'var(--red)' : 'var(--border)' }};background:{{ (filtreStatut == 'impayee' and filtreType == 'facture') ? 'var(--red-light)' : 'transparent' }};color:{{ (filtreStatut == 'impayee' and filtreType == 'facture') ? 'var(--red)' : 'var(--ink-soft)' }};">
+			<i class="mdi mdi-alert-circle-outline"></i> Impayées
+		</a>
+		<a href="{{ path('app_admin_facturation_utilisateur', {statut: 'payee'}) }}"
+		   style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.4rem 1rem;border-radius:100px;font-size:0.82rem;font-weight:600;text-decoration:none;border:1.5px solid {{ filtreStatut == 'payee' ? 'var(--green)' : 'var(--border)' }};background:{{ filtreStatut == 'payee' ? 'var(--green-light)' : 'transparent' }};color:{{ filtreStatut == 'payee' ? 'var(--green)' : 'var(--ink-soft)' }};">
+			<i class="mdi mdi-check-circle-outline"></i> Payées
+		</a>
+		<a href="{{ path('app_admin_facturation_utilisateur', {type: 'avoir'}) }}"
+		   style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.4rem 1rem;border-radius:100px;font-size:0.82rem;font-weight:600;text-decoration:none;border:1.5px solid {{ filtreType == 'avoir' ? 'var(--red)' : 'var(--border)' }};background:{{ filtreType == 'avoir' ? 'var(--red-light)' : 'transparent' }};color:{{ filtreType == 'avoir' ? 'var(--red)' : 'var(--ink-soft)' }};">
+			<i class="mdi mdi-file-restore-outline"></i> Avoirs
+		</a>
+		<a href="{{ path('app_admin_facturation_utilisateur', {statut: 'annulee'}) }}"
+		   style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.4rem 1rem;border-radius:100px;font-size:0.82rem;font-weight:600;text-decoration:none;border:1.5px solid {{ filtreStatut == 'annulee' ? 'var(--ink-soft)' : 'var(--border)' }};background:{{ filtreStatut == 'annulee' ? 'var(--surface-2)' : 'transparent' }};color:var(--ink-soft);">
+			<i class="mdi mdi-cancel"></i> Annulées
+		</a>
+	</div>
+
 	{% set currentEntreprise = null %}
 	{% set currentMonth = null %}
 
