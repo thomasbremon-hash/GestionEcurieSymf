@@ -21,7 +21,7 @@
 			<div class="page-eyebrow"><a href="{{ path('app_admin') }}">Dashboard</a> › <span>Facturation</span></div>
 			<h1 class="page-title">Facturation
 				<span class="subtitle">{{ factures|length }}
-					facture{{ factures|length > 1 ? 's' }}</span>
+					document{{ factures|length > 1 ? 's' }}</span>
 			</h1>
 		</div>
 		{% if is_granted('ROLE_ADMIN') %}
@@ -73,7 +73,7 @@
 			<tr>
 				<th>Mois</th>
 				<th>Client</th>
-				<th>N° Facture</th>
+				<th>N° / Type</th>
 				<th>Total TTC</th>
 				<th>Statut</th>
 				<th>Email</th>
@@ -110,17 +110,32 @@
 				</div>
 			</td>
 			<td>
-				<span class="invoice-num">{{ facture.numFacture }}</span>
+				<div style="display:flex;flex-direction:column;gap:0.25rem;">
+					<span class="invoice-num">{{ facture.numFacture }}</span>
+					{% if facture.type == 'avoir' %}
+						<span class="pill pill-avoir" style="font-size:0.7rem;padding:0.1rem 0.5rem;width:fit-content;">Avoir</span>
+						{% if facture.factureOrigine %}
+							<span style="font-size:0.72rem;color:var(--ink-muted);">Annule {{ facture.factureOrigine.numFacture }}</span>
+						{% endif %}
+					{% endif %}
+				</div>
 			</td>
 			<td>
-				<span class="amount-cell">{{ totauxTtc[facture.id]|number_format(2, ',', ' ') }}
-					€</span>
+				{% if facture.type == 'avoir' %}
+					<span class="amount-cell" style="color:var(--red);">-{{ (facture.total|abs)|number_format(2, ',', ' ') }} €</span>
+				{% else %}
+					<span class="amount-cell">{{ totauxTtc[facture.id]|number_format(2, ',', ' ') }} €</span>
+				{% endif %}
 			</td>
 			<td>
 				{% if facture.statut == 'payee' %}
 					<span class="pill pill-active">
 						<i class="mdi mdi-check-circle"></i>
 						Payée</span>
+				{% elseif facture.statut == 'annulee' %}
+					<span class="pill pill-annulee">
+						<i class="mdi mdi-cancel"></i>
+						Annulée</span>
 				{% elseif facture.statut == 'impayee' %}
 					<span class="pill pill-admin">
 						<i class="mdi mdi-alert-circle"></i>
@@ -154,12 +169,22 @@
 					</a>
 
 					{% if is_granted('ROLE_ADMIN') %}
-						{% if facture.statut != 'payee' %}
+						{% if facture.type == 'facture' and not facture.mailEnvoye and facture.statut != 'annulee' %}
+							<a href="{{ path('app_admin_facturation_edit', {id: facture.id}) }}" class="action-btn" style="color:var(--sidebar-accent);border-color:rgba(79,128,196,0.3);background:rgba(79,128,196,0.08);" title="Modifier">
+								<i class="mdi mdi-pencil"></i>
+							</a>
+						{% endif %}
+						{% if facture.type == 'facture' and facture.mailEnvoye and facture.statut != 'annulee' %}
+							<a href="{{ path('app_admin_facturation_corriger', {id: facture.id}) }}" class="action-btn" style="color:var(--red);border-color:rgba(185,28,28,0.3);background:var(--red-light);" title="Corriger (avoir)">
+								<i class="mdi mdi-file-replace-outline"></i>
+							</a>
+						{% endif %}
+						{% if facture.statut == 'impayee' and facture.type != 'avoir' %}
 							<a href="{{ path('app_admin_facturation_payer', {id: facture.id}) }}" class="action-btn" style="color:var(--green);border-color:rgba(61,107,82,0.3);background:var(--green-light);" title="Marquer payée">
 								<i class="mdi mdi-cash-plus"></i>
 							</a>
 						{% endif %}
-						{% if not facture.mailEnvoye %}
+						{% if not facture.mailEnvoye and facture.type == 'facture' and facture.statut != 'annulee' %}
 							<a href="{{ path('app_admin_facturation_envoyer_mail', {id: facture.id}) }}" class="action-btn" style="color:var(--gold);border-color:rgba(160,124,48,0.3);background:var(--gold-light);" title="Envoyer le mail">
 								<i class="mdi mdi-email-send"></i>
 							</a>

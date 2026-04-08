@@ -46,6 +46,10 @@ class FacturationUtilisateurController extends AbstractController
 
         $totauxTtc = [];
         foreach ($factures as $facture) {
+            if ($facture->getType() === 'avoir') {
+                $totauxTtc[$facture->getId()] = $facture->getTotal();
+                continue;
+            }
             $data = $calculator->calculerFactureUtilisateur($facture->getUtilisateur(), $facture->getMoisDeGestion());
             $totauxTtc[$facture->getId()] = $data['totalTTC'];
         }
