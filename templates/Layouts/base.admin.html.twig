@@ -462,6 +462,21 @@
           </div>
         </div>
 
+        <div class="sidebar-search-wrap">
+          <div class="sidebar-search-box">
+            <i class="mdi mdi-magnify sidebar-search-icon"></i>
+            <input
+              type="text"
+              id="sidebar-search-input"
+              class="sidebar-search-input"
+              placeholder="Rechercher…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <div class="search-dropdown" id="search-dropdown" hidden></div>
+        </div>
+
         <nav class="sidebar-nav">
           <div class="nav-section-label">Général</div>
 
@@ -490,7 +505,13 @@
           </div>
           <div class="submenu {% if currentPath in ['app_admin_mois_gestion', 'app_admin_facturation_utilisateur'] %}{% endif %}" id="sub-finance">
             <a href="{{ path('app_admin_mois_gestion') }}" class="submenu-item"><i class="mdi mdi-calendar-month"></i> Relevés</a>
-            <a href="{{ path('app_admin_facturation_utilisateur') }}" class="submenu-item"><i class="mdi mdi-file-document-outline"></i> Facturation</a>
+            <a href="{{ path('app_admin_facturation_utilisateur') }}" class="submenu-item">
+              <i class="mdi mdi-file-document-outline"></i> Facturation
+              {% set _retard = factures_en_retard_count() %}
+              {% if _retard > 0 %}
+                <span class="notif-badge">{{ _retard }}</span>
+              {% endif %}
+            </a>
           </div>
 
           {# Chevaux & Courses #}
@@ -622,6 +643,63 @@
       if (errorSummary) {
         errorSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+
+      // ── Recherche globale sidebar ──
+      (function () {
+        const input    = document.getElementById('sidebar-search-input');
+        const dropdown = document.getElementById('search-dropdown');
+        if (!input || !dropdown) return;
+
+        const SEARCH_URL = '{{ path('app_admin_search') }}';
+        let debounceTimer = null;
+
+        function closeDropdown() {
+          dropdown.hidden = true;
+          dropdown.innerHTML = '';
+        }
+
+        function renderResults(results) {
+          dropdown.innerHTML = '';
+          if (!results.length) {
+            dropdown.innerHTML = '<div class="search-no-result">Aucun résultat</div>';
+            dropdown.hidden = false;
+            return;
+          }
+          results.forEach(function (item) {
+            const a = document.createElement('a');
+            a.href = item.url;
+            a.className = 'search-result-item';
+            a.innerHTML =
+              '<i class="mdi ' + item.icon + ' search-result-icon"></i>' +
+              '<span class="search-result-text">' +
+                '<span class="search-result-label">' + item.label + '</span>' +
+                '<span class="search-result-sub">'   + (item.sub || '') + '</span>' +
+              '</span>';
+            dropdown.appendChild(a);
+          });
+          dropdown.hidden = false;
+        }
+
+        input.addEventListener('input', function () {
+          clearTimeout(debounceTimer);
+          const q = input.value.trim();
+          if (q.length < 2) { closeDropdown(); return; }
+          debounceTimer = setTimeout(function () {
+            fetch(SEARCH_URL + '?q=' + encodeURIComponent(q))
+              .then(function (r) { return r.json(); })
+              .then(function (data) { renderResults(data.results || []); })
+              .catch(function () { closeDropdown(); });
+          }, 300);
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') { closeDropdown(); input.value = ''; }
+        });
+
+        document.addEventListener('click', function (e) {
+          if (!input.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
+        });
+      })();
     </script>
   </body>
 </html>

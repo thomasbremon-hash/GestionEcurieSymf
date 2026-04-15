@@ -104,16 +104,16 @@ AdminController, UserController, ChevalController, StructureController, CourseCo
 
 ### 🔴 Fort impact, peu de travail
 
-- [ ] **Recherche globale** — Barre de recherche dans la sidebar (ou header) cherchant en temps reel dans chevaux, utilisateurs, factures, deplacements. Route AJAX `/admin/search?q=...` retournant JSON, rendu en dropdown. Entites a chercher : Cheval (nom), User (nom+prenom+email), FacturationUtilisateur (numFacture), Deplacement (cheval+date).
-- [ ] **Filtres factures dans l'URL** — Les filtres Toutes/Payees/Impayees sont en JS pur et perdus au rechargement. Passer a des query params `?statut=payee` dans `FacturationUtilisateurController::index()` + `Request $request` pour filtrer la liste cote serveur.
-- [ ] **Placeholders et aide sur les formulaires** — Aucun placeholder ni texte d'aide sur les champs. Ajouter `attr: {placeholder: '...'}` et `help: '...'` dans tous les FormTypes (ChevalType, EntrepriseType, UserType, etc.). Priorite : les champs non-evidents (SIREN, IBAN, BIC, numTVA, codeAPE).
+- [x] **Recherche globale** — ✅ Route `/admin/search`, dropdown sidebar, debounce 300ms, 4 entités (Cheval/User/Entreprise/Facture)
+- [x] **Filtres factures dans l'URL** — ✅ `?statut=` + `?type=` dans `FacturationUtilisateurController::index()`
+- [x] **Placeholders et aide sur les formulaires** — ✅ Déjà présents dans les FormTypes
 
 ### 🟠 Fort impact, travail moyen
 
-- [ ] **Dashboard enrichi (KPIs)** — Le dashboard `AdminController` est probablement vide ou basique. Ajouter : nb factures impayees + montant total, nb deplacements du mois en cours, nb chevaux actifs, derniers mouvements. Injecter les repositories dans `AdminController`.
-- [ ] **Export CSV** — Bouton "Exporter CSV" sur les listes chevaux, deplacements, factures. Symfony `StreamedResponse` + `fputcsv`. Pas de librairie externe necessaire.
-- [ ] **Confirmations de suppression enrichies** — Le modal affiche juste "Confirmer ?". Enrichir avec un comptage des relations : "Ce cheval a 3 courses et 2 deplacements associes. La suppression echouera." Calculer en Twig ou via un endpoint AJAX.
-- [ ] **Actions en masse sur les factures** — Envoyer les mails de plusieurs factures en une fois. Etendre le systeme `bulk-delete` existant avec une action "envoyer mail" groupee sur la liste facturation.
+- [x] **Dashboard enrichi (KPIs)** — ✅ KPI montant impayé + section activité récente (5 dernières factures + 5 derniers déplacements)
+- [x] **Export CSV** — ✅ Chevaux, déplacements, factures — boutons dans les 3 listes, BOM UTF-8, séparateur `;`
+- [x] **Confirmations de suppression enrichies** — ✅ Comptage relations dans modals cheval/user/entreprise + `.modal-warning` CSS
+- [x] **Actions en masse sur les factures** — ✅ Checkboxes + barre flottante + route POST `app_admin_facturation_send_bulk_mail`
 
 ### 🟡 Impact moyen
 
@@ -135,6 +135,9 @@ AdminController, UserController, ChevalController, StructureController, CourseCo
 ## Conventions et pieges
 
 - **Getter Cheval deplacements** : `getDeplacement()` (singulier) → utiliser `cheval.deplacement` dans Twig
+- **Getter Deplacement chevaux** : `getChevaux()` (pluriel) → `deplacement.chevaux` dans Twig (opposé à Cheval)
+- **Getter FacturationUtilisateur mailEnvoye** : `isMailEnvoye()` (booléen, pas `getMailEnvoye()`)
+- **Getter Entreprise factures** : `getManyToOne()` (nom hérité mal choisi) → `entreprise.manyToOne` dans Twig
 - **MDI 4.9.95** : `mdi-horse` n'existe pas, utiliser `mdi-horseshoe`
 - **CSS admin** : `public/assets/css/admin.css` (nouveau) + inline dans `base.admin.html.twig`
 - **CSS front** : `public/assets/css/front.css` — `.site-main` ajoute deja `padding-top: var(--nav-h)`, ne pas le re-ajouter
@@ -144,6 +147,10 @@ AdminController, UserController, ChevalController, StructureController, CourseCo
 - **Factures type** : `'facture'` (normal) ou `'avoir'` (credit note) — champ `type` sur `FacturationUtilisateur`
 - **Numérotation** : Toujours via `InvoiceNumberService::reserveNumbers()` — jamais de preg_match manuel
 - **Séparateurs de lignes** (deplacement/distance) : colspan ajuste automatiquement par `initBulkDelete()` en JS — ne pas modifier le colspan Twig des separateurs
+- **Liste facturation** : groupée par entreprise avec plusieurs `<table>` — tout ajout de colonne doit toucher chaque `<thead>` + ajuster les `colspan` des séparateurs de mois
+- **Export CSV** : BOM UTF-8 `\xEF\xBB\xBF` + séparateur `;` pour compatibilité Excel FR — `StreamedResponse` + `fputcsv`
+- **Lint rapide** : `php bin/console lint:twig templates/...` et `php bin/console lint:container` après chaque session
+- **Recherche globale** : Route `app_admin_search` dans `AdminController` — méthodes `searchByNom/searchByNomPrenomEmail/searchByNumFacture` dans les 4 repos
 - **DistanceController** : pas de prefix de route au niveau classe → toutes les routes utilisent le chemin absolu `/admin/distance/...`
 - **TaxesController** : utilise `#[IsGranted]` au lieu de `BackofficeAccessTrait`
 - **Communication** : En francais

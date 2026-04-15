@@ -64,8 +64,8 @@
 						<th data-sort="string">Entreprise</th>
 						<th>Adresse</th>
 						<th data-sort="string">Pays</th>
-						<th>Utilisateurs</th>
-						<th>Chevaux</th>
+						<th data-sort="number">Utilisateurs</th>
+						<th data-sort="number">Chevaux</th>
 						<th style="text-align:right">Actions</th>
 
 					</tr>
@@ -142,8 +142,24 @@
 						<i class="mdi mdi-trash-can-outline"></i>
 					</div>
 					<div class="modal-title">Supprimer l'entreprise ?</div>
-					<div class="modal-text">Vous êtes sur le point de supprimer
-						<strong>{{ item.nom }}</strong>.<br/>Cette action est irréversible.</div>
+					<div class="modal-text">
+						Vous êtes sur le point de supprimer <strong>{{ item.nom }}</strong>.
+						{% set nbFactures = item.manyToOne|length %}
+						{% set nbDep = item.deplacement|length %}
+						{% set nbChevaux = item.cheval|length %}
+						{% if nbFactures > 0 or nbDep > 0 or nbChevaux > 0 %}
+							<br/><br/>
+							<div class="modal-warning">
+								<i class="mdi mdi-alert"></i>
+								Cette entreprise a :
+								{% if nbFactures > 0 %}<br/>• <strong>{{ nbFactures }}</strong> facture{{ nbFactures > 1 ? 's' }} (suppression légalement bloquée){% endif %}
+								{% if nbDep > 0 %}<br/>• <strong>{{ nbDep }}</strong> déplacement{{ nbDep > 1 ? 's' }}{% endif %}
+								{% if nbChevaux > 0 %}<br/>• <strong>{{ nbChevaux }}</strong> cheval{{ nbChevaux > 1 ? 'aux' }}{% endif %}
+								<br/>associés qui seront impactés.
+							</div>
+						{% endif %}
+						<br/>Cette action est irréversible.
+					</div>
 					<div class="modal-actions">
 						<button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
 						<form method="post" action="{{ path('app_admin_entreprise_delete', {id: item.id}) }}" style="display:inline;">

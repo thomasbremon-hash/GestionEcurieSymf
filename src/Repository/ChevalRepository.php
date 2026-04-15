@@ -49,6 +49,18 @@ class ChevalRepository extends ServiceEntityRepository
      * Adapte 'uc.user' et 'uc.pourcentage' selon ta table de liaison.
      * Si tu as une entité UserCheval avec propriétés $user, $cheval, $pourcentage :
      */
+    /** @return Cheval[] */
+    public function searchByNom(string $q, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.nom LIKE :q')
+            ->setParameter('q', '%' . $q . '%')
+            ->orderBy('c.nom', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findByUserWithPourcentage(User $user): array
     {
         return $this->createQueryBuilder('c')

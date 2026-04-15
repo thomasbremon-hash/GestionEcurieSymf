@@ -152,9 +152,20 @@
 						<i class="mdi mdi-trash-can-outline"></i>
 					</div>
 					<div class="modal-title">Supprimer l'utilisateur ?</div>
-					<div class="modal-text">Vous êtes sur le point de supprimer
-						<strong>{{ item.prenom }}
-							{{ item.nom }}</strong>.<br/>Cette action est irréversible.</div>
+					<div class="modal-text">
+						Vous êtes sur le point de supprimer <strong>{{ item.prenom }} {{ item.nom }}</strong>.
+						{% set nbFactures = item.facturationUtilisateurs|length %}
+						{% if nbFactures > 0 %}
+							<br/><br/>
+							<div class="modal-warning">
+								<i class="mdi mdi-alert"></i>
+								Cet utilisateur a :
+								<br/>• <strong>{{ nbFactures }}</strong> facture{{ nbFactures > 1 ? 's' }} associée{{ nbFactures > 1 ? 's' }}
+								<br/>La suppression sera bloquée par la loi (conservation 10 ans).
+							</div>
+						{% endif %}
+						<br/>Cette action est irréversible.
+					</div>
 					<div class="modal-actions">
 						<button class="btn-ghost" onclick="closeModal('modal-{{ item.id }}')">Annuler</button>
 						<form method="post" action="{{ path('app_admin_user_delete', {id: item.id}) }}" style="display:inline;">

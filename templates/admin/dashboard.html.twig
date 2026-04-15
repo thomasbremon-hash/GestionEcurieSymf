@@ -50,6 +50,16 @@
           <div class="kpi-value">{{ totalCA|number_format(0, ',', ' ') }} €</div>
         </div>
       </div>
+      <div class="kpi-card c-red">
+        <div class="kpi-icon c-red">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div>
+          <div class="kpi-label">Montant impayé</div>
+          <div class="kpi-value">{{ montantImpaye|number_format(0, ',', ' ') }} €</div>
+          <div class="kpi-sub">{{ facturesImpayees|length }} facture{{ facturesImpayees|length != 1 ? 's' }}</div>
+        </div>
+      </div>
     </div>
 
     {# ── Bottom two-col layout ── #}
@@ -137,6 +147,76 @@
             Aucune facture impayée.
           </div>
         {% endif %}
+      </div>
+    </div>
+
+    {# ── Activité récente ── #}
+    <div class="two-col">
+      {# ── Dernières factures ── #}
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
+          <h4 class="section-title">Dernières factures</h4>
+        </div>
+        <div class="section-body">
+          {% if dernieresFactures is not empty %}
+            <div class="activity-list">
+              {% for facture in dernieresFactures %}
+                <div class="activity-row">
+                  <div class="activity-main">
+                    <div class="activity-title">
+                      <a href="{{ path('app_admin_facturation_voir_utilisateur', {id: facture.id}) }}" class="plain-link">{{ facture.numFacture ?? '—' }}</a>
+                    </div>
+                    <div class="activity-sub">
+                      {{ facture.utilisateur.nom ?? '' }} {{ facture.utilisateur.prenom ?? '' }}
+                      {% if facture.entreprise %}— {{ facture.entreprise.nom }}{% endif %}
+                    </div>
+                  </div>
+                  <div class="activity-meta">
+                    <div>{{ facture.total|number_format(2, ',', ' ') }} €</div>
+                    <div>
+                      <span class="status-badge pill-{{ facture.statut }}">{{ facture.statut }}</span>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">Aucune facture.</div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# ── Derniers déplacements ── #}
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <h4 class="section-title">Derniers déplacements</h4>
+        </div>
+        <div class="section-body">
+          {% if derniersDeplacements is not empty %}
+            <div class="activity-list">
+              {% for dep in derniersDeplacements %}
+                <div class="activity-row">
+                  <div class="activity-main">
+                    <div class="activity-title">{{ dep.cheval.nom ?? '—' }}</div>
+                    <div class="activity-sub">
+                      {% if dep.entreprise %}{{ dep.entreprise.nom }}{% endif %}
+                      {% if dep.structure %} — {{ dep.structure.nom }}{% endif %}
+                    </div>
+                  </div>
+                  <div class="activity-meta">{{ dep.date|date('d/m/Y') }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">Aucun déplacement.</div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>

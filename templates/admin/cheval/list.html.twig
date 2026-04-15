@@ -24,11 +24,16 @@
 						au total</span>
 				</h1>
 			</div>
-			{% if is_granted('ROLE_ADMIN') %}
-				<a href="{{ path('app_admin_cheval_new') }}" class="btn-primary-custom">
-					<i class="mdi mdi-plus"></i>
-					Ajouter un cheval</a>
-			{% endif %}
+			<div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+				<a href="{{ path('app_admin_cheval_export_csv') }}" class="btn-ghost" style="display:inline-flex;align-items:center;gap:0.4rem;">
+					<i class="mdi mdi-file-delimited-outline"></i> Export CSV
+				</a>
+				{% if is_granted('ROLE_ADMIN') %}
+					<a href="{{ path('app_admin_cheval_new') }}" class="btn-primary-custom">
+						<i class="mdi mdi-plus"></i>
+						Ajouter un cheval</a>
+				{% endif %}
+			</div>
 		</div>
 
 		<div class="table-card">
@@ -63,7 +68,7 @@
 					<tr>
 						<th data-sort="string">Cheval</th>
 						<th data-sort="string">Race</th>
-						<th>Sexe</th>
+						<th data-sort="string">Sexe</th>
 						<th data-sort="date">Date de naissance</th>
 						<th>Propriétaires</th>
 						{% if is_granted('ROLE_ADMIN') %}
@@ -146,8 +151,22 @@
 						<i class="mdi mdi-trash-can-outline"></i>
 					</div>
 					<div class="modal-title">Supprimer ce cheval ?</div>
-					<div class="modal-text">Vous êtes sur le point de supprimer
-						<strong>{{ cheval.nom }}</strong>.<br/>Cette action est irréversible.</div>
+					<div class="modal-text">
+						Vous êtes sur le point de supprimer <strong>{{ cheval.nom }}</strong>.
+						{% set nbDep = cheval.deplacement|length %}
+						{% set nbPart = cheval.participations|length %}
+						{% if nbDep > 0 or nbPart > 0 %}
+							<br/><br/>
+							<div class="modal-warning">
+								<i class="mdi mdi-alert"></i>
+								Ce cheval a :
+								{% if nbDep > 0 %}<br/>• <strong>{{ nbDep }}</strong> déplacement{{ nbDep > 1 ? 's' }}{% endif %}
+								{% if nbPart > 0 %}<br/>• <strong>{{ nbPart }}</strong> participation{{ nbPart > 1 ? 's' }} à des courses{% endif %}
+								<br/>associés qui seront également supprimés.
+							</div>
+						{% endif %}
+						<br/>Cette action est irréversible.
+					</div>
 					<div class="modal-actions">
 						<button class="btn-ghost" onclick="closeModal('modal-{{ cheval.id }}')">Annuler</button>
 						<form method="post" action="{{ path('app_admin_cheval_delete', {id: cheval.id}) }}" style="display:inline;">

@@ -19,6 +19,7 @@ use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -72,6 +73,38 @@ class FacturationUtilisateurController extends AbstractController
             'filtreStatut'   => $statut,
             'filtreType'     => $type,
         ]);
+    }
+
+    #[Route('/export-csv', name: 'app_admin_facturation_export_csv')]
+    public function exportCsv(FacturationUtilisateurRepository $repo): StreamedResponse
+    {
+        $this->requireBackofficeAccess();
+        $factures = $repo->findAll();
+
+        $response = new StreamedResponse(function () use ($factures) {
+            $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, ['N° Facture', 'Type', 'Utilisateur', 'Entreprise', 'Mois', 'Année', 'Total TTC', 'Statut', 'Mail envoyé', 'Date émission'], ';');
+            foreach ($factures as $facture) {
+                fputcsv($handle, [
+                    $facture->getNumFacture() ?? '',
+                    $facture->getType() ?? '',
+                    $facture->getUtilisateur()?->getNom() . ' ' . $facture->getUtilisateur()?->getPrenom(),
+                    $facture->getEntreprise()?->getNom() ?? '',
+                    $facture->getMoisDeGestion()?->getMois() ?? '',
+                    $facture->getMoisDeGestion()?->getAnnee() ?? '',
+                    number_format((float)($facture->getTotal() ?? 0), 2, ',', ' '),
+                    $facture->getStatut() ?? '',
+                    $facture->isMailEnvoye() ? 'Oui' : 'Non',
+                    $facture->getDateEmission()?->format('d/m/Y') ?? '',
+                ], ';');
+            }
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="factures_' . date('Y-m-d') . '.csv"');
+        return $response;
     }
 
     #[Route('/pdf/{id}', name: 'app_admin_facturation_pdf_utilisateur')]
@@ -374,6 +407,89 @@ class FacturationUtilisateurController extends AbstractController
             $this->addFlash('success', 'Mail envoyé avec succès.');
         } catch (\Exception $e) {
             $this->addFlash('danger', 'Erreur lors de l\'envoi du mail : ' . $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_admin_facturation_utilisateur');
+    }
+
+    #[Route('/send-bulk-mail', name: 'app_admin_facturation_send_bulk_mail', methods: ['POST'])]
+    public function sendBulkMail(Request $request, FacturationUtilisateurRepository $repo, MailerInterface $mailer, FactureCalculator $calculator): Response
+    {
+        $this->requireAdminAccess();
+
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('bulk-mail-facture', $token)) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+            return $this->redirectToRoute('app_admin_facturation_utilisateur');
+        }
+
+        $ids = array_filter(explode(',', $request->request->get('ids', '')));
+        $sent = 0;
+        $skipped = 0;
+
+        foreach ($ids as $id) {
+            $facture = $repo->find((int)$id);
+            if (!$facture) continue;
+            // Seulement les factures type='facture', non envoyées, non annulées
+            if ($facture->getType() !== 'facture' || $facture->isMailEnvoye() || $facture->getStatut() === 'annulee') {
+                $skipped++;
+                continue;
+            }
+
+            $user = $facture->getUtilisateur();
+            $mois = $facture->getMoisDeGestion();
+            $data = $calculator->calculerFactureUtilisateur($user, $mois);
+
+            $lignesParCheval = [];
+            foreach ($data['lignes'] as $ligne) {
+                if ($ligne['quantite'] <= 0) continue;
+                $lignesParCheval[$ligne['cheval']][] = $ligne;
+            }
+
+            $html = $this->renderView('admin/facturation/pdf.html.twig', [
+                'user' => $user,
+                'mois' => $mois,
+                'lignesParCheval' => $lignesParCheval,
+                'totalHT' => $data['totalHT'],
+                'totalTVA' => $data['totalTVA'],
+                'totalTTC' => $data['totalTTC'],
+                'facture' => $facture,
+            ]);
+
+            $options = new Options();
+            $options->set('defaultFont', 'DejaVu Sans');
+            $options->set('chroot', $this->getParameter('kernel.project_dir') . '/public');
+            $dompdf = new Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+
+            try {
+                $mailer->send((new \Symfony\Component\Mime\Email())
+                        ->from('facturation@monentreprise.com')
+                        ->to($user->getEmail())
+                        ->subject('Votre facture ' . $facture->getNumFacture())
+                        ->html($this->renderView('admin/facturation/mail.html.twig', [
+                            'facture' => $facture,
+                            'total' => $facture->getTotal(),
+                            'facturePdfUrl' => $this->generateUrl('app_admin_facturation_pdf_utilisateur', ['id' => $facture->getId()]),
+                        ]))
+                        ->attach($dompdf->output(), $facture->getNumFacture() . '.pdf', 'application/pdf')
+                );
+
+                $facture->setMailEnvoye(true);
+                $sent++;
+            } catch (\Exception $e) {
+                $skipped++;
+            }
+        }
+
+        $this->em->flush();
+
+        if ($sent > 0) {
+            $this->addFlash('success', "$sent mail(s) envoyé(s) avec succès." . ($skipped > 0 ? " $skipped ignoré(s)." : ''));
+        } else {
+            $this->addFlash('danger', 'Aucun mail envoyé. ' . ($skipped > 0 ? "$skipped facture(s) déjà envoyées ou non éligibles." : ''));
         }
 
         return $this->redirectToRoute('app_admin_facturation_utilisateur');

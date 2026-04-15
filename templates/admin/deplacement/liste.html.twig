@@ -24,11 +24,16 @@
 						au total</span>
 				</h1>
 			</div>
-			{% if is_granted('ROLE_ADMIN') %}
-				<a href="{{ path('app_admin_deplacement_new') }}" class="btn-primary-custom">
-					<i class="mdi mdi-plus"></i>
-					Ajouter un déplacement</a>
-			{% endif %}
+			<div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+				<a href="{{ path('app_admin_deplacements_export_csv') }}" class="btn-ghost" style="display:inline-flex;align-items:center;gap:0.4rem;">
+					<i class="mdi mdi-file-delimited-outline"></i> Export CSV
+				</a>
+				{% if is_granted('ROLE_ADMIN') %}
+					<a href="{{ path('app_admin_deplacement_new') }}" class="btn-primary-custom">
+						<i class="mdi mdi-plus"></i>
+						Ajouter un déplacement</a>
+				{% endif %}
+			</div>
 		</div>
 
 		<div class="table-card">
@@ -63,10 +68,10 @@
 					<tr>
 						<th data-sort="string">Nom</th>
 						<th data-sort="date">Date</th>
-						<th>Chevaux</th>
-						<th>Structure</th>
+						<th data-sort="number">Chevaux</th>
+						<th data-sort="string">Structure</th>
 						<th>Entreprise</th>
-						<th>Distance</th>
+						<th data-sort="number">Distance</th>
 						{% if is_granted('ROLE_ADMIN') %}
 							<th style="text-align:right">Actions</th>
 						{% endif %}

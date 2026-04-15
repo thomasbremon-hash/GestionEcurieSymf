@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/admin/deplacement')]
@@ -86,6 +87,38 @@ final class DeplacementController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_deplacements');
+    }
+
+    #[Route('/export-csv', name: 'app_admin_deplacements_export_csv')]
+    public function exportCsv(DeplacementRepository $deplacementRepository): StreamedResponse
+    {
+        $this->requireBackofficeAccess();
+        $deplacements = $deplacementRepository->createQueryBuilder('d')
+            ->leftJoin('d.entreprise', 'e')
+            ->orderBy('e.nom', 'ASC')
+            ->addOrderBy('d.date', 'DESC')
+            ->getQuery()->getResult();
+
+        $response = new StreamedResponse(function () use ($deplacements) {
+            $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, ['Date', 'Nom', 'Entreprise', 'Structure', 'Distance (km)', 'Nb chevaux'], ';');
+            foreach ($deplacements as $dep) {
+                fputcsv($handle, [
+                    $dep->getDate()?->format('d/m/Y') ?? '',
+                    $dep->getNom() ?? '',
+                    $dep->getEntreprise()?->getNom() ?? '',
+                    $dep->getStructure()?->getNom() ?? '',
+                    $dep->getDistance() ?? '',
+                    $dep->getChevaux()->count(),
+                ], ';');
+            }
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="deplacements_' . date('Y-m-d') . '.csv"');
+        return $response;
     }
 
     #[Route('/delete-bulk', name: 'app_admin_deplacement_delete_bulk', methods: ['POST'])]

@@ -10,6 +10,7 @@ use App\Security\BackofficeAccessTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -93,6 +94,35 @@ final class ChevalController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_chevaux');
+    }
+
+    #[Route('/export-csv', name: 'app_admin_cheval_export_csv')]
+    public function exportCsv(ChevalRepository $chevalRepository): StreamedResponse
+    {
+        $this->requireBackofficeAccess();
+        $chevaux = $chevalRepository->findAll();
+
+        $response = new StreamedResponse(function () use ($chevaux) {
+            $handle = fopen('php://output', 'w');
+            // BOM UTF-8 pour Excel
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, ['Nom', 'Race', 'Sexe', 'Date de naissance', 'Nb propriétaires', 'Nb déplacements'], ';');
+            foreach ($chevaux as $cheval) {
+                fputcsv($handle, [
+                    $cheval->getNom(),
+                    $cheval->getRace() ?? '',
+                    $cheval->getSexe() ?? '',
+                    $cheval->getDateNaissance()?->format('d/m/Y') ?? '',
+                    $cheval->getChevalProprietaires()->count(),
+                    $cheval->getDeplacement()->count(),
+                ], ';');
+            }
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="chevaux_' . date('Y-m-d') . '.csv"');
+        return $response;
     }
 
     #[Route('/delete-bulk', name: 'app_admin_cheval_delete_bulk', methods: ['POST'])]

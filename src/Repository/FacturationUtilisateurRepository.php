@@ -42,6 +42,34 @@ class FacturationUtilisateurRepository extends ServiceEntityRepository
     //        ;
     //    }
 
+    public function countImpaieesEnRetard(int $jours = 30): int
+    {
+        $limite = new \DateTimeImmutable("-{$jours} days");
+
+        return (int) $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->where('f.statut = :statut')
+            ->andWhere('f.type = :type')
+            ->andWhere('f.dateEmission <= :limite')
+            ->setParameter('statut', 'impayee')
+            ->setParameter('type', 'facture')
+            ->setParameter('limite', $limite)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /** @return FacturationUtilisateur[] */
+    public function searchByNumFacture(string $q, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('f')
+            ->where('f.numFacture LIKE :q')
+            ->setParameter('q', '%' . $q . '%')
+            ->orderBy('f.numFacture', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getNextNumeroFacture(): string
     {
         $year = date('Y');
